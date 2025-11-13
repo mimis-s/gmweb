@@ -1,8 +1,7 @@
-package main
+package registry
 
 import (
 	"context"
-	"embed"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,26 +12,7 @@ import (
 	"github.com/mimis-s/zpudding/pkg/zlog"
 )
 
-//go:embed templates
-var htmlEmbed embed.FS
-
-//go:embed assets
-var assetsEmbed embed.FS
-
-func main() {
-	s := newDefRegistry()
-
-	s.Run()
-	// 	flag.Parse()
-	// 	port := "8484"
-	// 	if listenPort != nil && *listenPort != "" {
-	// 		port = *listenPort
-
-	// 	}
-	// 	router.Start(":"+port, htmlEmbed, assetsEmbed)
-}
-
-func newDefRegistry() *app.Registry {
+func NewDefRegistry() *app.Registry {
 	s := app.NewRegistry(
 		app.AddRegistryBootConfigFile(boot_config.BootConfigData),
 		app.AddRegistryExBootFlags(boot_config.CustomBootFlagsData),
