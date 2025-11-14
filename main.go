@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/mimis-s/gmweb/common/boot_config"
+	"github.com/mimis-s/gmweb/router"
 
 	"github.com/mimis-s/zpudding/pkg/app"
 	"github.com/mimis-s/zpudding/pkg/zlog"
@@ -19,23 +20,11 @@ var htmlEmbed embed.FS
 //go:embed assets
 var assetsEmbed embed.FS
 
-func main() {
-	s := newDefRegistry()
-
-	s.Run()
-	// 	flag.Parse()
-	// 	port := "8484"
-	// 	if listenPort != nil && *listenPort != "" {
-	// 		port = *listenPort
-
-	// 	}
-	// 	router.Start(":"+port, htmlEmbed, assetsEmbed)
-}
-
 func newDefRegistry() *app.Registry {
 	s := app.NewRegistry(
 		app.AddRegistryBootConfigFile(boot_config.BootConfigData),
 		app.AddRegistryExBootFlags(boot_config.CustomBootFlagsData),
+		app.AddRegistryGlobalCmdFlag(boot_config.GlobalCmdFlagData),
 	)
 
 	s.AddInitTask("初始化rpc调用客户端", func() error {
@@ -47,6 +36,12 @@ func newDefRegistry() *app.Registry {
 	})
 
 	return s
+}
+
+func main() {
+	s := newDefRegistry()
+	router.Init(s, htmlEmbed, assetsEmbed)
+	s.Run()
 }
 
 func GracefulStop(cancel context.CancelFunc) {

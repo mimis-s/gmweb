@@ -1,47 +1,25 @@
-package common_client
+package web
 
 import (
 	"fmt"
+	"html/template"
+	"net/http"
 	"reflect"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mimis-s/zpudding/pkg/net/clientConn"
 )
 
-type Context interface {
-	SetGinContext(ctx *gin.Context)
-	GetGinContext() *gin.Context
-	ResponseParseParamsFieldFail(path string, field string, value string, err error)
-}
-
-var structuredUnmarshaler = func(c *gin.Context, structTemplate interface{}) (interface{}, string, string, error) {
+var structuredUnmarshaler = func(c *gin.Context, structTemplate interface{}) (interface{}, error) {
 	toReq := reflect.TypeOf(structTemplate)
 	receiver := reflect.New(toReq).Interface()
-	value := reflect.ValueOf(receiver).Elem()
-	// 给每个字段赋值
-	to := value.Type()
-	for i := 0; i < to.NumField(); i++ {
-		f := to.Field(i)
-		fieldTagName := f.Tag.Get("json")
-		if fieldTagName == "" {
-			fieldTagName = f.Name
-		}
-
-		field := value.Field(i)
-		if !field.CanSet() {
-			continue
-		}
-
-		fieldStr := c.Query(fieldTagName)
-		err := setValue(field, fieldStr)
-		if err != nil {
-			// c.ResponseFailWithDefaultCode(fmt.Sprintf("query param(%v) error:%v", fieldTagName, err))
-			return nil, field.String(), fieldStr, fmt.Errorf("query param(%v) error:%v", fieldTagName, err)
-		}
+	err := c.ShouldBindJSON(receiver)
+	if err != nil {
+		return nil, err
 	}
-
-	return receiver, "", "", nil
+	return receiver, nil
 }
 
 // setValue 设置结构体一个字段的值
@@ -237,6 +215,7 @@ func (g *RouterGroup) TravelGroupTree() map[string]*RouteInfo {
 }
 
 type Engine struct {
+	addr          string
 	basePath      string
 	ginEngine     *gin.Engine
 	GroupRoutes   map[string]*RouterGroup // 组路由
@@ -244,14 +223,21 @@ type Engine struct {
 	newContextFun func() Context
 }
 
-func NewEngine(newContextFun func() Context) *Engine {
+func NewEngine(addr string, newContextFun func() Context) *Engine {
 	engine := &Engine{
+		addr:          addr,
 		ginEngine:     gin.Default(),
 		newContextFun: newContextFun,
 		GroupRoutes:   make(map[string]*RouterGroup),
 		Routes:        make(map[string]*RouteInfo),
 	}
 	return engine
+}
+func (e *Engine) SetHTMLTemplate(templ *template.Template) {
+	e.ginEngine.SetHTMLTemplate(templ)
+}
+func (e *Engine) StaticFS(relativePath string, fs http.FileSystem) gin.IRoutes {
+	return e.ginEngine.StaticFS(relativePath, fs)
 }
 
 func (e *Engine) Use(middleware ...HandlerFunc) {
@@ -303,8 +289,15 @@ func (e *Engine) TravelGroupTree() map[string]*RouteInfo {
 	return m
 }
 
-func (e *Engine) Run(addr ...string) {
-	e.ginEngine.Run(addr...)
+func (e *Engine) SetAddr(addr, protocol string, newSessionFunc func(clientConn.ClientConn) clientConn.ClientSession) {
+	return
+}
+
+func (e *Engine) Run() error {
+	return e.ginEngine.Run(e.addr)
+}
+
+func (e *Engine) Stop() {
 }
 
 func getGinHandlerFun(newContextFun func() Context, structTemplate interface{}, handlers ...HandlerFunc) gin.HandlerFunc {
@@ -313,9 +306,12 @@ func getGinHandlerFun(newContextFun func() Context, structTemplate interface{}, 
 		ctx.SetGinContext(c)
 		for _, h := range handlers {
 			if structTemplate != nil {
-				receiver, field, value, err := structuredUnmarshaler(c, structTemplate)
+				receiver, err := structuredUnmarshaler(c, structTemplate)
 				if err != nil {
-					ctx.ResponseParseParamsFieldFail(c.FullPath(), field, value, err)
+					ctx.GetGinContext().JSON(http.StatusInternalServerError, gin.H{
+						"success": false,
+						"message": fmt.Sprintf("操作失败:%v", err),
+					})
 					c.Abort()
 					return
 				} else {

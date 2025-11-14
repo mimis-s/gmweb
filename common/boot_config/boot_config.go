@@ -1,5 +1,7 @@
 package boot_config
 
+import "github.com/mimis-s/zpudding/pkg/app"
+
 /*
 	解析boot_config.yaml文件
 */
@@ -34,3 +36,4 @@ type BootConfig struct {
 
 var BootConfigData = new(BootConfig)
 var CustomBootFlagsData = new(BootFlags)
+var GlobalCmdFlagData = new(app.GlobalCmdFlag)
