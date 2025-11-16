@@ -4,7 +4,6 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>兼容移动手机的侧边栏多级导航菜单UI设计|DEMO_jQuery之家-自由分享jQuery、html5、css3的插件库</title>
 	<!-- food icons -->
 	<link rel="stylesheet" type="text/css" href="assets/assets/tab_home/css/organicfoodicons.css" />
 	<!-- demo styles -->
@@ -21,13 +20,6 @@
 			<div class="dummy-logo">
 				<div class="dummy-icon foodicon foodicon--coconut"></div>
 				<h2 class="dummy-heading">Fooganic</h2>
-			</div>
-			<div class="bp-header__main">
-				<h1 class="bp-header__title">多级导航菜单</h1>
-				<nav class="bp-nav">
-					<a class="htmleaf-icon icon-htmleaf-home-outline" href="http://www.htmleaf.com/" title="jQuery之家" target="_blank"><span> jQuery之家</span></a>
-					<a class="htmleaf-icon icon-htmleaf-arrow-forward-outline" href="http://www.htmleaf.com/css3/ui-design/201511202803.html" title="返回下载页" target="_blank"><span> 返回下载页</span></a>
-				</nav>
 			</div>
 		</header>
 		<button class="action action--open" aria-label="Open Menu"><span class="icon icon--menu"></span></button>
@@ -140,12 +132,26 @@
 			ev.preventDefault();
 
 			closeMenu();
-			gridWrapper.innerHTML = '';
 			classie.add(gridWrapper, 'content--loading');
 			setTimeout(function() {
-				classie.remove(gridWrapper, 'content--loading');
-				gridWrapper.innerHTML = '<ul class="products">' + dummyData[itemName] + '<ul>';
-			}, 700);
+			    fetch('gm_order_card.html')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('网络响应不正常');
+                    }
+                    return response.text();
+                })
+                .then(html => {
+					classie.remove(gridWrapper, 'content--loading');
+			    	gridWrapper.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('加载 header.html 时出现问题:', error);
+                });
+				// gridWrapper.innerHTML = '<ul class="products">' + dummyData[itemName] + '<ul>';
+				// gridWrapper.innerHTML =	'<ul class="products">' + '${login_lineedi}'  + '<ul>';
+				// gridWrapper.innerHTML =	'<div class="card"> <h2>${login_lineedit}</h2> </div>';
+			}, 100);
 		}
 	})();
 	</script>

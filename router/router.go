@@ -31,6 +31,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.Get("/register", "注册", controllerHandler.Register)
 		engine.Get("/tab_home", "主页", controllerHandler.Home)
 		engine.PostWithStructParams("/api/login", "登陆的post", webmodel.User{}, controllerHandler.PostApiLogin)
+		engine.Get("/gm_order_card.html", "主页", controllerHandler.GmOrderCard)
 
 		a.AddServer("gmweb", engine)
 		return nil

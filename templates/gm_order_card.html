@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GM命令卡片</title>
+    <link rel="stylesheet" href="assets/assets/card/card.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="card">
+        <div class="card-top">
+            <h2>GM发邮件</h2>
+            <p>点击下方按钮查看更多内容</p>
+            <button class="trigger-btn" id="triggerBtn">
+                <i class="fas fa-external-link-alt"></i> 点击查看详情
+            </button>
+        </div>
+        
+        <div class="card-bottom">
+            <button class="action-btn like-btn" id="likeBtn">
+                <i class="fas fa-thumbs-up"></i>
+                <span>点赞</span>
+            </button>
+            
+            <button class="action-btn dislike-btn" id="dislikeBtn">
+                <i class="fas fa-thumbs-down"></i>
+                <span>喝倒彩</span>
+            </button>
+            
+            <button class="action-btn favorite-btn" id="favoriteBtn">
+                <i class="fas fa-star"></i>
+                <span>收藏</span>
+            </button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <button class="close-btn" id="closeBtn">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2>详情内容</h2>
+            <div class="modal-image">
+                卡片详情图片或内容区域
+            </div>
+            <p>这是一个模态框示例，展示了卡片详情内容。您可以在此处添加任何您想要展示的信息、图片或其他内容。</p>
+            <p>点击右上角的关闭按钮或模态框外部区域可以关闭此窗口。</p>
+            
+            <div class="counters">
+                <div>点赞: <span id="likeCount">0</span></div>
+                <div>喝倒彩: <span id="dislikeCount">0</span></div>
+                <div>收藏: <span id="favoriteCount">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const triggerBtn = document.getElementById('triggerBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeBtn = document.getElementById('closeBtn');
+        const likeBtn = document.getElementById('likeBtn');
+        const dislikeBtn = document.getElementById('dislikeBtn');
+        const favoriteBtn = document.getElementById('favoriteBtn');
+        
+        const likeCount = document.getElementById('likeCount');
+        const dislikeCount = document.getElementById('dislikeCount');
+        const favoriteCount = document.getElementById('favoriteCount');
+        
+        // 初始化计数器
+        let likeCounter = 0;
+        let dislikeCounter = 0;
+        let favoriteCounter = 0;
+        
+        // 打开模态框
+        triggerBtn.addEventListener('click', () => {
+            modalOverlay.classList.add('active');
+        });
+        
+        // 关闭模态框
+        closeBtn.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+        });
+        
+        // 点击模态框外部关闭
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+            }
+        });
+        
+        // 点赞功能
+        likeBtn.addEventListener('click', () => {
+            likeBtn.classList.toggle('active');
+            if (likeBtn.classList.contains('active')) {
+                likeCounter++;
+            } else {
+                likeCounter--;
+            }
+            likeCount.textContent = likeCounter;
+        });
+        
+        // 喝倒彩功能
+        dislikeBtn.addEventListener('click', () => {
+            dislikeBtn.classList.toggle('active');
+            if (dislikeBtn.classList.contains('active')) {
+                dislikeCounter++;
+            } else {
+                dislikeCounter--;
+            }
+            dislikeCount.textContent = dislikeCounter;
+        });
+        
+        // 收藏功能
+        favoriteBtn.addEventListener('click', () => {
+            favoriteBtn.classList.toggle('active');
+            if (favoriteBtn.classList.contains('active')) {
+                favoriteCounter++;
+            } else {
+                favoriteCounter--;
+            }
+            favoriteCount.textContent = favoriteCounter;
+        });
+    </script>
+</body>
+
+</html>

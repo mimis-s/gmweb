@@ -11,7 +11,6 @@ import (
 	"github.com/mimis-s/gmweb/router"
 
 	"github.com/mimis-s/zpudding/pkg/app"
-	"github.com/mimis-s/zpudding/pkg/zlog"
 )
 
 //go:embed templates
@@ -29,7 +28,7 @@ func newDefRegistry() *app.Registry {
 
 	s.AddInitTask("初始化rpc调用客户端", func() error {
 		// 日志
-		zlog.NewLogger(boot_config.BootConfigData.Log.Path + "/" + "log.log")
+		// zlog.NewLogger(boot_config.BootConfigData.Log.Path + "/" + "log.log")
 		_, cancel := context.WithCancel(context.Background())
 		go GracefulStop(cancel)
 		return nil

@@ -48,3 +48,8 @@ func (c *ControllerHandler) PostApiLogin(ctx *web.WebContext, req *webmodel.User
 	SetSeesion(ctx, req)
 	c.loginSvc.LoginHandler(ctx, req)
 }
+
+// gm命令卡片界面
+func (c *ControllerHandler) GmOrderCard(ctx *web.WebContext) {
+	ctx.GetGinContext().HTML(200, "gm_order_card.html", nil)
+}
