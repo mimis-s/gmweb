@@ -99,61 +99,7 @@
 	<script src="assets/assets/tab_home/js/classie.js"></script>
 	<script src="assets/assets/tab_home/js/dummydata.js"></script>
 	<script src="assets/assets/tab_home/js/main.js"></script>
-	<script>
-	(function() {
-		var menuEl = document.getElementById('ml-menu'),
-			mlmenu = new MLMenu(menuEl, {
-				// breadcrumbsCtrl : true, // show breadcrumbs
-				// initialBreadcrumb : 'all', // initial breadcrumb text
-				backCtrl : false, // show back button
-				// itemsDelayInterval : 60, // delay between each menu item sliding animation
-				onItemClick: loadDummyData // callback: item that doesn´t have a submenu gets clicked - onItemClick([event], [inner HTML of the clicked item])
-			});
-
-		// mobile menu toggle
-		var openMenuCtrl = document.querySelector('.action--open'),
-			closeMenuCtrl = document.querySelector('.action--close');
-
-		openMenuCtrl.addEventListener('click', openMenu);
-		closeMenuCtrl.addEventListener('click', closeMenu);
-
-		function openMenu() {
-			classie.add(menuEl, 'menu--open');
-		}
-
-		function closeMenu() {
-			classie.remove(menuEl, 'menu--open');
-		}
-
-		// simulate grid content loading
-		var gridWrapper = document.querySelector('.content');
-
-		function loadDummyData(ev, itemName) {
-			ev.preventDefault();
-
-			closeMenu();
-			classie.add(gridWrapper, 'content--loading');
-			setTimeout(function() {
-			    fetch('gm_order_card.html')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('网络响应不正常');
-                    }
-                    return response.text();
-                })
-                .then(html => {
-					classie.remove(gridWrapper, 'content--loading');
-			    	gridWrapper.innerHTML = html;
-                })
-                .catch(error => {
-                    console.error('加载 header.html 时出现问题:', error);
-                });
-				// gridWrapper.innerHTML = '<ul class="products">' + dummyData[itemName] + '<ul>';
-				// gridWrapper.innerHTML =	'<ul class="products">' + '${login_lineedi}'  + '<ul>';
-				// gridWrapper.innerHTML =	'<div class="card"> <h2>${login_lineedit}</h2> </div>';
-			}, 100);
-		}
-	})();
-	</script>
+	<script src="assets/assets/gm_order_card/card.js"></script>
+	<script src="assets/assets/tab_home/js/select.js"></script>
 </body>
 </html>

@@ -19,17 +19,19 @@ type Account struct {
 }
 
 type Role struct {
-	Rid           int64                   `xorm:"rid not null pk comment('主键') BIGINT"`
-	BaseData      *db_extra.RoleBase      `xorm:"base_data JSON" json:"base_data,omitempty"`
-	RolePowerData *db_extra.RolePowerInfo `xorm:"role_power_data JSON" json:"role_power_data,omitempty"`
-	CreatedAt     time.Time               `xorm:"created"`
-	UpdatedAt     time.Time               `xorm:"updated"`
-	DeletedAt     time.Time               `xorm:"deleted"`
+	Rid           int64                       `xorm:"rid not null pk comment('主键') BIGINT"`
+	BaseData      *db_extra.RoleBase          `xorm:"base_data JSON" json:"base_data,omitempty"`
+	RolePowerData *db_extra.RolePowerInfo     `xorm:"role_power_data JSON" json:"role_power_data,omitempty"`
+	OrderStatus   *db_extra.RoleGmOrderStatus `xorm:"order_status JSON" json:"order_status,omitempty"`
+	CreatedAt     time.Time                   `xorm:"created"`
+	UpdatedAt     time.Time                   `xorm:"updated"`
+	DeletedAt     time.Time                   `xorm:"deleted"`
 }
 
 // 权限组表
 type PowerGroup struct {
 	GroupId   int64                     `xorm:"group_id not null pk autoincr comment('主键') BIGINT"`
+	Name      string                    `xorm:"not null VARCHAR(255)"`
 	ExtraData *db_extra.PowerGroupExtra `xorm:"extra_data JSON" json:"extra_data,omitempty"`
 	CreatedAt time.Time                 `xorm:"created"`
 	UpdatedAt time.Time                 `xorm:"updated"`
@@ -39,6 +41,7 @@ type PowerGroup struct {
 // 权限表
 type Power struct {
 	PowerId   int64                `xorm:"power_id not null pk autoincr comment('主键') BIGINT"`
+	Name      string               `xorm:"not null VARCHAR(255)"`
 	Data      *db_extra.PowerExtra `xorm:"data JSON" json:"data,omitempty"`
 	CreatedAt time.Time            `xorm:"created"`
 	UpdatedAt time.Time            `xorm:"updated"`

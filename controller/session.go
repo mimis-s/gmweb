@@ -3,13 +3,14 @@ package controller
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/mimis-s/gmweb/common/web"
 
 	"github.com/gorilla/sessions"
 	"github.com/mimis-s/gmweb/common/webmodel"
 )
 
-var users = []*webmodel.User{}
+var users = []*webmodel.GetUserReq{}
 var sessionStore = sessions.NewCookieStore([]byte("your-secret-key"))
 
 func GetSession(ctx *web.WebContext) *sessions.Session {
@@ -19,10 +20,14 @@ func GetSession(ctx *web.WebContext) *sessions.Session {
 		return session
 	}
 
+	ctx.GetGinContext().HTML(http.StatusOK, "login.html", gin.H{
+		"title": "用户登录",
+	})
+
 	return nil
 }
 
-func SetSeesion(ctx *web.WebContext, req *webmodel.User) *sessions.Session {
+func SetSeesion(ctx *web.WebContext, req *webmodel.GetUserReq) *sessions.Session {
 	// 创建会话
 	session, _ := sessionStore.Get(ctx.GetGinContext().Request, "session1")
 	session.Values["authenticated"] = true
