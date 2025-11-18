@@ -36,5 +36,9 @@ func (w *WebContext) Err(formatStr string, args ...any) {
 }
 
 func (w *WebContext) SuccessOk(rsp interface{}) {
-	w.ctx.JSON(http.StatusOK, rsp)
+
+	w.ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": rsp,
+	})
 }

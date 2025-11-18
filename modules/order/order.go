@@ -8,7 +8,7 @@ import (
 	"github.com/mimis-s/gmweb/dao"
 )
 
-func GetGmOrderReq(ctx *web.WebContext, roleId int64, req *webmodel.GetGmOrderReq, rsp *webmodel.GetGmOrderRsp) error {
+func GetGmOrderBoxReq(ctx *web.WebContext, roleId int64, req *webmodel.GetGmOrderBoxReq, rsp *webmodel.GetGmOrderBoxRsp) error {
 	rsp.ProjectId = req.ProjectId
 	rsp.Datas = make([]*webmodel.GmOrder, 0)
 

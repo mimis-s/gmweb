@@ -1,15 +1,46 @@
-function gmOrderCardEvent() {
+// 读取card页面
+function loadGmOrderCard(gridWrapper, gmOrderData){
+  fetch('gm_order_card.html')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('网络响应不正常');
+        }
+        return response.text();
+    }).then(html => {
+        const orderList = gmOrderData.datas;
+        for (let i = 0; i < orderList.length; i++) {
+            const order = orderList[i];
+            const newBox = document.createElement('div');
+            newBox.className = "gm_order_card_layout"
+		    newBox.innerHTML = html;
+            const gmName = newBox.querySelector("#cardName");
+            gmName.textContent = order.ordername;
+            const gmModelName = newBox.querySelector("#modalOverlayName");
+            gmModelName.textContent = order.ordername;
+            const gmModelDesc = newBox.querySelector("#modalOverlayDesc");
+            gmModelDesc.textContent = order.orderdesc;
+            
+
+            gridWrapper.appendChild(newBox);
+            gmOrderCardEvent(newBox); // 卡片事件
+        }
+    }).catch(error => {
+        console.error('加载 gm_order_box.html 时出现问题:', error);
+    });
+}
+
+function gmOrderCardEvent(newBox) {
     // 获取DOM元素
-    const triggerBtn = document.getElementById('triggerBtn');
-    const modalOverlay = document.getElementById('modalOverlay');
-    const closeBtn = document.getElementById('closeBtn');
-    const likeBtn = document.getElementById('likeBtn');
-    const dislikeBtn = document.getElementById('dislikeBtn');
-    const favoriteBtn = document.getElementById('favoriteBtn');
+    const triggerBtn = newBox.querySelector('#triggerBtn');
+    const modalOverlay = newBox.querySelector('#modalOverlay');
+    const closeBtn = newBox.querySelector('#closeBtn');
+    const likeBtn = newBox.querySelector('#likeBtn');
+    const dislikeBtn = newBox.querySelector('#dislikeBtn');
+    const favoriteBtn = newBox.querySelector('#favoriteBtn');
     
-    const likeCount = document.getElementById('likeCount');
-    const dislikeCount = document.getElementById('dislikeCount');
-    const favoriteCount = document.getElementById('favoriteCount');
+    const likeCount = newBox.querySelector('#likeCount');
+    const dislikeCount = newBox.querySelector('#dislikeCount');
+    const favoriteCount = newBox.querySelector('#favoriteCount');
     
     // 初始化计数器
     let likeCounter = 0;

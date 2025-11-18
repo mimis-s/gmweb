@@ -22,7 +22,7 @@
 		closeMenu();
 		classie.add(gridWrapper, 'content--loading');
 		setTimeout(function() {
-		    fetch('base_box.html')
+		    fetch('gm_order_box.html')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('网络响应不正常');
@@ -31,10 +31,10 @@
             })
             .then(html => {
 				classie.remove(gridWrapper, 'content--loading');
-				const newBox = document.createElement('div');
-				newBox.innerHTML = html;
-		    	gridWrapper.appendChild(newBox);
-				gmOrderCardEvent(); // 卡片事件
+				// const newBox = document.createElement('div');
+				// newBox.innerHTML = html;
+		    	gridWrapper.innerHTML = html;
+				loadGmOrderBoxEvent(gridWrapper); // box里面所有order的数据		
             })
             .catch(error => {
                 console.error('加载 header.html 时出现问题:', error);
@@ -42,3 +42,4 @@
 		}, 100);
 	}
 })();
+

@@ -34,7 +34,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.Get("/gm_order_box.html", "gm命令界面布局", controllerHandler.GmOrderBox)
 
 		engine.PostWithStructParams("/api/login", "登陆的post", webmodel.GetUserReq{}, controllerHandler.PostApiLogin)
-		engine.PostWithStructParams("/api/gm_order", "获取gm指令的post", webmodel.GetGmOrderReq{}, controllerHandler.PostApiGmOrder)
+		engine.PostWithStructParams("/api/gm_order_box", "获取gm指令的post", webmodel.GetGmOrderBoxReq{}, controllerHandler.PostApiGmOrderBox)
 
 		a.AddServer("gmweb", engine)
 		return nil
