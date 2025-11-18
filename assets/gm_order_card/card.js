@@ -22,14 +22,16 @@ function loadGmOrderCard(gridWrapper, gmOrderData){
             
 
             gridWrapper.appendChild(newBox);
-            gmOrderCardEvent(newBox); // 卡片事件
+            gmOrderCardEvent(order, newBox); // 卡片事件
         }
     }).catch(error => {
         console.error('加载 gm_order_box.html 时出现问题:', error);
     });
 }
 
-function gmOrderCardEvent(newBox) {
+function gmOrderCardEvent(order, newBox) {
+
+
     // 获取DOM元素
     const triggerBtn = newBox.querySelector('#triggerBtn');
     const modalOverlay = newBox.querySelector('#modalOverlay');
@@ -42,6 +44,10 @@ function gmOrderCardEvent(newBox) {
     const dislikeCount = newBox.querySelector('#dislikeCount');
     const favoriteCount = newBox.querySelector('#favoriteCount');
     
+    renderJSONForm(jsonData);
+    updatePreview(jsonData);
+    showSuccess();
+
     // 初始化计数器
     let likeCounter = 0;
     let dislikeCounter = 0;
