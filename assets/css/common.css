@@ -10,3 +10,7 @@
     /* IE6, 7专用*/
     zoom: 1;
 }
+
+.gm_card_layout{
+    float: left;
+}

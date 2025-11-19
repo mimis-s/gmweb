@@ -11,7 +11,7 @@ function loadGmOrderCard(gridWrapper, gmOrderData){
         for (let i = 0; i < orderList.length; i++) {
             const order = orderList[i];
             const newBox = document.createElement('div');
-            newBox.className = "gm_order_card_layout"
+            newBox.className = "gm_card_layout"
 		    newBox.innerHTML = html;
             const gmName = newBox.querySelector("#cardName");
             gmName.textContent = order.ordername;

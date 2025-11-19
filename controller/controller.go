@@ -53,6 +53,16 @@ func (c *ControllerHandler) GmOrderBox(ctx *web.WebContext) {
 	ctx.GetGinContext().HTML(200, "gm_order_box.html", nil)
 }
 
+// 项目卡片
+func (c *ControllerHandler) GmProjectCard(ctx *web.WebContext) {
+	ctx.GetGinContext().HTML(200, "gm_project_card.html", nil)
+}
+
+// 项目界面布局
+func (c *ControllerHandler) GmProjectBox(ctx *web.WebContext) {
+	ctx.GetGinContext().HTML(200, "gm_project_box.html", nil)
+}
+
 // 获取当前的gm命令
 func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq) {
 	session := GetSession(ctx)
@@ -96,6 +106,14 @@ func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel
 
 // 发送gm命令
 func (c *ControllerHandler) PostApiSendGmOrder(ctx *web.WebContext, req *webmodel.SendGmOrderReq) {
+	session := GetSession(ctx)
+	if session == nil {
+		return
+	}
+	ctx.SuccessOk("成功")
+}
+
+func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *webmodel.GetGmProjectBoxReq) {
 	session := GetSession(ctx)
 	if session == nil {
 		return

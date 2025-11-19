@@ -287,10 +287,6 @@
     font-size: 14px;
 }
 
-.gm_order_card_layout{
-    float: left;
-}
-
 @media (max-width: 480px) {
     .card-bottom {
         padding: 20px 15px;

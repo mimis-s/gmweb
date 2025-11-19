@@ -38,3 +38,9 @@ type SendGmOrderReq struct {
 
 type SendGmOrderRsp struct {
 }
+
+type GetGmProjectBoxReq struct {
+}
+
+type GetGmProjectBoxRsp struct {
+}
