@@ -318,6 +318,7 @@
 
 .card_form_input {
   width: 100%;
+  max-width:140px;
   padding: 10px;
   border: none;
   background-color: #fff;
@@ -331,8 +332,10 @@ textarea.card_form_input {
 
 .struct_box {
   float: left;
-  padding:10px;
-  margin: 10px;
+  padding:5px;
+  margin-left: 10px;
+  margin-top: 10px;
+  margin-bottom: 2px;
   background-color: #e8e8e8;
   border-radius: 8px;
 }

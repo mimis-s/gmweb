@@ -18,7 +18,7 @@ function renderJSONForm(jsonOutput, data, parentKey = '') {
 // 渲染数组
 function renderArray(jsonOutput, arr, parentKey) {
     const container = document.createElement('div');
-    container.className = 'json-array';
+    container.className = 'json-array struct_box';
     
     arr.forEach((item, index) => {
         const itemElement = document.createElement('div');
@@ -70,7 +70,7 @@ function renderArrayField(arr, container, key) {
 // 渲染对象字段
 function renderObjectField(obj, container, key) {
     const objectContainer = document.createElement('div');
-    objectContainer.className = 'json-object struct_box';
+    objectContainer.className = 'json-object';
     
     for (const prop in obj) {
         if (obj.hasOwnProperty(prop)) {
