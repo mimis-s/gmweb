@@ -202,10 +202,31 @@
     visibility: visible;
 }
 
+.modal-overlay-tip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay-tip.active {
+    opacity: 1;
+    visibility: visible;
+}
+
 .modal-content {
     background: white;
     width: 90%;
-    max-width: 500px;
+    max-width: 750px;
     border-radius: 15px;
     padding: 30px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
@@ -247,7 +268,7 @@
 
 .modal-image {
     width: 100%;
-    height: 200px;
+    /* height: 200px; */
     background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
     border-radius: 10px;
     margin-bottom: 20px;
@@ -286,4 +307,32 @@
     .action-btn span {
         font-size: 12px;
     }
+}
+
+.card_form_label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.card_form_input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background-color: #fff;
+  color: #333;
+  border-radius: 5px;
+}
+
+textarea.card_form_input {
+  height: 100px;
+}
+
+.struct_box {
+  float: left;
+  padding:10px;
+  margin: 10px;
+  background-color: #e8e8e8;
+  border-radius: 8px;
 }

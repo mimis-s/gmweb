@@ -30,3 +30,11 @@ type GmOrder struct {
 	IsBelittle  bool          // 当前玩家是否倒赞
 	Iscollect   bool          // 当前玩家是否收藏
 }
+
+type SendGmOrderReq struct {
+	OrderId int64  `json:"orderid"` // 命令id
+	Msg     string `json:"msg"`     // gm命令数据
+}
+
+type SendGmOrderRsp struct {
+}

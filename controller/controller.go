@@ -93,3 +93,12 @@ func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel
 	// }
 	// ctx.SuccessOk(rsp)
 }
+
+// 发送gm命令
+func (c *ControllerHandler) PostApiSendGmOrder(ctx *web.WebContext, req *webmodel.SendGmOrderReq) {
+	session := GetSession(ctx)
+	if session == nil {
+		return
+	}
+	ctx.SuccessOk("成功")
+}

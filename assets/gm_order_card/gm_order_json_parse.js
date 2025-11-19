@@ -1,14 +1,14 @@
 // gm命令的json解析
 
 // 渲染JSON表单
-function renderJSONForm(data, parentKey = '') {
+function renderJSONForm(jsonOutput, data, parentKey = '') {
     jsonOutput.innerHTML = '';
     
     if (typeof data === 'object' && data !== null) {
         if (Array.isArray(data)) {
-            renderArray(data, parentKey);
+            renderArray(jsonOutput, data, parentKey);
         } else {
-            renderObject(data, parentKey);
+            renderObject(jsonOutput,data, parentKey);
         }
     } else {
         jsonOutput.innerHTML = '<p>JSON 数据格式不正确</p>';
@@ -16,7 +16,7 @@ function renderJSONForm(data, parentKey = '') {
 }
 
 // 渲染数组
-function renderArray(arr, parentKey) {
+function renderArray(jsonOutput, arr, parentKey) {
     const container = document.createElement('div');
     container.className = 'json-array';
     
@@ -25,7 +25,7 @@ function renderArray(arr, parentKey) {
         itemElement.className = 'json-array-item';
         
         const indexElement = document.createElement('span');
-        indexElement.className = 'json-key';
+        indexElement.className = 'json-key card_form_label';
         indexElement.textContent = `[${index}]:`;
         
         itemElement.appendChild(indexElement);
@@ -52,7 +52,7 @@ function renderArray(arr, parentKey) {
 // 渲染数组字段
 function renderArrayField(arr, container, key) {
     const arrayContainer = document.createElement('div');
-    arrayContainer.className = 'json-array';
+    arrayContainer.className = 'json-array struct_box';
     
     arr.forEach((item, index) => {
         const itemElement = document.createElement('div');
@@ -70,7 +70,7 @@ function renderArrayField(arr, container, key) {
 // 渲染对象字段
 function renderObjectField(obj, container, key) {
     const objectContainer = document.createElement('div');
-    objectContainer.className = 'json-object';
+    objectContainer.className = 'json-object struct_box';
     
     for (const prop in obj) {
         if (obj.hasOwnProperty(prop)) {
@@ -78,7 +78,7 @@ function renderObjectField(obj, container, key) {
             field.className = 'json-field';
             
             const propElement = document.createElement('span');
-            propElement.className = 'json-key';
+            propElement.className = 'json-key card_form_label';
             propElement.textContent = prop + ':';
             
             field.appendChild(propElement);
@@ -124,15 +124,15 @@ function createInputForValue(value, key) {
             input.value = value;
             input.placeholder = '请输入文本...';
         }
-        input.className = 'json-string';
+        input.className = 'json-string card_form_input';
     } else if (typeof value === 'number') {
         input = document.createElement('input');
-        input.type = 'number';
+        // input.type = 'number';
         input.value = value;
-        input.className = 'json-number';
+        input.className = 'json-number card_form_input';
     } else if (typeof value === 'boolean') {
         input = document.createElement('select');
-        input.className = 'json-boolean';
+        input.className = 'json-boolean card_form_input';
         
         const trueOption = document.createElement('option');
         trueOption.value = 'true';
@@ -146,16 +146,16 @@ function createInputForValue(value, key) {
         input.appendChild(falseOption);
         input.value = value.toString();
     } else if (value === null) {
-       input = document.createElement('input');
+        input = document.createElement('input');
         input.type = 'text';
         input.value = 'null';
         input.disabled = true;
-        input.className = 'json-null';
+        input.className = 'json-null card_form_input';
     } else {
         input = document.createElement('input');
         input.type = 'text';
         input.value = String(value);
-        input.className = 'json-string';
+        input.className = 'json-string card_form_input';
     }
     
     input.setAttribute('data-key', key);
@@ -203,19 +203,19 @@ function setNestedValue(obj, path, value) {
 
 
 // 渲染对象
-function renderObject(obj, parentKey) {
+function renderObject(jsonOutput, obj, parentKey) {
     const container = document.createElement('div');
     container.className = 'json-object';
     
     for (const key in obj) {
         if (obj.hasOwnProperty(key)) {
             const field = document.createElement('div');
-            field.className = 'json-field';
+            field.className = 'json-field struct_box';
             
             const fullKey = parentKey ? `${parentKey}.${key}` : key;
             
             const keyElement = document.createElement('span');
-            keyElement.className = 'json-key';
+            keyElement.className = 'json-key card_form_label';
             keyElement.textContent = key + ':';
             
             field.appendChild(keyElement);
@@ -240,24 +240,28 @@ function renderObject(obj, parentKey) {
     jsonOutput.appendChild(container);
 }
 
-// 更新预览
-function updatePreview(data) {
-    previewContent.innerHTML = '';
+// 获取表单数据
+function getFormData(jsonOutput) {
+    const inputs = jsonOutput.querySelectorAll('input, textarea, select');
+    const data = {};
     
-    if (typeof data === 'object' && data !== null) {
-        const pre = document.createElement('pre');
-        pre.textContent = JSON.stringify(data, null, 2);
-        previewContent.appendChild(pre);
-    } else {
-        previewContent.innerHTML = '<p>没有数据可预览</p>';
-    }
+    inputs.forEach(input => {
+        const key = input.getAttribute('data-key');
+        if (key) {
+            setNestedValue(data, key, getInputValue(input));
+        }
+    });
+    
+    return data;
 }
 
-// 显示成功消息
-function showSuccess(message) {
-    if (message) {
-        successMessage.querySelector('strong').textContent = '成功：' + message;
+// 获取输入值
+function getInputValue(input) {
+    if (input.tagName === 'SELECT') {
+        return input.value === 'true';
+    } else if (input.type === 'number') {
+        return parseFloat(input.value);
+    } else {
+        return input.value;
     }
-    successMessage.style.display = 'block';
-    errorMessage.style.display = 'none';
 }

@@ -48,8 +48,8 @@
             </div>
             <h2 id="modalOverlayName">详情内容</h2>
             <p id="modalOverlayDesc">描述信息</p>
-            <div class="modal-image">
-                命令参数区域
+            <div class="modal-image clearfix" id="modalJsonArgs">
+                 <p>命令参数区域</p>
             </div>
             <p>点击右上角的关闭按钮或模态框外部区域可以关闭此窗口。</p>
             <button class="send-btn" id="sendBtn">
@@ -61,6 +61,15 @@
                 </div>
               <span>Send</span>
             </button>
+        </div>
+    </div>
+    <div class="modal-overlay-tip" id="modalOverlayTip">
+        <div class="modal-content">
+            <button class="close-btn" id="closeBtnTip">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 id="modalOverlayTipTitle">发送成功</h2>
+            <p id="modalOverlayTipShow">返回参数</p>
         </div>
     </div>
 
