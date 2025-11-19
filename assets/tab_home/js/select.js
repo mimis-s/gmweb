@@ -18,28 +18,43 @@
 	// simulate grid content loading
 	var gridWrapper = document.querySelector('.content');
 	function loadDummyData(ev, itemName) {
-		ev.preventDefault();
-		closeMenu();
-		classie.add(gridWrapper, 'content--loading');
-		setTimeout(function() {
-		    fetch('gm_order_box.html')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('网络响应不正常');
-                }
-                return response.text();
-            })
-            .then(html => {
-				classie.remove(gridWrapper, 'content--loading');
-				// const newBox = document.createElement('div');
-				// newBox.innerHTML = html;
-		    	gridWrapper.innerHTML = html;
-				loadGmOrderBoxEvent(gridWrapper); // box里面所有order的数据		
-            })
-            .catch(error => {
-                console.error('加载 header.html 时出现问题:', error);
-            });
-		}, 100);
+        ev.preventDefault();
+        closeMenu();
+        gridWrapper.innerHTML = `<p class="info">GM管理平台欢迎你</p>`;
+        // classie.add(gridWrapper, 'content--loading');
+		if (itemName == "手游测试服")
+		{
+			loadGmOrderModule(ev, gridWrapper, classie)
+		}
+		if (itemName == "项目总览")
+		{
+			loadGmOrderModule(ev, gridWrapper, classie)
+		}
+		if (itemName == "GM命令")
+		{
+			loadGmOrderModule(ev, gridWrapper, classie)
+		}		
 	}
 })();
 
+function loadGmOrderModule(ev, gridWrapper, classie){
+    setTimeout(function() {
+        fetch('gm_order_box.html')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('网络响应不正常');
+            }
+            return response.text();
+        })
+        .then(html => {
+    		classie.remove(gridWrapper, 'content--loading');
+    		// const newBox = document.createElement('div');
+    		// newBox.innerHTML = html;
+        	gridWrapper.innerHTML = html;
+    		loadGmOrderBoxEvent(gridWrapper); // box里面所有order的数据		
+        })
+        .catch(error => {
+            console.error('加载 header.html 时出现问题:', error);
+        });
+    }, 100);
+}
