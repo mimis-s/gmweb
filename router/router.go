@@ -34,6 +34,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.Get("/gm_order_box.html", "gm命令界面布局", controllerHandler.GmOrderBox)
 		engine.Get("/gm_project_card.html", "项目卡片", controllerHandler.GmProjectCard)
 		engine.Get("/gm_project_box.html", "项目界面布局", controllerHandler.GmProjectBox)
+		engine.Get("/gm_order_table.html", "gm命令管理表", controllerHandler.GmOrderTable)
 
 		engine.PostWithStructParams("/api/login", "登陆的post", webmodel.GetUserReq{}, controllerHandler.PostApiLogin)
 		engine.PostWithStructParams("/api/gm_order_box", "获取gm指令的post", webmodel.GetGmOrderBoxReq{}, controllerHandler.PostApiGmOrderBox)

@@ -14,7 +14,7 @@ function loadGmProjectBoxEvent(gridWrapper) {
       });
     })
     .then((data) => {
-      console.log('成功:', data);
+      console.log('成功拿到所有命令:', data);
       loadGmProjectCard(gridWrapper, data.message);    // 初始化所有卡片
       return;
     })

@@ -16,7 +16,9 @@ func Init() (*ControllerHandler, error) {
 }
 
 func (c *ControllerHandler) Index(ctx *web.WebContext) {
-	ctx.GetGinContext().HTML(200, "index.html", nil)
+	// ctx.GetGinContext().HTML(200, "index.html", nil)
+	SetSeesion(ctx, &webmodel.GetUserReq{Username: "1"})
+	c.Home(ctx)
 }
 
 // 注册界面
@@ -61,6 +63,11 @@ func (c *ControllerHandler) GmProjectCard(ctx *web.WebContext) {
 // 项目界面布局
 func (c *ControllerHandler) GmProjectBox(ctx *web.WebContext) {
 	ctx.GetGinContext().HTML(200, "gm_project_box.html", nil)
+}
+
+// gm命令管理表
+func (c *ControllerHandler) GmOrderTable(ctx *web.WebContext) {
+	ctx.GetGinContext().HTML(200, "gm_order_table.html", nil)
 }
 
 // 获取当前的gm命令
@@ -118,5 +125,26 @@ func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *web
 	if session == nil {
 		return
 	}
-	ctx.SuccessOk("成功")
+	rsp := &webmodel.GetGmOrderBoxRsp{}
+	rsp.ProjectId = 1
+	rsp.Datas = make([]*webmodel.GmOrder, 0)
+	for i := 0; i < 10; i++ {
+		orderId := int64(i)
+		orderName := fmt.Sprintf("名字:%v", i)
+		orderDesc := fmt.Sprintf("GM发邮件:%v", i)
+
+		rsp.Datas = append(rsp.Datas, &webmodel.GmOrder{
+			OrderId:     orderId,
+			OrderName:   orderName,
+			OrderDesc:   orderDesc,
+			Level:       1,
+			OrderStruct: "",
+			LastRunArgs: "",
+			OrderStatus: map[int]int64{1: 10, 2: 20, 3: 5},
+			IsLike:      true,
+			IsBelittle:  false,
+			Iscollect:   true,
+		})
+	}
+	ctx.SuccessOk(rsp)
 }

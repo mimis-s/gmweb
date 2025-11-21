@@ -43,4 +43,6 @@ type GetGmProjectBoxReq struct {
 }
 
 type GetGmProjectBoxRsp struct {
+	ProjectId int64      `json:"projectid"` // 项目id
+	Datas     []*GmOrder `json:"datas"`     // 项目id对应的所有命令数据
 }

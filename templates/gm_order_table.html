@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/assets/gm_order_table/table.css">
+    <link rel="stylesheet" href="assets/assets/css/common.css">
+    <title>gm命令数据列表管理</title>
+</head>
+<body>
+    <div class="project-table-data-list scroll_list" id="projectTableDataList">
+        <div class="project-table-list-header">
+            <div class="project-table-item-content">数据内容</div>
+            <div class="project-table-item-actions">操作</div>
+        </div>
+    </div>
+        
+    <!-- 编辑模态框 -->
+    <div class="project-table-modal" id="projectTableEditModal">
+        <div class="project-table-modal-content">
+            <div class="project-table-modal-header">
+                <h2 class="project-table-modal-title">编辑数据</h2>
+                <button class="project-table-close-btn" onclick="closeEditItemModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <div class="project-table-form-group">
+                    <label for="editName">姓名</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="project-table-form-group">
+                    <label for="editRole">角色</label>
+                    <select id="editRole" required>
+                        <option value="">请选择角色</option>
+                        <option value="前端开发工程师">前端开发工程师</option>
+                        <option value="UI设计师">UI设计师</option>
+                        <option value="产品经理">产品经理</option>
+                        <option value="后端开发工程师">后端开发工程师</option>
+                        <option value="测试工程师">测试工程师</option>
+                    </select>
+                </div>
+                <div class="project-table-form-group">
+                    <label for="editDescription">描述</label>
+                    <textarea id="editDescription" required></textarea>
+                </div>
+                <div class="project-table-form-actions">
+                    <button class="project-table-btn project-table-btn-cancel" onclick="closeEditItemModal()">取消</button>
+                    <button type="submit" class="project-table-btn project-table-btn-save">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 添加模态框 -->
+    <div class="project-table-modal" id="projectTableAddModal">
+        <div class="project-table-modal-content">
+            <div class="project-table-modal-header">
+                <h2 class="project-table-modal-title">添加新数据</h2>
+                <button class="project-table-close-btn" onclick="closeAddModal()">&times;</button>
+            </div>
+            <form id="addForm">
+                <div class="project-table-form-group">
+                    <label for="addName">姓名</label>
+                    <input type="text" id="addName" required>
+                </div>
+                <div class="project-table-form-group">
+                    <label for="addRole">角色</label>
+                    <select id="addRole" required>
+                        <option value="">请选择角色</option>
+                        <option value="前端开发工程师">前端开发工程师</option>
+                        <option value="UI设计师">UI设计师</option>
+                        <option value="产品经理">产品经理</option>
+                        <option value="后端开发工程师">后端开发工程师</option>
+                        <option value="测试工程师">测试工程师</option>
+                    </select>
+                </div>
+                <div class="project-table-form-group">
+                    <label for="addDescription">描述</label>
+                    <textarea id="addDescription" required></textarea>
+                </div>
+                <div class="project-table-form-actions">
+                    <button type="button" class="project-table-btn project-table-btn-cancel" onclick="closeAddModal()">取消</button>
+                    <button type="submit" class="project-table-btn project-table-btn-save">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

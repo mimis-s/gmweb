@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GM命令卡片</title>
     <link rel="stylesheet" href="assets/assets/gm_project_card/card.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="project-card">
@@ -15,20 +16,24 @@
             <p class="project-title">内网测试服GM</p>
             <p></p>
           </div>
-          <button class="project-card-btn">修改</button>
+          <button class="project-card-btn" id="projectCardBtn">更多</button>
         </div>
-      </div>
-    <!-- <div class="project-card">
-        <div class="project-wrapper">
-          <div class="project-card-image">内</div>
-          <div class="project-content">
-            <p class="project-title">内网测试服GM</p>
-            <p></p>
+    </div>
+    <div class="project-card-modal-overlay" id="modalOverlay">
+      <div class="project-card-modal-content">
+          <div>
+              <button class="close-btn" id="closeBtn">
+                  <i class="fas fa-times"></i>
+              </button>
           </div>
-          <button class="project-card-btn">修改</button>
-        </div>
-        <p class="project-tag">New</p>
-    </div> -->
+          <div class="project-card-modal-image" id="modalJsonArgs">
+               <p>命令参数区域</p>
+          </div>
+          <div>
+            <button class="project-card-btn project-card-btn-add">添加新数据</button>
+          </div>
+      </div>
+  </div>
 </body>
 
 </html>
