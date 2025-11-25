@@ -17,7 +17,6 @@ func Init() (*ControllerHandler, error) {
 
 func (c *ControllerHandler) Index(ctx *web.WebContext) {
 	// ctx.GetGinContext().HTML(200, "index.html", nil)
-	SetSeesion(ctx, &webmodel.GetUserReq{Username: "1"})
 	c.Home(ctx)
 }
 
@@ -72,10 +71,10 @@ func (c *ControllerHandler) GmOrderTable(ctx *web.WebContext) {
 
 // 获取当前的gm命令
 func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq) {
-	session := GetSession(ctx)
-	if session == nil {
-		return
-	}
+	// session := GetSession(ctx)
+	// if session == nil {
+	// 	return
+	// }
 	// roleId := session.Values["user_id"].(int64)
 
 	// 现在暂时不接入mysql, 先造一个假数据把界面展示做了
@@ -121,10 +120,10 @@ func (c *ControllerHandler) PostApiSendGmOrder(ctx *web.WebContext, req *webmode
 }
 
 func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *webmodel.GetGmProjectBoxReq) {
-	session := GetSession(ctx)
-	if session == nil {
-		return
-	}
+	// session := GetSession(ctx)
+	// if session == nil {
+	// 	return
+	// }
 	rsp := &webmodel.GetGmOrderBoxRsp{}
 	rsp.ProjectId = 1
 	rsp.Datas = make([]*webmodel.GmOrder, 0)
@@ -147,4 +146,10 @@ func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *web
 		})
 	}
 	ctx.SuccessOk(rsp)
+}
+
+// 删除gm命令
+func (c *ControllerHandler) PostApiDelGmOrder(ctx *web.WebContext, req *webmodel.DelGmOrderReq) {
+	fmt.Printf("删除gm命令成功%v\n", req)
+	ctx.SuccessOk("成功")
 }

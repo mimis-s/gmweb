@@ -28,21 +28,16 @@ function initGmRederTableDatagmOrderData(newBox, gmOrderData){
     gmOrderData.datas.forEach(data => {
         createTableItem(newBox, data);
     });
-
-    // 修改数据模态框
-    const projectTableEditModal = newBox.querySelector('#projectTableEditModal');
-    projectTableEditModal.addEventListener('submit', function(e) { 
-        const editName = projectTableEditModal.querySelector('#editName')
-        alert('数据修改成功！', editName.value);
-    });
 }
 
 function createTableItem(newBox, data){
     const listContainer = newBox.querySelector('#projectTableDataList');
-    const index = newBox.querySelectorAll("#project-table-list-item").length;
+    const index = listContainer.querySelectorAll("#projectTableListItem").length;
+    // gmOrderTableMap.set(index, data);
 
     const listItem = document.createElement('div');
     listItem.className = 'project-table-list-item';
+    listItem.id = 'projectTableListItem';
     listItem.innerHTML = `
         <div class="project-table-item-content">
             <div>
@@ -50,28 +45,61 @@ function createTableItem(newBox, data){
             </div>
         </div>
         <div class="project-table-item-actions">
-            <button class="project-table-btn project-table-btn-edit" onclick="openEditItemModal(${newBox}, ${index})">修改</button>
-            <button class="project-table-btn project-table-btn-delete" onclick="deleteItemModel(${newBox}, ${index})">删除</button>
+            <button class="project-table-btn project-table-btn-edit" id="projectTableBtnEdit-${index}">修改</button>
+            <button class="project-table-btn project-table-btn-delete" id="projectTableBtnDelete-${index}">删除</button>
         </div>
     `;
-    gmOrderTableMap.set(index, data);
+   
+    // 修改事件
+    const editButton = listItem.querySelector('#projectTableBtnEdit-'+String(index))
+    editButton.addEventListener('click', () => {
+        const projectTableEditModal =  document.getElementById('projectTableEditModal');
+        projectTableEditModal.style.display = 'flex';
+        projectTableEditModal.querySelector('#editName').value = data.ordername;
+        projectTableEditModal.querySelector('#editDescription').value = data.orderdesc;
+    });
+
+    // 删除事件
+    const delButton = listItem.querySelector('#projectTableBtnDelete-'+String(index))
+    delButton.addEventListener('click', function(e) {
+        console.log(`按钮在第 ${index + 1} 行`);
+        listItem.remove();
+        postDelGmOrder(data.projectid, data.orderid);
+    });
     listContainer.appendChild(listItem);
 }
 
-// 打开编辑模态框
-function openEditItemModal(newBox, index) {
-    // 示例数据
-    document.getElementById('projectTableEditModal').style.display = 'flex';
-    const projectTableEditModal = newBox.querySelector('#projectTableEditModal');
-    projectTableEditModal.style.display = 'flex';
-    const itemData = gmOrderTableMap.get(index)
-    projectTableEditModal.querySelector('#editName').value = itemData.ordername;
-    projectTableEditModal.querySelector('#editDescription').value = itemData.orderdesc;
-}
+// // 打开编辑模态框
+// function openEditItemModal() {
+
+//     // 找到当前打开的是第几行的数据
+//     const listContainer = document.getElementById('projectTableDataList');
+//     buttons = Array.from(document.querySelectorAll('#projectTableListItem'));
+
+//     // 示例数据
+//     const projectTableEditModal =  document.getElementById('projectTableEditModal');
+//     projectTableEditModal.style.display = 'flex';
+//     const itemData = gmOrderTableMap.get(index);
+//     console.log(gmOrderTableMap.get(0))
+//     console.log(gmOrderTableMap)
+//     projectTableEditModal.querySelector('#editName').value = itemData.ordername;
+//     projectTableEditModal.querySelector('#editDescription').value = itemData.orderdesc;
+// }
 
 // 关闭编辑模态框
 function closeEditItemModal() {
     document.getElementById('projectTableEditModal').style.display = 'none';
+}
+
+// 保存编辑框内容
+function saveEditItemModal() {
+    // 你的保存逻辑
+    console.log('保存数据...');
+    const projectTableEditModal = document.getElementById('projectTableEditModal');
+    // 关闭当前模态框
+   projectTableEditModal.style.display = 'none';
+    const editName = projectTableEditModal.querySelector('#editName')
+    alert('数据修改成功！', editName.value);
 }
 
 // 打开添加模态框
@@ -83,18 +111,4 @@ function openAddModal() {
 function closeAddModal() {
     // document.getElementById('addModal').style.display = 'none';
     // document.getElementById('addForm').reset();
-}
-
-// 删除项目
-function deleteItem(newBox, index) {
-    // 示例数据
-    let dataItems = [
-        { name: "用户1", role: "前端开发工程师", description: "3年经验" },
-        { name: "用户2", role: "UI设计师", description: "擅长响应式设计" },
-        { name: "用户3", role: "产品经理", description: "5年互联网经验" }
-    ];
-    if (confirm("确定要删除这条数据吗？")) {
-        dataItems.splice(index, 1);
-        // renderList();
-    }
 }

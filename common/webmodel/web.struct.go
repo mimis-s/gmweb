@@ -46,3 +46,11 @@ type GetGmProjectBoxRsp struct {
 	ProjectId int64      `json:"projectid"` // 项目id
 	Datas     []*GmOrder `json:"datas"`     // 项目id对应的所有命令数据
 }
+
+type DelGmOrderReq struct {
+	ProjectId int64 `json:"projectid"` // 项目id
+	OrderId   int64 `json:"orderid"`   // 命令id
+}
+
+type DelGmOrderRsp struct {
+}

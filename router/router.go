@@ -40,6 +40,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.PostWithStructParams("/api/gm_order_box", "获取gm指令的post", webmodel.GetGmOrderBoxReq{}, controllerHandler.PostApiGmOrderBox)
 		engine.PostWithStructParams("/api/gm_order_send", "发送gm命令", webmodel.SendGmOrderReq{}, controllerHandler.PostApiSendGmOrder)
 		engine.PostWithStructParams("/api/gm_project_box", "获取项目数据", webmodel.GetGmProjectBoxReq{}, controllerHandler.PostApiGetGmProjectBox)
+		engine.PostWithStructParams("/api/gm_order_del", "删除gm命令", webmodel.DelGmOrderReq{}, controllerHandler.PostApiDelGmOrder)
 
 		a.AddServer("gmweb", engine)
 		return nil

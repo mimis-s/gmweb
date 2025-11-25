@@ -19,39 +19,28 @@
     <div class="project-table-modal" id="projectTableEditModal">
         <div class="project-table-modal-content">
             <div class="project-table-modal-header">
-                <h2 class="project-table-modal-title">编辑数据</h2>
+                <h2 class="project-table-modal-title">修改GM命令</h2>
                 <button class="project-table-close-btn" onclick="closeEditItemModal()">&times;</button>
             </div>
             <form id="editForm">
                 <div class="project-table-form-group">
-                    <label for="editName">姓名</label>
-                    <input type="text" id="editName" required>
+                    <label for="editName">命令名字(不允许修改)</label>
+                    <input type="text" id="editName" required disabled>
                 </div>
                 <div class="project-table-form-group">
-                    <label for="editRole">角色</label>
-                    <select id="editRole" required>
-                        <option value="">请选择角色</option>
-                        <option value="前端开发工程师">前端开发工程师</option>
-                        <option value="UI设计师">UI设计师</option>
-                        <option value="产品经理">产品经理</option>
-                        <option value="后端开发工程师">后端开发工程师</option>
-                        <option value="测试工程师">测试工程师</option>
-                    </select>
-                </div>
-                <div class="project-table-form-group">
-                    <label for="editDescription">描述</label>
-                    <textarea id="editDescription" required></textarea>
+                    <label for="editDescription">命令详情</label>
+                    <textarea id="editDescription" class="form-input" required></textarea>
                 </div>
                 <div class="project-table-form-actions">
                     <button class="project-table-btn project-table-btn-cancel" onclick="closeEditItemModal()">取消</button>
-                    <button type="submit" class="project-table-btn project-table-btn-save">保存</button>
+                    <button type="button" class="project-table-btn project-table-btn-save" onclick="saveEditItemModal()">保存</button>
                 </div>
             </form>
         </div>
     </div>
     
     <!-- 添加模态框 -->
-    <div class="project-table-modal" id="projectTableAddModal">
+    <!-- <div class="project-table-modal" id="projectTableAddModal">
         <div class="project-table-modal-content">
             <div class="project-table-modal-header">
                 <h2 class="project-table-modal-title">添加新数据</h2>
@@ -83,6 +72,6 @@
                 </div>
             </form>
         </div>
-    </div>
+    </div> -->
 </body>
 </html>
