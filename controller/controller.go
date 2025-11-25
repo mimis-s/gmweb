@@ -133,11 +133,23 @@ func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *web
 		orderDesc := fmt.Sprintf("GM发邮件:%v", i)
 
 		rsp.Datas = append(rsp.Datas, &webmodel.GmOrder{
-			OrderId:     orderId,
-			OrderName:   orderName,
-			OrderDesc:   orderDesc,
-			Level:       1,
-			OrderStruct: "",
+			OrderId:   orderId,
+			OrderName: orderName,
+			OrderDesc: orderDesc,
+			Level:     1,
+			OrderStruct: ` {
+                            "id": 101,
+                            "title": "JavaScript高级程序设计",
+                            "author": "Nicholas C. Zakas",
+                            "price": 89.50,
+                            "inStock": true,
+                            "tags": ["编程", "前端", "JavaScript"],
+                            "metadata": {
+                                "isbn": "9787115275790",
+                                "pages": 704,
+                                "publisher": "人民邮电出版社"
+                            }
+                        },`,
 			LastRunArgs: "",
 			OrderStatus: map[int]int64{1: 10, 2: 20, 3: 5},
 			IsLike:      true,

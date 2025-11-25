@@ -56,7 +56,7 @@ function createTableItem(newBox, data){
         const projectTableEditModal =  document.getElementById('projectTableEditModal');
         projectTableEditModal.style.display = 'flex';
         projectTableEditModal.querySelector('#editName').value = data.ordername;
-        projectTableEditModal.querySelector('#editDescription').value = data.orderdesc;
+        projectTableEditModal.querySelector('#editDescription').value = data.orderstruct;
     });
 
     // 删除事件
