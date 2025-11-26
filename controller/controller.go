@@ -149,7 +149,7 @@ func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *web
                                 "pages": 704,
                                 "publisher": "人民邮电出版社"
                             }
-                        },`,
+                        }`,
 			LastRunArgs: "",
 			OrderStatus: map[int]int64{1: 10, 2: 20, 3: 5},
 			IsLike:      true,

@@ -33,7 +33,7 @@ function initGmRederTableDatagmOrderData(newBox, gmOrderData){
 function createTableItem(newBox, data){
     const listContainer = newBox.querySelector('#projectTableDataList');
     const index = listContainer.querySelectorAll("#projectTableListItem").length;
-    // gmOrderTableMap.set(index, data);
+    gmOrderTableMap.set(data.ordername, data);
 
     const listItem = document.createElement('div');
     listItem.className = 'project-table-list-item';
@@ -41,7 +41,7 @@ function createTableItem(newBox, data){
     listItem.innerHTML = `
         <div class="project-table-item-content">
             <div>
-                <strong>${data.ordername}</strong> - ${data.orderdesc} - ${data.lastrunargs}
+                <strong id="orderName">${data.ordername}</strong> - <strong>${data.orderdesc}</strong> - <strong id="orderStruct">${data.orderstruct}</strong>
             </div>
         </div>
         <div class="project-table-item-actions">
@@ -55,8 +55,20 @@ function createTableItem(newBox, data){
     editButton.addEventListener('click', () => {
         const projectTableEditModal =  document.getElementById('projectTableEditModal');
         projectTableEditModal.style.display = 'flex';
+        console.debug('点击按钮:',data.ordername)
         projectTableEditModal.querySelector('#editName').value = data.ordername;
-        projectTableEditModal.querySelector('#editDescription').value = data.orderstruct;
+        const editDescriptionWarn = projectTableEditModal.querySelector('#editDescriptionWarn')
+        const outputArea = projectTableEditModal.querySelector('#editDescription')
+        try {
+            // 格式化JSON并显示
+            const parsedJSON = JSON.parse(data.orderstruct);
+            outputArea.value = JSON.stringify(parsedJSON, null, 2);
+            outputArea.style.display = 'block';
+            editDescriptionWarn.textContent='';
+        } catch (error) {
+            // 处理JSON解析错误
+            editDescriptionWarn.textContent = '错误：无效的JSON格式\n' + error.message;
+        }
     });
 
     // 删除事件
@@ -69,22 +81,20 @@ function createTableItem(newBox, data){
     listContainer.appendChild(listItem);
 }
 
-// // 打开编辑模态框
-// function openEditItemModal() {
-
-//     // 找到当前打开的是第几行的数据
-//     const listContainer = document.getElementById('projectTableDataList');
-//     buttons = Array.from(document.querySelectorAll('#projectTableListItem'));
-
-//     // 示例数据
-//     const projectTableEditModal =  document.getElementById('projectTableEditModal');
-//     projectTableEditModal.style.display = 'flex';
-//     const itemData = gmOrderTableMap.get(index);
-//     console.log(gmOrderTableMap.get(0))
-//     console.log(gmOrderTableMap)
-//     projectTableEditModal.querySelector('#editName').value = itemData.ordername;
-//     projectTableEditModal.querySelector('#editDescription').value = itemData.orderdesc;
-// }
+function parseGmJson(){
+    const outputArea =  document.getElementById('editDescription');
+    const editDescriptionWarn = document.getElementById('editDescriptionWarn')
+    try {
+        // 格式化JSON并显示
+        const parsedJSON = JSON.parse(outputArea.value);
+        outputArea.value = JSON.stringify(parsedJSON, null, 2);
+        outputArea.style.display = 'block';
+        editDescriptionWarn.textContent='';
+    } catch (error) {
+        // 处理JSON解析错误
+        editDescriptionWarn.textContent = '错误：无效的JSON格式\n' + error.message;
+    }
+}
 
 // 关闭编辑模态框
 function closeEditItemModal() {
@@ -97,9 +107,19 @@ function saveEditItemModal() {
     console.log('保存数据...');
     const projectTableEditModal = document.getElementById('projectTableEditModal');
     // 关闭当前模态框
-   projectTableEditModal.style.display = 'none';
+    projectTableEditModal.style.display = 'none';
     const editName = projectTableEditModal.querySelector('#editName')
-    alert('数据修改成功！', editName.value);
+    const outputArea = projectTableEditModal.querySelector('#editDescription')
+
+    const listContainer = document.getElementById('projectTableDataList');
+    listContainer.querySelectorAll("#projectTableListItem").forEach((child) => {
+        console.log('保存数据...', child.querySelector('#orderName').textContent, editName.value);
+        if (child.querySelector('#orderName').textContent == editName.value)
+        {
+            child.querySelector('#orderStruct').textContent = outputArea.value;
+            gmOrderTableMap.get(editName.value).orderstruct = outputArea.value;
+        }
+    });
 }
 
 // 打开添加模态框

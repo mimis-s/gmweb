@@ -28,11 +28,15 @@
                     <input type="text" id="editName" required disabled>
                 </div>
                 <div class="project-table-form-group">
-                    <label for="editDescription">命令详情</label>
-                    <textarea id="editDescription" class="form-input" required></textarea>
+                    <button type="button" class="project-table-btn" onclick="parseGmJson()">格式化</button>
+                </div>
+                <div class="project-table-form-group">
+                    <label for="editDescription">命令详情:<label id="editDescriptionWarn" style="color: red;"></label></label>
+                    <textarea id="editDescription" class="project-table-json-textarea"></textarea>
+                <!-- <div id="editDescription" class="project-table-json-textarea"></div> -->
                 </div>
                 <div class="project-table-form-actions">
-                    <button class="project-table-btn project-table-btn-cancel" onclick="closeEditItemModal()">取消</button>
+                    <button type="button" class="project-table-btn project-table-btn-cancel" onclick="closeEditItemModal()">取消</button>
                     <button type="button" class="project-table-btn project-table-btn-save" onclick="saveEditItemModal()">保存</button>
                 </div>
             </form>
