@@ -9,7 +9,7 @@ function loadGmOrderCard(gridWrapper, gmOrderData){
     }).then(html => {
         const orderList = gmOrderData.datas;
         for (let i = 0; i < orderList.length; i++) {
-            const order = orderList[i];
+            const order = orderList[i].gmorderdata;
             const newBox = document.createElement('div');
             newBox.className = "gm_card_layout"
 		    newBox.innerHTML = html;

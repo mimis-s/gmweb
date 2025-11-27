@@ -14,21 +14,21 @@ type GetGmOrderBoxReq struct {
 }
 
 type GetGmOrderBoxRsp struct {
-	ProjectId int64      `json:"projectid"` // 项目id
-	Datas     []*GmOrder `json:"datas"`     // 项目id对应的所有命令数据
+	ProjectId int64          `json:"projectid"` // 项目id
+	Datas     []*RoleGmOrder `json:"datas"`     // 项目id对应的所有命令数据
+}
+
+type RoleGmOrder struct {
+	GmOrderData *GmOrder `json:"gmorderdata"`
+	LastRunArgs string   `json:"lastrunargs"` // 玩家上一次执行的参数(大量的数据其实都是重复写入的, 所以这里记录玩家上一次执行命令)
 }
 
 type GmOrder struct {
-	OrderId     int64         `json:"orderid"` // 命令id
-	OrderName   string        `json:"ordername"`
-	OrderDesc   string        `json:"orderdesc"`
-	Level       int           `json:"level"`
-	OrderStruct string        `json:"orderstruct"` // 命令结构
-	LastRunArgs string        `json:"lastrunargs"` // 玩家上一次执行的参数(大量的数据其实都是重复写入的, 所以这里记录玩家上一次执行命令)
-	OrderStatus map[int]int64 `json:"orderstatus"` // 点赞/倒赞/收藏对应的数量
-	IsLike      bool          // 当前玩家是否点赞
-	IsBelittle  bool          // 当前玩家是否倒赞
-	Iscollect   bool          // 当前玩家是否收藏
+	OrderId     int64  `json:"orderid"` // 命令id
+	OrderName   string `json:"ordername"`
+	OrderDesc   string `json:"orderdesc"`
+	Level       int    `json:"level"`
+	OrderStruct string `json:"orderstruct"` // 命令结构
 }
 
 type SendGmOrderReq struct {
@@ -53,4 +53,27 @@ type DelGmOrderReq struct {
 }
 
 type DelGmOrderRsp struct {
+}
+
+type AddGmOrderReq struct {
+	ProjectId   int64  `json:"projectid"` // 项目id
+	OrderName   string `json:"ordername"` // 命令名字(不允许重名)
+	Level       int    `json:"level"`
+	OrderDesc   string `json:"orderdesc"`
+	OrderStruct string `json:"orderstruct"` // 命令结构
+}
+
+type AddGmOrderRsp struct {
+	ProjectId int64    `json:"projectid"` // 项目id
+	Data      *GmOrder `json:"data"`
+}
+
+type ModifyGmOrderReq struct {
+	ProjectId int64    `json:"projectid"` // 项目id
+	Data      *GmOrder `json:"data"`
+}
+
+type ModifyGmOrderRsp struct {
+	ProjectId int64    `json:"projectid"` // 项目id
+	Data      *GmOrder `json:"data"`
 }

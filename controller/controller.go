@@ -80,23 +80,28 @@ func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel
 	// 现在暂时不接入mysql, 先造一个假数据把界面展示做了
 	rsp := &webmodel.GetGmOrderBoxRsp{}
 	rsp.ProjectId = 1
-	rsp.Datas = make([]*webmodel.GmOrder, 0)
+	rsp.Datas = make([]*webmodel.RoleGmOrder, 0)
 	for i := 0; i < 10; i++ {
 		orderId := int64(i)
 		orderName := fmt.Sprintf("名字:%v", i)
 		orderDesc := fmt.Sprintf("GM发邮件:%v", i)
 
-		rsp.Datas = append(rsp.Datas, &webmodel.GmOrder{
-			OrderId:     orderId,
-			OrderName:   orderName,
-			OrderDesc:   orderDesc,
-			Level:       1,
-			OrderStruct: "",
+		rsp.Datas = append(rsp.Datas, &webmodel.RoleGmOrder{
+			GmOrderData: &webmodel.GmOrder{
+				OrderId:   orderId,
+				OrderName: orderName,
+				OrderDesc: orderDesc,
+				Level:     1,
+				OrderStruct: ` {
+                            "id": 101,
+                            "title": "JavaScript高级程序设计",
+                            "author": "Nicholas C. Zakas",
+                            "price": 89.50,
+                            "inStock": true,
+                            "tags": ["编程", "前端", "JavaScript"]
+							}`,
+			},
 			LastRunArgs: "",
-			OrderStatus: map[int]int64{1: 10, 2: 20, 3: 5},
-			IsLike:      true,
-			IsBelittle:  false,
-			Iscollect:   true,
 		})
 	}
 	ctx.SuccessOk(rsp)
@@ -126,35 +131,28 @@ func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *web
 	// }
 	rsp := &webmodel.GetGmOrderBoxRsp{}
 	rsp.ProjectId = 1
-	rsp.Datas = make([]*webmodel.GmOrder, 0)
+	rsp.Datas = make([]*webmodel.RoleGmOrder, 0)
 	for i := 0; i < 10; i++ {
 		orderId := int64(i)
 		orderName := fmt.Sprintf("名字:%v", i)
 		orderDesc := fmt.Sprintf("GM发邮件:%v", i)
 
-		rsp.Datas = append(rsp.Datas, &webmodel.GmOrder{
-			OrderId:   orderId,
-			OrderName: orderName,
-			OrderDesc: orderDesc,
-			Level:     1,
-			OrderStruct: ` {
+		rsp.Datas = append(rsp.Datas, &webmodel.RoleGmOrder{
+			GmOrderData: &webmodel.GmOrder{
+				OrderId:   orderId,
+				OrderName: orderName,
+				OrderDesc: orderDesc,
+				Level:     1,
+				OrderStruct: ` {
                             "id": 101,
                             "title": "JavaScript高级程序设计",
                             "author": "Nicholas C. Zakas",
                             "price": 89.50,
                             "inStock": true,
-                            "tags": ["编程", "前端", "JavaScript"],
-                            "metadata": {
-                                "isbn": "9787115275790",
-                                "pages": 704,
-                                "publisher": "人民邮电出版社"
-                            }
-                        }`,
+                            "tags": ["编程", "前端", "JavaScript"]
+							}`,
+			},
 			LastRunArgs: "",
-			OrderStatus: map[int]int64{1: 10, 2: 20, 3: 5},
-			IsLike:      true,
-			IsBelittle:  false,
-			Iscollect:   true,
 		})
 	}
 	ctx.SuccessOk(rsp)
@@ -164,4 +162,28 @@ func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *web
 func (c *ControllerHandler) PostApiDelGmOrder(ctx *web.WebContext, req *webmodel.DelGmOrderReq) {
 	fmt.Printf("删除gm命令成功%v\n", req)
 	ctx.SuccessOk("成功")
+}
+
+// 新增gm命令
+func (c *ControllerHandler) PostApiAddGmOrder(ctx *web.WebContext, req *webmodel.AddGmOrderReq) {
+	rsp := &webmodel.AddGmOrderRsp{
+		Data: &webmodel.GmOrder{
+			Level:       req.Level,
+			OrderDesc:   req.OrderDesc,
+			OrderId:     1,
+			OrderStruct: req.OrderStruct,
+			OrderName:   req.OrderName,
+		},
+	}
+	rsp.ProjectId = req.ProjectId
+	ctx.SuccessOk(rsp)
+}
+
+// 修改gm命令
+func (c *ControllerHandler) PostApiModifyGmOrder(ctx *web.WebContext, req *webmodel.ModifyGmOrderReq) {
+	rsp := &webmodel.ModifyGmOrderRsp{
+		Data: req.Data,
+	}
+	rsp.ProjectId = req.ProjectId
+	ctx.SuccessOk(rsp)
 }

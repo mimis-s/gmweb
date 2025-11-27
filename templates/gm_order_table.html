@@ -14,6 +14,9 @@
             <div class="project-table-item-actions">操作</div>
         </div>
     </div>
+    <div>
+        <button class="project-card-btn project-card-btn-add" onclick="openAddModal()">添加新数据</button>
+    </div>
         
     <!-- 编辑模态框 -->
     <div class="project-table-modal" id="projectTableEditModal">
@@ -28,7 +31,15 @@
                     <input type="text" id="editName" required disabled>
                 </div>
                 <div class="project-table-form-group">
-                    <button type="button" class="project-table-btn" onclick="parseGmJson()">格式化</button>
+                    <label for="editLevel">等级</label>
+                    <input type="text" id="editLevel" required>
+                </div>
+                <div class="project-table-form-group">
+                    <label for="editDesc">描述</label>
+                    <input type="text" id="editDesc" required>
+                </div>
+                <div class="project-table-form-group">
+                    <button type="button" class="project-table-btn" onclick="parseGmJsonEdit()">格式化</button>
                 </div>
                 <div class="project-table-form-group">
                     <label for="editDescription">命令详情:<label id="editDescriptionWarn" style="color: red;"></label></label>
@@ -44,38 +55,39 @@
     </div>
     
     <!-- 添加模态框 -->
-    <!-- <div class="project-table-modal" id="projectTableAddModal">
+    <div class="project-table-modal" id="projectTableAddModal">
         <div class="project-table-modal-content">
             <div class="project-table-modal-header">
-                <h2 class="project-table-modal-title">添加新数据</h2>
+                <h2 class="project-table-modal-title">新增GM命令</h2>
                 <button class="project-table-close-btn" onclick="closeAddModal()">&times;</button>
             </div>
             <form id="addForm">
                 <div class="project-table-form-group">
-                    <label for="addName">姓名</label>
+                    <label for="addName">命令名字(不能重名)</label>
                     <input type="text" id="addName" required>
                 </div>
                 <div class="project-table-form-group">
-                    <label for="addRole">角色</label>
-                    <select id="addRole" required>
-                        <option value="">请选择角色</option>
-                        <option value="前端开发工程师">前端开发工程师</option>
-                        <option value="UI设计师">UI设计师</option>
-                        <option value="产品经理">产品经理</option>
-                        <option value="后端开发工程师">后端开发工程师</option>
-                        <option value="测试工程师">测试工程师</option>
-                    </select>
+                    <label for="addLevel">等级</label>
+                    <input type="text" id="addLevel" required>
                 </div>
                 <div class="project-table-form-group">
-                    <label for="addDescription">描述</label>
-                    <textarea id="addDescription" required></textarea>
+                    <label for="addDesc">描述</label>
+                    <input type="text" id="addDesc" required>
+                </div>
+                <div class="project-table-form-group">
+                    <button type="button" class="project-table-btn" onclick="parseGmJsonAdd()">格式化</button>
+                </div>
+                <div class="project-table-form-group">
+                    <label for="addDescription">命令详情:<label id="addDescriptionWarn" style="color: red;"></label></label>
+                    <textarea id="addDescription" class="project-table-json-textarea"></textarea>
+                <!-- <div id="editDescription" class="project-table-json-textarea"></div> -->
                 </div>
                 <div class="project-table-form-actions">
                     <button type="button" class="project-table-btn project-table-btn-cancel" onclick="closeAddModal()">取消</button>
-                    <button type="submit" class="project-table-btn project-table-btn-save">添加</button>
+                    <button type="button" class="project-table-btn project-table-btn-save" onclick="saveAddItemModal()">保存</button>
                 </div>
             </form>
         </div>
-    </div> -->
+    </div>
 </body>
 </html>
