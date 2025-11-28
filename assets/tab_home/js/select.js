@@ -20,7 +20,7 @@
 	function loadDummyData(ev, itemName) {
         ev.preventDefault();
         closeMenu();
-        gridWrapper.innerHTML = `<p class="info">GM管理平台欢迎你</p>`;
+        gridWrapper.innerHTML = `<p class="info" id="gridWrapper">GM管理平台欢迎你</p>`;
         // classie.add(gridWrapper, 'content--loading');
 		if (itemName == "相当重要😨")
 		{
@@ -47,7 +47,7 @@ function loadGmOrderModule(ev, gridWrapper, classie){
     		// const newBox = document.createElement('div');
     		// newBox.innerHTML = html;
         	gridWrapper.innerHTML = html;
-    		loadGmOrderBoxEvent(gridWrapper); // box里面所有order的数据		
+    		loadGmOrderBoxEvent(gridWrapper.querySelector('#gmOrderBox')); // box里面所有order的数据		
         })
         .catch(error => {
             console.error('加载 header.html 时出现问题:', error);
@@ -69,7 +69,7 @@ function loadGmProjectModule(ev, gridWrapper, classie){
     		// const newBox = document.createElement('div');
     		// newBox.innerHTML = html;
         	gridWrapper.innerHTML = html;
-    		loadGmProjectBoxEvent(gridWrapper); // box里面所有order的数据		
+    		loadGmProjectBoxEvent(gridWrapper.querySelector('#gmProjectBox')); // box里面所有order的数据		
         })
         .catch(error => {
             console.error('加载 header.html 时出现问题:', error);

@@ -8,7 +8,7 @@ function loadGmProjectCard(gridWrapper, gmOrderData){
           return response.text();
       }).then(html => {
               const newBox = document.createElement('div');
-              // newBox.className = "gm_card_layout"
+              newBox.className = "gm_card_layout"
               newBox.innerHTML = html;
               gridWrapper.appendChild(newBox);
               gmProjectCardEvent(gmOrderData, newBox); // 卡片事件

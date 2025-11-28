@@ -100,6 +100,8 @@ func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel
                             "inStock": true,
                             "tags": ["编程", "前端", "JavaScript"]
 							}`,
+				Path:   "/api/test",
+				Method: "POST",
 			},
 			LastRunArgs: "",
 		})
@@ -129,21 +131,20 @@ func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *web
 	// if session == nil {
 	// 	return
 	// }
-	rsp := &webmodel.GetGmOrderBoxRsp{}
+	rsp := &webmodel.GetGmProjectBoxRsp{}
 	rsp.ProjectId = 1
-	rsp.Datas = make([]*webmodel.RoleGmOrder, 0)
+	rsp.Datas = make([]*webmodel.GmOrder, 0)
 	for i := 0; i < 10; i++ {
 		orderId := int64(i)
 		orderName := fmt.Sprintf("名字:%v", i)
 		orderDesc := fmt.Sprintf("GM发邮件:%v", i)
 
-		rsp.Datas = append(rsp.Datas, &webmodel.RoleGmOrder{
-			GmOrderData: &webmodel.GmOrder{
-				OrderId:   orderId,
-				OrderName: orderName,
-				OrderDesc: orderDesc,
-				Level:     1,
-				OrderStruct: ` {
+		rsp.Datas = append(rsp.Datas, &webmodel.GmOrder{
+			OrderId:   orderId,
+			OrderName: orderName,
+			OrderDesc: orderDesc,
+			Level:     1,
+			OrderStruct: ` {
                             "id": 101,
                             "title": "JavaScript高级程序设计",
                             "author": "Nicholas C. Zakas",
@@ -151,8 +152,8 @@ func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *web
                             "inStock": true,
                             "tags": ["编程", "前端", "JavaScript"]
 							}`,
-			},
-			LastRunArgs: "",
+			Path:   "/api/test",
+			Method: "POST",
 		})
 	}
 	ctx.SuccessOk(rsp)
@@ -185,5 +186,35 @@ func (c *ControllerHandler) PostApiModifyGmOrder(ctx *web.WebContext, req *webmo
 		Data: req.Data,
 	}
 	rsp.ProjectId = req.ProjectId
+	ctx.SuccessOk(rsp)
+}
+
+// 新增gm项目
+func (c *ControllerHandler) PostApiAddGmProject(ctx *web.WebContext, req *webmodel.AddGmProjectReq) {
+	rsp := &webmodel.AddGmProjectRsp{
+		ProjectId: 1,
+		Name:      req.Name,
+		Desc:      req.Desc,
+		GmAddr:    req.GmAddr,
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 删除gm项目
+func (c *ControllerHandler) PostApiDelGmProject(ctx *web.WebContext, req *webmodel.DelGmProjectReq) {
+	rsp := &webmodel.DelGmProjectRsp{
+		ProjectId: req.ProjectId,
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 删除gm项目
+func (c *ControllerHandler) PostApiModifyGmProject(ctx *web.WebContext, req *webmodel.ModifyGmProjectReq) {
+	rsp := &webmodel.ModifyGmProjectRsp{
+		ProjectId: req.ProjectId,
+		Name:      req.Name,
+		Desc:      req.Desc,
+		GmAddr:    req.GmAddr,
+	}
 	ctx.SuccessOk(rsp)
 }

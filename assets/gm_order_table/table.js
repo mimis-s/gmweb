@@ -61,6 +61,8 @@ function createTableItem(newBox, gmorderdata){
         projectTableEditModal.querySelector('#editName').value = data.ordername;
         projectTableEditModal.querySelector('#editLevel').value = data.level;
         projectTableEditModal.querySelector('#editDesc').value = data.orderdesc;
+        projectTableEditModal.querySelector('#editPath').value = data.path;
+        projectTableEditModal.querySelector('#editSelectMethod').value = data.method;
         const editDescriptionWarn = projectTableEditModal.querySelector('#editDescriptionWarn')
         const outputArea = projectTableEditModal.querySelector('#editDescription')
         try {
@@ -135,6 +137,8 @@ function saveEditItemModal() {
     const editLevel = projectTableEditModal.querySelector('#editLevel');
     const editDesc = projectTableEditModal.querySelector('#editDesc');
     const outputArea = projectTableEditModal.querySelector('#editDescription')
+    const editPath = projectTableEditModal.querySelector('#editPath');
+    const editMethod = projectTableEditModal.querySelector('#editSelectMethod');
     var modifyGmOrderReq = {
         ProjectId: 1, // 项目id
         "data":{
@@ -142,6 +146,8 @@ function saveEditItemModal() {
 	        Level: Number(editLevel.value),
 	        OrderDesc: editDesc.value,
 	        OrderStruct: outputArea.value,
+            Path: editPath.value,
+            Method: editMethod.value,
         }
     }
     modifyGmOrderData(modifyGmOrderReq)
@@ -158,13 +164,16 @@ function saveAddItemModal() {
     const outputArea = projectTableAddModal.querySelector('#addDescription');
     const addLevel = projectTableAddModal.querySelector('#addLevel');
     const addDesc = projectTableAddModal.querySelector('#addDesc');
-
+    const addPath = projectTableEditModal.querySelector('#addPath');
+    const addMethod = projectTableEditModal.querySelector('#addSelectMethod');
     var addGmOrderReq = {
         ProjectId: 1, // 项目id
 	    OrderName: addName.value, // 命令名字(不允许重名)
 	    Level: Number(addLevel.value),
 	    OrderDesc: addDesc.value,
 	    OrderStruct: outputArea.value,
+        Path: addPath.value,
+        Method: addMethod.value,
     }
     addGmOrderData(addGmOrderReq)
 }

@@ -1,7 +1,7 @@
 .gm_project_box {
-    display: flex;
+    display: flow-root;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    /* background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); */
     padding: 20px;
 }

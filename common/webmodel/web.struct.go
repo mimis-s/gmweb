@@ -26,6 +26,8 @@ type RoleGmOrder struct {
 type GmOrder struct {
 	OrderId     int64  `json:"orderid"` // 命令id
 	OrderName   string `json:"ordername"`
+	Path        string `json:"path"`   // 路径
+	Method      string `json:"method"` // POST / GET
 	OrderDesc   string `json:"orderdesc"`
 	Level       int    `json:"level"`
 	OrderStruct string `json:"orderstruct"` // 命令结构
@@ -76,4 +78,39 @@ type ModifyGmOrderReq struct {
 type ModifyGmOrderRsp struct {
 	ProjectId int64    `json:"projectid"` // 项目id
 	Data      *GmOrder `json:"data"`
+}
+
+type AddGmProjectReq struct {
+	Name   string // 项目名(不可重复)
+	Desc   string // 项目描述
+	GmAddr string // 项目Gm地址
+}
+
+type AddGmProjectRsp struct {
+	ProjectId int64  `json:"projectid"` // 项目id
+	Name      string // 项目名(不可重复)
+	Desc      string // 项目描述
+	GmAddr    string // 项目Gm地址
+}
+
+type DelGmProjectReq struct {
+	ProjectId int64 `json:"projectid"` // 项目id
+}
+
+type DelGmProjectRsp struct {
+	ProjectId int64 `json:"projectid"` // 项目id
+}
+
+type ModifyGmProjectReq struct {
+	ProjectId int64  `json:"projectid"` // 项目id
+	Name      string // 项目名(不可重复)
+	Desc      string // 项目描述
+	GmAddr    string // 项目Gm地址
+}
+
+type ModifyGmProjectRsp struct {
+	ProjectId int64  `json:"projectid"` // 项目id
+	Name      string // 项目名(不可重复)
+	Desc      string // 项目描述
+	GmAddr    string // 项目Gm地址
 }

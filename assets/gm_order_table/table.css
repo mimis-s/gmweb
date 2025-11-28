@@ -201,13 +201,3 @@ textarea {
         justify-content: flex-start;
     }
 }
-
-.project-table-json-textarea {
-  width: 100%;
-  height: 420px;
-  padding: 10px;
-  border-width: 2px;
-  background-color: #fff;
-  border-radius: 5px;
-  resize: none;
-}
