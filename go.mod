@@ -5,7 +5,7 @@ go 1.23.4
 require (
 	github.com/gin-gonic/gin v1.11.0
 	github.com/gorilla/sessions v1.4.0
-	github.com/mimis-s/zpudding v0.0.0-20251031104121-c300fe40b0da
+	github.com/mimis-s/zpudding v0.0.0-20251116070920-f98fc07c088f
 	xorm.io/xorm v1.3.11
 )
 
@@ -71,7 +71,7 @@ require (
 	go.etcd.io/etcd/client/v2 v2.305.1 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.1 // indirect
 	go.uber.org/mock v0.5.0 // indirect
-	go.uber.org/multierr v1.11.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/arch v0.20.0 // indirect
 	golang.org/x/crypto v0.40.0 // indirect

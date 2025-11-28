@@ -133,6 +133,7 @@ func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *web
 	// }
 	rsp := &webmodel.GetGmProjectBoxRsp{}
 	rsp.ProjectId = 1
+	rsp.ProjectName = "C3内网压测"
 	rsp.Datas = make([]*webmodel.GmOrder, 0)
 	for i := 0; i < 10; i++ {
 		orderId := int64(i)

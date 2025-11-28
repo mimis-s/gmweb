@@ -69,6 +69,7 @@ function loadGmProjectModule(ev, gridWrapper, classie){
     		// const newBox = document.createElement('div');
     		// newBox.innerHTML = html;
         	gridWrapper.innerHTML = html;
+			gridWrapper.id = 'projectGridWrapper';
     		loadGmProjectBoxEvent(gridWrapper.querySelector('#gmProjectBox')); // box里面所有order的数据		
         })
         .catch(error => {

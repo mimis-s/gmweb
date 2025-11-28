@@ -18,6 +18,11 @@ function loadGmProjectCard(gridWrapper, gmOrderData){
   }
 
 function gmProjectCardEvent(gmOrderData, newBox){
+  const projectTitle = newBox.querySelector('#projectTitle');
+  const projectCardImage = newBox.querySelector('#projectCardImage');
+  projectTitle.textContent = gmOrderData.projectname;
+  projectCardImage.textContent = `${gmOrderData.projectname.substring(0, 2)}`;
+
   const projectCardBtn = newBox.querySelector('#projectCardBtn');
   const modalOverlay = newBox.querySelector('#modalOverlay');
   const closeBtn = newBox.querySelector('#closeBtn');

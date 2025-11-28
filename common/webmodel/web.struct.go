@@ -45,8 +45,9 @@ type GetGmProjectBoxReq struct {
 }
 
 type GetGmProjectBoxRsp struct {
-	ProjectId int64      `json:"projectid"` // 项目id
-	Datas     []*GmOrder `json:"datas"`     // 项目id对应的所有命令数据
+	ProjectId   int64      `json:"projectid"` // 项目id
+	ProjectName string     `json:"projectname"`
+	Datas       []*GmOrder `json:"datas"` // 项目id对应的所有命令数据
 }
 
 type DelGmOrderReq struct {
@@ -86,11 +87,16 @@ type AddGmProjectReq struct {
 	GmAddr string // 项目Gm地址
 }
 
+type GmProject struct {
+}
+
 type AddGmProjectRsp struct {
-	ProjectId int64  `json:"projectid"` // 项目id
-	Name      string // 项目名(不可重复)
-	Desc      string // 项目描述
-	GmAddr    string // 项目Gm地址
+	ProjectId   int64  `json:"projectid"` // 项目id
+	Name        string // 项目名(不可重复)
+	Desc        string // 项目描述
+	GmAddr      string // 项目Gm地址
+	ProjectId   int64  `json:"projectid"` // 项目id
+	ProjectName string `json:"projectname"`
 }
 
 type DelGmProjectReq struct {

@@ -58,7 +58,7 @@ function saveAddProjectModal(){
   .then((data) => {
       console.log('成功添加项目:', data);
       document.getElementById('projectAddModal').style.display = 'none';
-      const gridWrapper = document.getElementById('gridWrapper');
+      const gridWrapper = document.getElementById('projectGridWrapper');
       const gmProjectBox = gridWrapper.querySelector('#gmProjectBox');
       loadGmProjectCard(gmProjectBox, data.message);
       alert('新增成功');
