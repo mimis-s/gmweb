@@ -1,6 +1,6 @@
 .project-card {
   width: 190px;
-  height: 254px;
+  height: 294px;
   background: #f5f5f5;
   padding: 15px;
   border-radius: 10px;
@@ -61,6 +61,37 @@
   background-color: greenyellow;
   color: rgb(35, 35, 35);
 }
+
+.project-right {
+  text-align: right;
+}
+
+.project-card-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #64748b;
+  margin-right: -60px;
+  cursor: pointer;
+}
+.project-card:hover .project-card-close-btn {
+  margin-right: 0;
+}
+
+.project-card-edit-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #64748b;
+  margin-right: -60px;
+  cursor: pointer;
+}
+.project-card:hover .project-card-edit-btn {
+  margin-right: 100px;
+}
+
 .project-card:hover {
   background-color: white;
 }
@@ -153,7 +184,6 @@
 .close-btn:hover {
   color: #333;
 }
-
 
 .project-card-btn {
   padding: 8px 15px;

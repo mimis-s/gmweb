@@ -131,16 +131,21 @@ func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *web
 	// if session == nil {
 	// 	return
 	// }
-	rsp := &webmodel.GetGmProjectBoxRsp{}
-	rsp.ProjectId = 1
-	rsp.ProjectName = "C3内网压测"
-	rsp.Datas = make([]*webmodel.GmOrder, 0)
+	rsp := &webmodel.GetGmProjectBoxRsp{
+		Datas: make([]*webmodel.GmProject, 0),
+	}
+	retData := &webmodel.GmProject{}
+	retData.ProjectId = 1
+	retData.GmAddr = "127.0.0.1:2001"
+	retData.Name = "C3内网压测"
+	retData.Desc = "描述"
+	retData.Datas = make([]*webmodel.GmOrder, 0)
 	for i := 0; i < 10; i++ {
 		orderId := int64(i)
 		orderName := fmt.Sprintf("名字:%v", i)
 		orderDesc := fmt.Sprintf("GM发邮件:%v", i)
 
-		rsp.Datas = append(rsp.Datas, &webmodel.GmOrder{
+		retData.Datas = append(retData.Datas, &webmodel.GmOrder{
 			OrderId:   orderId,
 			OrderName: orderName,
 			OrderDesc: orderDesc,
@@ -157,6 +162,9 @@ func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *web
 			Method: "POST",
 		})
 	}
+	rsp.Datas = append(rsp.Datas, retData)
+	rsp.Datas = append(rsp.Datas, retData)
+
 	ctx.SuccessOk(rsp)
 }
 
@@ -193,10 +201,12 @@ func (c *ControllerHandler) PostApiModifyGmOrder(ctx *web.WebContext, req *webmo
 // 新增gm项目
 func (c *ControllerHandler) PostApiAddGmProject(ctx *web.WebContext, req *webmodel.AddGmProjectReq) {
 	rsp := &webmodel.AddGmProjectRsp{
-		ProjectId: 1,
-		Name:      req.Name,
-		Desc:      req.Desc,
-		GmAddr:    req.GmAddr,
+		Data: &webmodel.GmProject{
+			ProjectId: 1,
+			Name:      req.Name,
+			Desc:      req.Desc,
+			GmAddr:    req.GmAddr,
+		},
 	}
 	ctx.SuccessOk(rsp)
 }

@@ -45,9 +45,15 @@ type GetGmProjectBoxReq struct {
 }
 
 type GetGmProjectBoxRsp struct {
-	ProjectId   int64      `json:"projectid"` // 项目id
-	ProjectName string     `json:"projectname"`
-	Datas       []*GmOrder `json:"datas"` // 项目id对应的所有命令数据
+	Datas []*GmProject `json:"datas"`
+}
+
+type GmProject struct {
+	ProjectId int64      `json:"projectid"` // 项目id
+	Name      string     `json:"name"`      // 项目名(不可重复)
+	Desc      string     `json:"desc"`      // 项目描述
+	GmAddr    string     `json:"gmaddr"`    // 项目Gm地址(普通用户没有权限查看修改地址)
+	Datas     []*GmOrder `json:"datas"`     // 项目id对应的所有命令数据
 }
 
 type DelGmOrderReq struct {
@@ -82,21 +88,13 @@ type ModifyGmOrderRsp struct {
 }
 
 type AddGmProjectReq struct {
-	Name   string // 项目名(不可重复)
-	Desc   string // 项目描述
-	GmAddr string // 项目Gm地址
-}
-
-type GmProject struct {
+	Name   string `json:"name"`   // 项目名(不可重复)
+	Desc   string `json:"desc"`   // 项目描述
+	GmAddr string `json:"gmaddr"` // 项目Gm地址
 }
 
 type AddGmProjectRsp struct {
-	ProjectId   int64  `json:"projectid"` // 项目id
-	Name        string // 项目名(不可重复)
-	Desc        string // 项目描述
-	GmAddr      string // 项目Gm地址
-	ProjectId   int64  `json:"projectid"` // 项目id
-	ProjectName string `json:"projectname"`
+	Data *GmProject `json:"data"`
 }
 
 type DelGmProjectReq struct {
@@ -109,14 +107,14 @@ type DelGmProjectRsp struct {
 
 type ModifyGmProjectReq struct {
 	ProjectId int64  `json:"projectid"` // 项目id
-	Name      string // 项目名(不可重复)
-	Desc      string // 项目描述
-	GmAddr    string // 项目Gm地址
+	Name      string `json:"name"`      // 项目名(不可重复)
+	Desc      string `json:"desc"`      // 项目描述
+	GmAddr    string `json:"gmaddr"`    // 项目Gm地址
 }
 
 type ModifyGmProjectRsp struct {
 	ProjectId int64  `json:"projectid"` // 项目id
-	Name      string // 项目名(不可重复)
-	Desc      string // 项目描述
-	GmAddr    string // 项目Gm地址
+	Name      string `json:"name"`      // 项目名(不可重复)
+	Desc      string `json:"desc"`      // 项目描述
+	GmAddr    string `json:"gmaddr"`    // 项目Gm地址
 }

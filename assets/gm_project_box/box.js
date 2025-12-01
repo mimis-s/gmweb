@@ -1,5 +1,5 @@
 // 读取数据
-function loadGmProjectBoxEvent(gridWrapper) {
+function loadGmProjectBoxEvent(gmProjectBox) {
     var gmProjectBoxReq = {}
     fetch('/api/gm_project_box', {
       method: 'POST',
@@ -15,7 +15,7 @@ function loadGmProjectBoxEvent(gridWrapper) {
     })
     .then((data) => {
       console.log('成功拿到所有命令:', data);
-      gmProjectBoxEvent(gridWrapper, data.message);    // 初始化所有卡片
+      gmProjectBoxEvent(gmProjectBox, data.message);    // 初始化所有卡片
       return;
     })
     .catch((error) => {
@@ -60,7 +60,7 @@ function saveAddProjectModal(){
       document.getElementById('projectAddModal').style.display = 'none';
       const gridWrapper = document.getElementById('projectGridWrapper');
       const gmProjectBox = gridWrapper.querySelector('#gmProjectBox');
-      loadGmProjectCard(gmProjectBox, data.message);
+      loadGmProjectCard(gmProjectBox, data.message.data);
       alert('新增成功');
     return;
   })
@@ -70,16 +70,23 @@ function saveAddProjectModal(){
   });
 }
 
-function gmProjectBoxEvent(newBox, data){
-  loadGmProjectCard(newBox, data);    // 初始化所有卡片
-  const projectAddModal = document.getElementById('projectAddModal');
-  const gmProjectBoxAddBtn = newBox.querySelector('#gmProjectBoxAddBtn');
+function gmProjectBoxEvent(gmProjectBox, projectDatas){
 
-  // 打开模态框
-  gmProjectBoxAddBtn.addEventListener('click', () => {
-    projectAddModal.style.display = 'flex';
-    console.debug("打开模态框");
+  projectDatas.datas.forEach(projectData => {
+    loadGmProjectCard(gmProjectBox, projectData);
+    const gmProjectBoxAddBtn = gmProjectBox.querySelector('#gmProjectBoxAddBtn');
+
+    // 打开模态框
+    gmProjectBoxAddBtn.addEventListener('click', () => {
+      projectAddModal.style.display = 'flex';
+      console.debug("打开模态框");
+    });
   });
+
+
+
+  const projectAddModal = document.getElementById('projectAddModal');
+
   
   // 点击模态框外部关闭
   projectAddModal.addEventListener('click', (e) => {

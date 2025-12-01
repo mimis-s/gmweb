@@ -13,9 +13,11 @@
 
 .gm_card_layout{
     float: left;
+    padding-left: 20px;
+    padding-bottom: 20px;
 }
 
-.gm_add_btn_layout{
+.gm_right_btn_layout{
     float: right;
 }
 
@@ -62,15 +64,6 @@
     color: #1e293b;
 }
 
-
-.project-close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #64748b;
-}
-
 .project-form-group {
     margin-bottom: 20px;
     color: #47515f;
@@ -112,9 +105,6 @@
     transform: translateY(-2px);
 }
 
-
-
-
 .projet-input {
   border: 2px solid transparent;
   width: 15em;
@@ -137,4 +127,19 @@
   border: 2px solid #4A9DEC;
   box-shadow: 0px 0px 0px 7px rgb(120, 80, 190, 20%);
   background-color: white;
+}
+
+.project-close-btn {
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #777;
+    transition: color 0.3s ease;
+}
+
+.project-close-btn:hover {
+    color: #333;
 }

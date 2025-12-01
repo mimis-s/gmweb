@@ -9,7 +9,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="project-card">
+    <div class="project-card" id="projectCard">
+      <div class="project-right">
+        <button class="project-card-edit-btn" id="projectCardEditBtn">&#8801</button>
+        <button class="project-card-close-btn" id="projectCardCloseBtn">&times;</button>
+      </div>
         <div class="project-wrapper">
           <div class="project-card-image" id="projectCardImage">内</div>
           <div class="project-content">
@@ -17,6 +21,7 @@
             <p></p>
           </div>
           <button class="project-card-btn" id="projectCardBtn">更多</button>
+          <!-- <div class="project-table-form-actions"></div> -->
         </div>
     </div>
     <div class="project-card-modal-overlay" id="modalOverlay">
@@ -30,7 +35,34 @@
                <p>命令参数区域</p>
           </div>
       </div>
-  </div>
+    </div>
+    <!-- 修改项目模态框 -->
+    <div class="project-modal" id="projectEditModal">
+        <div class="project-modal-content">
+            <div class="project-modal-header">
+                <h2 class="project-modal-title">修改项目</h2>
+                <button class="project-close-btn" id="projectEditModalCloseBtn">&times;</button>
+            </div>
+            <form id="addForm">
+                <div class="project-form-group">
+                    <label for="editName">项目名字</label>
+                    <input type="text" class="projet-input" id="editName" required>
+                </div>
+                <div class="project-form-group">
+                    <label for="editDesc">描述</label>
+                    <input type="text" class="projet-input" id="editDesc" required>
+                </div>
+                <div class="project-form-group">
+                    <label for="editIPPath">IP地址</label>
+                    <input type="text" class="projet-input" id="editIPPath" required>
+                </div>
+                <div class="project-form-actions">
+                    <button type="button" class="project-btn project-btn-cancel" id="projectEditModalCloseBtn">取消</button>
+                    <button type="button" class="project-btn project-btn-save" id="projectEditModalSaveBtn">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 
 </html>

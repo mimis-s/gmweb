@@ -26,9 +26,11 @@ function loadGmOrderTable(gridWrapper, gmOrderData){
 
 // 填写数据
 function initGmRederTableDatagmOrderData(newBox, gmOrderData){
-    gmOrderData.datas.forEach(data => {
-        createTableItem(newBox, data);
-    });
+    if (gmOrderData.datas != null){
+        gmOrderData.datas.forEach(data => {
+            createTableItem(newBox, data);
+        });
+    }
 }
 
 function createTableItem(newBox, gmorderdata){
