@@ -35,6 +35,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.Get("/gm_project_card.html", "项目卡片", controllerHandler.GmProjectCard)
 		engine.Get("/gm_project_box.html", "项目界面布局", controllerHandler.GmProjectBox)
 		engine.Get("/gm_order_table.html", "gm命令管理表", controllerHandler.GmOrderTable)
+		engine.Get("/gm_user_mangement.html", "用户管理界面", controllerHandler.GmUserMangement)
 
 		engine.PostWithStructParams("/api/login", "登陆的post", webmodel.GetUserReq{}, controllerHandler.PostApiLogin)
 		engine.PostWithStructParams("/api/gm_order_box", "获取gm指令的post", webmodel.GetGmOrderBoxReq{}, controllerHandler.PostApiGmOrderBox)
@@ -46,6 +47,12 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.PostWithStructParams("/api/gm_project_add", "新增gm项目", webmodel.AddGmProjectReq{}, controllerHandler.PostApiAddGmProject)
 		engine.PostWithStructParams("/api/gm_project_del", "删除gm项目", webmodel.DelGmProjectReq{}, controllerHandler.PostApiDelGmProject)
 		engine.PostWithStructParams("/api/gm_project_modify", "修改gm项目", webmodel.ModifyGmProjectReq{}, controllerHandler.PostApiModifyGmProject)
+
+		// 用户
+		engine.PostWithStructParams("/api/gm_user_mangement", "修改gm项目", webmodel.GetAllUsersReq{}, controllerHandler.PostApiGetAllUsers)
+		engine.PostWithStructParams("/api/gm_user_mangement/add", "增加用户", webmodel.AddUserReq{}, controllerHandler.PostApiAddUser)
+		engine.PostWithStructParams("/api/gm_user_mangement/del", "删除用户信息", webmodel.DelUserReq{}, controllerHandler.PostApiDelUser)
+		engine.PostWithStructParams("/api/gm_user_mangement/modify", "修改用户信息", webmodel.ModifyUserReq{}, controllerHandler.PostApiModifyUser)
 
 		a.AddServer("gmweb", engine)
 		return nil

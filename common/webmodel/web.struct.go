@@ -118,3 +118,43 @@ type ModifyGmProjectRsp struct {
 	Desc      string `json:"desc"`      // 项目描述
 	GmAddr    string `json:"gmaddr"`    // 项目Gm地址
 }
+
+type User struct {
+	UserId   int64  `json:"userid"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
+
+type GetAllUsersReq struct {
+}
+
+type GetAllUsersRsp struct {
+	Datas []*User `json:"datas"`
+}
+
+type ModifyUserReq struct {
+	UserId   int64  `json:"userid"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
+
+type ModifyUserRsp struct {
+	Data *User `json:"data"`
+}
+
+type AddUserReq struct {
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
+
+type AddUserRsp struct {
+	Data *User `json:"data"`
+}
+
+type DelUserReq struct {
+	UserId int64 `json:"userid"`
+}
+
+type DelUserRsp struct {
+	UserId int64 `json:"userid"`
+}

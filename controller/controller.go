@@ -69,6 +69,11 @@ func (c *ControllerHandler) GmOrderTable(ctx *web.WebContext) {
 	ctx.GetGinContext().HTML(200, "gm_order_table.html", nil)
 }
 
+// 用户管理界面
+func (c *ControllerHandler) GmUserMangement(ctx *web.WebContext) {
+	ctx.GetGinContext().HTML(200, "gm_user_mangement.html", nil)
+}
+
 // 获取当前的gm命令
 func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq) {
 	// session := GetSession(ctx)
@@ -226,6 +231,62 @@ func (c *ControllerHandler) PostApiModifyGmProject(ctx *web.WebContext, req *web
 		Name:      req.Name,
 		Desc:      req.Desc,
 		GmAddr:    req.GmAddr,
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 获取所有用户
+func (c *ControllerHandler) PostApiGetAllUsers(ctx *web.WebContext, req *webmodel.GetAllUsersReq) {
+	rsp := &webmodel.GetAllUsersRsp{
+		Datas: []*webmodel.User{
+			{
+				UserId:   1,
+				Name:     "小一",
+				Password: "342",
+			},
+			{
+				UserId:   2,
+				Name:     "寒风",
+				Password: "5678",
+			},
+			{
+				UserId:   3,
+				Name:     "小毛毛",
+				Password: "23",
+			},
+		},
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 增加用户
+func (c *ControllerHandler) PostApiAddUser(ctx *web.WebContext, req *webmodel.AddUserReq) {
+	rsp := &webmodel.AddUserRsp{
+		Data: &webmodel.User{
+			UserId:   1,
+			Name:     req.Name,
+			Password: req.Password,
+		},
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 删除用户
+func (c *ControllerHandler) PostApiDelUser(ctx *web.WebContext, req *webmodel.DelUserReq) {
+	rsp := &webmodel.DelUserRsp{
+		UserId: req.UserId,
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 修改用户信息
+func (c *ControllerHandler) PostApiModifyUser(ctx *web.WebContext, req *webmodel.ModifyUserReq) {
+	rsp := &webmodel.ModifyUserRsp{
+		Data: &webmodel.User{
+			UserId:   req.UserId,
+			Name:     req.Name,
+			Password: req.Password,
+		},
 	}
 	ctx.SuccessOk(rsp)
 }

@@ -30,6 +30,10 @@
 		{
 			loadGmProjectModule(ev, gridWrapper, classie)
 		}
+		if (itemName == "用户管理")
+		{
+			loadUserMangementModule(ev, gridWrapper, classie)
+		}
 	}
 })();
 
@@ -77,3 +81,24 @@ function loadGmProjectModule(ev, gridWrapper, classie){
         });
     }, 100);
 }
+
+function loadUserMangementModule(ev, gridWrapper, classie){
+    setTimeout(function() {
+        fetch('gm_user_mangement.html')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('网络响应不正常');
+            }
+            return response.text();
+        })
+        .then(html => {
+    		classie.remove(gridWrapper, 'content--loading');
+        	gridWrapper.innerHTML = html;
+    		loadUsersBoxEvent(gridWrapper); // box里面所有order的数据
+        })
+        .catch(error => {
+            console.error('加载 header.html 时出现问题:', error);
+        });
+    }, 100);
+}
+

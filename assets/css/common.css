@@ -143,3 +143,10 @@
 .project-close-btn:hover {
     color: #333;
 }
+ 
+.project-container {
+    width: 90%;
+    margin: 0 auto;
+    padding: 20px;
+    margin-top: 40px;
+}
