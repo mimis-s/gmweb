@@ -30,21 +30,124 @@ function loadUsersBoxEvent(gridWrapper) {
 
 function initUserMangement(gridWrapper, data){   
     // 从本地存储加载用户数据，如果没有则使用示例数据
-    const savedUsers = localStorage.getItem('userManagementSystem');
-    if (savedUsers) {
-        users = JSON.parse(savedUsers);
-    } else {
-        users = data.datas;
-        saveUsersToLocalStorage();
-    }
-    
+    users = data.datas;
     renderUsersTable();
 }
 
-// 保存用户数据到本地存储
-function saveUsersToLocalStorage() {
-    localStorage.setItem('userManagementSystem', JSON.stringify(users));
+// 保存用户数据到服务器
+function saveUsersToEvent(userIndex, userName, userPassword) {
+    const modifyUserReq = {
+        UserId: users[userIndex].userid,
+	    Name: userName,
+	    Password: userPassword,
+    }
+
+  fetch('/api/gm_user_mangement/modify', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(modifyUserReq)
+  })
+  .then(response => {
+    return response.json().then(data => {
+      return data;
+    });
+  })
+  .then((data) => {
+    const now = new Date();
+    const formattedTime = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    console.log('修改用户数据成功:', data);
+    const oldName = users[userIndex].name;
+    users[userIndex].name = userName;
+    users[userIndex].password = userPassword;
+    renderUsersTable();
+    showAlert('success', '修改成功', `用户 "${oldName}" 已修改为 "${userName}"`, `密码已更新，操作时间: ${formattedTime}`);
+    return;
+  })
+  .catch((error) => {
+      console.error('错误:', error);
+      alert('修改失败');
+  });
 }
+
+// 删除用户数据
+function delUsersToEvent(userId) {
+    const delUserReq = {
+        UserId: userId,
+    }
+
+  fetch('/api/gm_user_mangement/del', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(delUserReq)
+  })
+  .then(response => {
+    return response.json().then(data => {
+      return data;
+    });
+  })
+  .then((data) => {
+    const user = users.find(u => u.userid === userId);
+    const now = new Date();
+    const formattedTime = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    console.log('删除用户数据成功:', data);
+    users = users.filter(u => u.userid !== userId);
+    renderUsersTable();
+    showAlert('warning', '删除成功', `用户 "${user.name}" 已删除`, `操作时间: ${formattedTime}`);
+    return;
+  })
+  .catch((error) => {
+      console.error('错误:', error);
+      alert('修改失败');
+  });
+}
+
+// 新增用户数据
+function addUsersToEvent(userName, userPassword) {
+  const addUserReq = {
+      Name: userName,
+      Password: userPassword,
+  }
+
+  fetch('/api/gm_user_mangement/add', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(addUserReq)
+  })
+  .then(response => {
+    return response.json().then(data => {
+      return data;
+    });
+  })
+  .then((data) => {
+    console.log("新增用户:", data)
+    const now = new Date();
+    const formattedTime = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    const newUser = {
+        userid: data.message.data.userid,
+        name: data.message.data.name,
+        password: data.message.data.password,
+    };
+    
+    users.push(newUser);
+    renderUsersTable();
+    showAlert('success', '新增成功', `用户 "${newUser.name}" 已添加`, `密码: ${newUser.password}，操作时间: ${formattedTime}`);
+    return;
+  })
+  .catch((error) => {
+      console.error('错误:', error);
+      alert('增加失败');
+  });
+}
+
 
 // 渲染用户表格
 function renderUsersTable(filteredUsers = null) {
@@ -68,7 +171,7 @@ function renderUsersTable(filteredUsers = null) {
         
         tableHTML += `
             <tr>
-                <td>${index + 1}</td>
+                <td>${user.userid}</td>
                 <td>
                     <div class="user-avatar" style="background: linear-gradient(135deg, #${getColorFromName(user.name)});">
                         ${firstChar}
@@ -78,16 +181,16 @@ function renderUsersTable(filteredUsers = null) {
                     <div class="user-name">${user.name}</div>
                 </td>
                 <td>
-                    <span class="password-mask" id="password-${user.id}">${passwordMask}</span>
-                    <button onclick="togglePassword(${user.id})" style="margin-left: 10px; padding: 4px 8px; font-size: 0.8rem; background: #f1f1f1; border: none; border-radius: 4px; cursor: pointer;">
+                    <span class="password-mask" id="password-${user.userid}">${passwordMask}</span>
+                    <button id="password-${user.userid}-btn" onclick="togglePassword(${user.userid})" style="margin-left: 10px; padding: 4px 8px; font-size: 0.8rem; background: #f1f1f1; border: none; border-radius: 4px; cursor: pointer;">
                         显示密码
                     </button>
                 </td>
                 <td class="action-cell">
-                    <button class="action-btn action-btn-edit" onclick="editUser(${user.id})">
+                    <button class="action-btn action-btn-edit" onclick="editUser(${user.userid})">
                         编辑
                     </button>
-                    <button class="action-btn action-btn-delete" onclick="deleteUser(${user.id})">
+                    <button class="action-btn action-btn-delete" onclick="deleteUser(${user.userid})">
                         删除
                     </button>
                 </td>
@@ -127,17 +230,18 @@ function getColorFromName(name) {
 
 // 切换密码显示/隐藏
 function togglePassword(userId) {
-    const user = users.find(u => u.id === userId);
+    const user = users.find(u => u.userid === userId);
     const passwordElement = document.getElementById(`password-${userId}`);
-    
+    const passwordBtn = document.getElementById(`password-${userId}-btn`);
+
     if (!user) return;
-    
+
     if (passwordElement.textContent.includes('*')) {
         passwordElement.textContent = user.password;
-        passwordElement.previousElementSibling.textContent = '隐藏密码';
+        passwordBtn.textContent = '隐藏密码';
     } else {
         passwordElement.textContent = '*'.repeat(user.password.length);
-        passwordElement.previousElementSibling.textContent = '显示密码';
+        passwordBtn.textContent = '显示密码';
     }
 }
 
@@ -153,13 +257,13 @@ function openAddModal() {
 
 // 打开编辑用户弹窗
 function editUser(userId) {
-    const user = users.find(u => u.id === userId);
+    const user = users.find(u => u.userid === userId);
     if (!user) return;
     
     isEditing = true;
     currentUserId = userId;
     document.getElementById('modalTitle').textContent = '编辑用户';
-    document.getElementById('userId').value = user.id;
+    document.getElementById('userId').value = user.userid;
     document.getElementById('userName').value = user.name;
     document.getElementById('userPassword').value = user.password;
     openModal('userModal');
@@ -175,33 +279,16 @@ function saveUser() {
         return;
     }
     
-    const now = new Date();
-    const formattedTime = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
     if (isEditing) {
         // 编辑现有用户
-        const userIndex = users.findIndex(u => u.id === currentUserId);
+        const userIndex = users.findIndex(u => u.userid === currentUserId);
         if (userIndex !== -1) {
-            const oldName = users[userIndex].name;
-            users[userIndex].name = userName;
-            users[userIndex].password = userPassword;
-            saveUsersToLocalStorage();
-            renderUsersTable();
-            showAlert('success', '修改成功', `用户 "${oldName}" 已修改为 "${userName}"`, `密码已更新，操作时间: ${formattedTime}`);
+            saveUsersToEvent(userIndex, userName, userPassword);
         }
     } else {
         // 新增用户
-        const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
-        const newUser = {
-            id: newId,
-            name: userName,
-            password: userPassword,
-        };
         
-        users.push(newUser);
-        saveUsersToLocalStorage();
-        renderUsersTable();
-        showAlert('success', '新增成功', `用户 "${userName}" 已添加`, `密码: ${userPassword}，操作时间: ${formattedTime}`);
+        addUsersToEvent(userName, userPassword);
     }
     
     closeModal();
@@ -209,19 +296,11 @@ function saveUser() {
 
 // 删除用户
 function deleteUser(userId) {
-    const user = users.find(u => u.id === userId);
+    const user = users.find(u => u.userid === userId);
     if (!user) return;
     
     if (confirm(`确定要删除用户 "${user.name}" 吗？`)) {
-        const userName = user.name;
-        users = users.filter(u => u.id !== userId);
-        saveUsersToLocalStorage();
-        renderUsersTable();
-        
-        const now = new Date();
-        const formattedTime = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-        
-        showAlert('warning', '删除成功', `用户 "${userName}" 已删除`, `操作时间: ${formattedTime}`);
+        delUsersToEvent(user.userid);
     }
 }
 
@@ -289,24 +368,3 @@ function closeAlertModal() {
     closeModal();
 }
 
-// 页面加载时初始化
-document.addEventListener('DOMContentLoaded', function() {
-    initializeUsers();
-    
-    // 点击弹窗外部关闭弹窗
-    const modals = document.querySelectorAll('.modal-overlay');
-    modals.forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-    });
-    
-    // 按ESC键关闭弹窗
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeModal();
-        }
-    });
-});

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"math/rand"
 
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
@@ -261,9 +262,10 @@ func (c *ControllerHandler) PostApiGetAllUsers(ctx *web.WebContext, req *webmode
 
 // 增加用户
 func (c *ControllerHandler) PostApiAddUser(ctx *web.WebContext, req *webmodel.AddUserReq) {
+	userId := rand.Intn(100000)
 	rsp := &webmodel.AddUserRsp{
 		Data: &webmodel.User{
-			UserId:   1,
+			UserId:   int64(userId),
 			Name:     req.Name,
 			Password: req.Password,
 		},
