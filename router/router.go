@@ -36,6 +36,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.Get("/gm_project_box.html", "项目界面布局", controllerHandler.GmProjectBox)
 		engine.Get("/gm_order_table.html", "gm命令管理表", controllerHandler.GmOrderTable)
 		engine.Get("/gm_user_mangement.html", "用户管理界面", controllerHandler.GmUserMangement)
+		engine.Get("/gm_permission.html", "权限管理界面", controllerHandler.GmPermission)
 
 		engine.PostWithStructParams("/api/login", "登陆的post", webmodel.GetUserReq{}, controllerHandler.PostApiLogin)
 		engine.PostWithStructParams("/api/gm_order_box", "获取gm指令的post", webmodel.GetGmOrderBoxReq{}, controllerHandler.PostApiGmOrderBox)
@@ -53,6 +54,18 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.PostWithStructParams("/api/gm_user_mangement/add", "增加用户", webmodel.AddUserReq{}, controllerHandler.PostApiAddUser)
 		engine.PostWithStructParams("/api/gm_user_mangement/del", "删除用户信息", webmodel.DelUserReq{}, controllerHandler.PostApiDelUser)
 		engine.PostWithStructParams("/api/gm_user_mangement/modify", "修改用户信息", webmodel.ModifyUserReq{}, controllerHandler.PostApiModifyUser)
+
+		// 权限管理
+		engine.PostWithStructParams("/api/gm_permission", "获取权限", webmodel.GetPermissionReq{}, controllerHandler.PostApiGetPermission)
+		engine.PostWithStructParams("/api/gm_permission/add", "增加权限", webmodel.AddPermissionReq{}, controllerHandler.PostApiAddPermission)
+		engine.PostWithStructParams("/api/gm_permission/modify", "修改权限", webmodel.ModifyPermissionReq{}, controllerHandler.PostApiModifyPermission)
+		engine.PostWithStructParams("/api/gm_permission/del", "删除权限", webmodel.DelPermissionReq{}, controllerHandler.PostApiDelPermission)
+
+		// 权限组管理
+		engine.PostWithStructParams("/api/gm_permission/group", "获取权限组", webmodel.GetPermissionGroupReq{}, controllerHandler.PostApiGetPermissionGroup)
+		engine.PostWithStructParams("/api/gm_permission/group/add", "增加权限组", webmodel.AddPermissionGroupReq{}, controllerHandler.PostApiAddPermissionGroup)
+		engine.PostWithStructParams("/api/gm_permission/group/modify", "修改权限组", webmodel.ModifyPermissionGroupReq{}, controllerHandler.PostApiModifyPermissionGroup)
+		engine.PostWithStructParams("/api/gm_permission/group/del", "删除权限组", webmodel.DelPermissionGroupReq{}, controllerHandler.PostApiDelPermissionGroup)
 
 		a.AddServer("gmweb", engine)
 		return nil

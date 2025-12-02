@@ -158,3 +158,51 @@ type DelUserReq struct {
 type DelUserRsp struct {
 	UserId int64 `json:"userid"`
 }
+
+type GetPermissionReq struct {
+}
+
+type GetPermissionRsp struct {
+}
+
+type AddPermissionReq struct {
+}
+
+type AddPermissionRsp struct {
+}
+
+type DelPermissionReq struct {
+}
+
+type DelPermissionRsp struct {
+}
+
+type ModifyPermissionReq struct {
+}
+
+type ModifyPermissionRsp struct {
+}
+
+type GetPermissionGroupReq struct {
+}
+
+type GetPermissionGroupRsp struct {
+}
+
+type AddPermissionGroupReq struct {
+}
+
+type AddPermissionGroupRsp struct {
+}
+
+type DelPermissionGroupReq struct {
+}
+
+type DelPermissionGroupRsp struct {
+}
+
+type ModifyPermissionGroupReq struct {
+}
+
+type ModifyPermissionGroupRsp struct {
+}

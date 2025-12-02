@@ -75,6 +75,11 @@ func (c *ControllerHandler) GmUserMangement(ctx *web.WebContext) {
 	ctx.GetGinContext().HTML(200, "gm_user_mangement.html", nil)
 }
 
+// 权限管理界面
+func (c *ControllerHandler) GmPermission(ctx *web.WebContext) {
+	ctx.GetGinContext().HTML(200, "gm_permission.html", nil)
+}
+
 // 获取当前的gm命令
 func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq) {
 	// session := GetSession(ctx)
@@ -290,5 +295,53 @@ func (c *ControllerHandler) PostApiModifyUser(ctx *web.WebContext, req *webmodel
 			Password: req.Password,
 		},
 	}
+	ctx.SuccessOk(rsp)
+}
+
+// 获取权限
+func (c *ControllerHandler) PostApiGetPermission(ctx *web.WebContext, req *webmodel.GetPermissionReq) {
+	rsp := &webmodel.GetPermissionRsp{}
+	ctx.SuccessOk(rsp)
+}
+
+// 增加权限
+func (c *ControllerHandler) PostApiAddPermission(ctx *web.WebContext, req *webmodel.AddPermissionReq) {
+	rsp := &webmodel.AddPermissionRsp{}
+	ctx.SuccessOk(rsp)
+}
+
+// 修改权限
+func (c *ControllerHandler) PostApiModifyPermission(ctx *web.WebContext, req *webmodel.ModifyPermissionReq) {
+	rsp := &webmodel.ModifyPermissionRsp{}
+	ctx.SuccessOk(rsp)
+}
+
+// 删除权限
+func (c *ControllerHandler) PostApiDelPermission(ctx *web.WebContext, req *webmodel.DelPermissionReq) {
+	rsp := &webmodel.DelPermissionRsp{}
+	ctx.SuccessOk(rsp)
+}
+
+// 获取权限组
+func (c *ControllerHandler) PostApiGetPermissionGroup(ctx *web.WebContext, req *webmodel.GetPermissionGroupReq) {
+	rsp := &webmodel.GetPermissionGroupRsp{}
+	ctx.SuccessOk(rsp)
+}
+
+// 增加权限组
+func (c *ControllerHandler) PostApiAddPermissionGroup(ctx *web.WebContext, req *webmodel.AddPermissionGroupReq) {
+	rsp := &webmodel.AddPermissionGroupRsp{}
+	ctx.SuccessOk(rsp)
+}
+
+// 修改权限组
+func (c *ControllerHandler) PostApiModifyPermissionGroup(ctx *web.WebContext, req *webmodel.ModifyPermissionGroupReq) {
+	rsp := &webmodel.ModifyPermissionGroupRsp{}
+	ctx.SuccessOk(rsp)
+}
+
+// 删除权限组
+func (c *ControllerHandler) PostApiDelPermissionGroup(ctx *web.WebContext, req *webmodel.DelPermissionGroupReq) {
+	rsp := &webmodel.DelPermissionGroupRsp{}
 	ctx.SuccessOk(rsp)
 }
