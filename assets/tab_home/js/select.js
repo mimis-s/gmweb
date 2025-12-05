@@ -119,6 +119,7 @@ function loadPermissionModule(ev, gridWrapper, classie){
         .then(html => {
     		classie.remove(gridWrapper, 'content--loading');
         	gridWrapper.innerHTML = html;
+            initPermissionBox(gridWrapper)
     		// loadUsersBoxEvent(gridWrapper); // box里面所有order的数据
         })
         .catch(error => {

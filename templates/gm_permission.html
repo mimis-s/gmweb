@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="assets/assets/gm_permission/permission.css">
 </head>
 <body>
-    <div class="premission-container">
+    <div class="premission-container" id="premissionContainer">
         <div class="modules-container">
             <!-- 权限模块 -->
             <div class="module-card permissions">
@@ -24,21 +24,14 @@
                 
                 <div class="permission-filter">
                     <input type="text" id="permissionName" placeholder="权限名称">
-                    <select id="permissionLevel">
-                        <option value="">所有等级</option>
-                        <option value="1">等级 1</option>
-                        <option value="2">等级 2</option>
-                        <option value="3">等级 3</option>
-                        <option value="4">等级 4</option>
+                    <select id="permissionProjectSelect">
+                        <option value="">所有项目</option>
                     </select>
+                    <select id="permissionLevelSelect">
+                        <option value="">所有等级</option>
+                    </select>
+                    <input type="text" id="permissionOrderNameMatch" placeholder="名字匹配">
                     <button class="btn btn-primary" id="addPermissionBtn">添加权限</button>
-                </div>
-                
-                <div class="form-group">
-                    <label>选择命令：</label>
-                    <div class="checkbox-group" id="commandCheckboxes">
-                        <!-- 命令复选框将通过JS动态生成 -->
-                    </div>
                 </div>
                 
                 <div id="permissionsList">
@@ -47,7 +40,7 @@
                             <tr>
                                 <th>权限名称</th>
                                 <th>等级范围</th>
-                                <th>命令数量</th>
+                                <th>正则匹配</th>
                                 <th>状态</th>
                                 <th>操作</th>
                             </tr>
@@ -102,8 +95,8 @@
                     <table>
                         <thead>
                             <tr>
+                                <th>ID</th>
                                 <th>权限组名称</th>
-                                <th>描述</th>
                                 <th>权限数量</th>
                                 <th>状态</th>
                                 <th>操作</th>
@@ -137,8 +130,11 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>玩家ID：</label>
-                    <input type="text" id="playerId" placeholder="输入玩家ID">
+                    <label>选择用户：</label>
+                    <select id="playerIdSelect">
+                        <option value="">选择用户</option>
+                        <!-- 权限组选项将通过JS动态生成 -->
+                    </select>
                 </div>
                 
                 <div class="form-group">
@@ -158,9 +154,9 @@
                         <thead>
                             <tr>
                                 <th>玩家ID</th>
+                                <th>玩家名字</th>
+                                <th>权限组ID</th>
                                 <th>权限组</th>
-                                <th>分配时间</th>
-                                <th>状态</th>
                                 <th>操作</th>
                             </tr>
                         </thead>

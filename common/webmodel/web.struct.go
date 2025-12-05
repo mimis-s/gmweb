@@ -159,50 +159,97 @@ type DelUserRsp struct {
 	UserId int64 `json:"userid"`
 }
 
+type PermissionInfo struct {
+	Id             int64  `json:"id"`
+	Name           string `json:"name"`
+	Enable         bool   `json:"enable"`         // 是否启用
+	ProjectId      int64  `json:"projectid"`      // 项目id(为0匹配所有项目)
+	ProjectName    string `json:"projectname"`    // 项目名字
+	Level          int    `json:"level"`          // 命令的等级(为0匹配所有level)
+	OrderNameMatch string `json:"ordernamematch"` // 命令字符串匹配(在level下面匹配命令)
+}
+
+type PermissionGroupUserInfo struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+type PermissionGroupInfo struct {
+	Id       int64                      `json:"id"`
+	Name     string                     `json:"name"`
+	Enable   bool                       `json:"enable"` // 是否启用
+	PowerIds []int64                    `json:"powerids"`
+	Users    []*PermissionGroupUserInfo `json:"users"` // 拥有权限组的用户
+}
+
+type PermissionProject struct {
+	ProjectId int64  `json:"projectid"` // 项目id
+	Name      string `json:"name"`      // 项目名(不可重复)
+}
+
 type GetPermissionReq struct {
 }
 
 type GetPermissionRsp struct {
+	PermissionDatas      []*PermissionInfo          `json:"permissiondatas"`      // 权限列表
+	PermissionGroupDatas []*PermissionGroupInfo     `json:"permissiongroupdatas"` // 权限组列表
+	AllUsers             []*PermissionGroupUserInfo `json:"allusers"`             // 所有玩家(做权限筛选)
+	AllProjects          []*PermissionProject       `json:"allprojects"`          // 所有项目(做权限筛选)
+	AllLevels            []int                      `json:"allLevels"`            // 所有可选命令等级(做权限筛选)
 }
 
 type AddPermissionReq struct {
+	Name           string `json:"name"`
+	Enable         bool   `json:"enable"`         // 是否启用
+	ProjectId      int64  `json:"projectid"`      // 项目id(为0匹配所有项目)
+	ProjectName    string `json:"projectname"`    // 项目名称
+	Level          int    `json:"level"`          // 命令的等级(为0匹配所有level)
+	OrderNameMatch string `json:"ordernamematch"` // 命令字符串匹配(在level下面匹配命令)
 }
 
 type AddPermissionRsp struct {
+	Data *PermissionInfo `json:"data"`
 }
 
 type DelPermissionReq struct {
+	Id int64 `json:"id"`
 }
 
 type DelPermissionRsp struct {
+	Id int64 `json:"id"`
 }
 
 type ModifyPermissionReq struct {
+	Data *PermissionInfo `json:"data"`
 }
 
 type ModifyPermissionRsp struct {
-}
-
-type GetPermissionGroupReq struct {
-}
-
-type GetPermissionGroupRsp struct {
+	Data *PermissionInfo `json:"data"`
 }
 
 type AddPermissionGroupReq struct {
+	Id       int64   `json:"id"`
+	Name     string  `json:"name"`
+	Enable   bool    `json:"enable"` // 是否启用
+	PowerIds []int64 `json:"powerids"`
 }
 
 type AddPermissionGroupRsp struct {
+	Data *PermissionGroupInfo `json:"data"`
 }
 
 type DelPermissionGroupReq struct {
+	Id int64 `json:"id"`
 }
 
 type DelPermissionGroupRsp struct {
+	Id int64 `json:"id"`
 }
 
 type ModifyPermissionGroupReq struct {
+	Data *PermissionGroupInfo `json:"data"`
 }
 
 type ModifyPermissionGroupRsp struct {
+	Data *PermissionGroupInfo `json:"data"`
 }

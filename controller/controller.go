@@ -300,48 +300,157 @@ func (c *ControllerHandler) PostApiModifyUser(ctx *web.WebContext, req *webmodel
 
 // 获取权限
 func (c *ControllerHandler) PostApiGetPermission(ctx *web.WebContext, req *webmodel.GetPermissionReq) {
-	rsp := &webmodel.GetPermissionRsp{}
+	rsp := &webmodel.GetPermissionRsp{
+		PermissionDatas:      make([]*webmodel.PermissionInfo, 0),
+		PermissionGroupDatas: make([]*webmodel.PermissionGroupInfo, 0),
+		AllUsers:             make([]*webmodel.PermissionGroupUserInfo, 0),
+		AllProjects:          make([]*webmodel.PermissionProject, 0),
+		AllLevels:            make([]int, 0),
+	}
+	// 权限
+	rsp.PermissionDatas = append(rsp.PermissionDatas, &webmodel.PermissionInfo{
+		Id:             1,
+		Name:           "测试服等级为1的所有命令",
+		Enable:         true,
+		ProjectId:      1,
+		ProjectName:    "测试服",
+		Level:          2,
+		OrderNameMatch: "*",
+	})
+	rsp.PermissionDatas = append(rsp.PermissionDatas, &webmodel.PermissionInfo{
+		Id:             2,
+		Name:           "线上服gm发邮件",
+		Enable:         false,
+		ProjectId:      2,
+		ProjectName:    "线上服",
+		Level:          2,
+		OrderNameMatch: "邮件",
+	})
+
+	// 权限组
+	rsp.PermissionGroupDatas = append(rsp.PermissionGroupDatas, &webmodel.PermissionGroupInfo{
+		Id:       1,
+		Name:     "线上线下1,2权限",
+		Enable:   true,
+		PowerIds: []int64{1, 2},
+		Users:    []*webmodel.PermissionGroupUserInfo{},
+	})
+	rsp.PermissionGroupDatas = append(rsp.PermissionGroupDatas, &webmodel.PermissionGroupInfo{
+		Id:       1,
+		Name:     "线上权限",
+		Enable:   false,
+		PowerIds: []int64{2},
+		Users: []*webmodel.PermissionGroupUserInfo{
+			{
+				Id:   1,
+				Name: "zhangbin",
+			},
+		},
+	})
+
+	// 所有玩家
+	rsp.AllUsers = append(rsp.AllUsers, &webmodel.PermissionGroupUserInfo{
+		Id:   1,
+		Name: "zhangbin",
+	})
+	rsp.AllUsers = append(rsp.AllUsers, &webmodel.PermissionGroupUserInfo{
+		Id:   2,
+		Name: "xiaoming",
+	})
+	rsp.AllUsers = append(rsp.AllUsers, &webmodel.PermissionGroupUserInfo{
+		Id:   3,
+		Name: "hongsefengbao",
+	})
+
+	// 所有项目
+	rsp.AllProjects = append(rsp.AllProjects, &webmodel.PermissionProject{
+		ProjectId: 1,
+		Name:      "测试服GM命令",
+	})
+	rsp.AllProjects = append(rsp.AllProjects, &webmodel.PermissionProject{
+		ProjectId: 1,
+		Name:      "线上服GM命令",
+	})
+
+	// 所有等级
+	rsp.AllLevels = append(rsp.AllLevels, []int{1, 2, 3, 4, 5}...)
+
 	ctx.SuccessOk(rsp)
 }
 
 // 增加权限
 func (c *ControllerHandler) PostApiAddPermission(ctx *web.WebContext, req *webmodel.AddPermissionReq) {
-	rsp := &webmodel.AddPermissionRsp{}
+	id := rand.Intn(100000)
+	rsp := &webmodel.AddPermissionRsp{
+		Data: &webmodel.PermissionInfo{
+			Id:             int64(id),
+			Name:           req.Name,
+			Enable:         req.Enable,
+			ProjectId:      req.ProjectId,
+			ProjectName:    req.ProjectName,
+			Level:          req.Level,
+			OrderNameMatch: req.OrderNameMatch,
+		},
+	}
 	ctx.SuccessOk(rsp)
 }
 
-// 修改权限
+// 修改权限(难得写, 不写了)
 func (c *ControllerHandler) PostApiModifyPermission(ctx *web.WebContext, req *webmodel.ModifyPermissionReq) {
-	rsp := &webmodel.ModifyPermissionRsp{}
+	rsp := &webmodel.ModifyPermissionRsp{
+		Data: &webmodel.PermissionInfo{
+			Id:             req.Data.Id,
+			Name:           req.Data.Name,
+			Enable:         req.Data.Enable,
+			ProjectId:      req.Data.ProjectId,
+			ProjectName:    req.Data.ProjectName,
+			Level:          req.Data.Level,
+			OrderNameMatch: req.Data.OrderNameMatch,
+		},
+	}
 	ctx.SuccessOk(rsp)
 }
 
 // 删除权限
 func (c *ControllerHandler) PostApiDelPermission(ctx *web.WebContext, req *webmodel.DelPermissionReq) {
-	rsp := &webmodel.DelPermissionRsp{}
-	ctx.SuccessOk(rsp)
-}
-
-// 获取权限组
-func (c *ControllerHandler) PostApiGetPermissionGroup(ctx *web.WebContext, req *webmodel.GetPermissionGroupReq) {
-	rsp := &webmodel.GetPermissionGroupRsp{}
+	rsp := &webmodel.DelPermissionRsp{
+		Id: req.Id,
+	}
 	ctx.SuccessOk(rsp)
 }
 
 // 增加权限组
 func (c *ControllerHandler) PostApiAddPermissionGroup(ctx *web.WebContext, req *webmodel.AddPermissionGroupReq) {
-	rsp := &webmodel.AddPermissionGroupRsp{}
+	rsp := &webmodel.AddPermissionGroupRsp{
+		Data: &webmodel.PermissionGroupInfo{
+			Id:       req.Id,
+			Name:     req.Name,
+			Enable:   req.Enable,
+			PowerIds: req.PowerIds,
+			Users:    make([]*webmodel.PermissionGroupUserInfo, 0),
+		},
+	}
 	ctx.SuccessOk(rsp)
 }
 
 // 修改权限组
 func (c *ControllerHandler) PostApiModifyPermissionGroup(ctx *web.WebContext, req *webmodel.ModifyPermissionGroupReq) {
-	rsp := &webmodel.ModifyPermissionGroupRsp{}
+	rsp := &webmodel.ModifyPermissionGroupRsp{
+		Data: &webmodel.PermissionGroupInfo{
+			Id:       req.Data.Id,
+			Name:     req.Data.Name,
+			Enable:   req.Data.Enable,
+			PowerIds: req.Data.PowerIds,
+			Users:    req.Data.Users,
+		},
+	}
 	ctx.SuccessOk(rsp)
 }
 
 // 删除权限组
 func (c *ControllerHandler) PostApiDelPermissionGroup(ctx *web.WebContext, req *webmodel.DelPermissionGroupReq) {
-	rsp := &webmodel.DelPermissionGroupRsp{}
+	rsp := &webmodel.DelPermissionGroupRsp{
+		Id: req.Id,
+	}
 	ctx.SuccessOk(rsp)
 }
