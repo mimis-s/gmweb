@@ -336,7 +336,7 @@ func (c *ControllerHandler) PostApiGetPermission(ctx *web.WebContext, req *webmo
 		Users:    []*webmodel.PermissionGroupUserInfo{},
 	})
 	rsp.PermissionGroupDatas = append(rsp.PermissionGroupDatas, &webmodel.PermissionGroupInfo{
-		Id:       1,
+		Id:       2,
 		Name:     "线上权限",
 		Enable:   false,
 		PowerIds: []int64{2},
@@ -381,6 +381,9 @@ func (c *ControllerHandler) PostApiGetPermission(ctx *web.WebContext, req *webmo
 // 增加权限
 func (c *ControllerHandler) PostApiAddPermission(ctx *web.WebContext, req *webmodel.AddPermissionReq) {
 	id := rand.Intn(100000)
+	if req.OrderNameMatch == "" {
+		req.OrderNameMatch = "*"
+	}
 	rsp := &webmodel.AddPermissionRsp{
 		Data: &webmodel.PermissionInfo{
 			Id:             int64(id),
@@ -395,7 +398,6 @@ func (c *ControllerHandler) PostApiAddPermission(ctx *web.WebContext, req *webmo
 	ctx.SuccessOk(rsp)
 }
 
-// 修改权限(难得写, 不写了)
 func (c *ControllerHandler) PostApiModifyPermission(ctx *web.WebContext, req *webmodel.ModifyPermissionReq) {
 	rsp := &webmodel.ModifyPermissionRsp{
 		Data: &webmodel.PermissionInfo{

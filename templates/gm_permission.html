@@ -6,6 +6,7 @@
     <title>命令权限管理系统</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/assets/gm_permission/permission.css">
+    <link rel="stylesheet" href="assets/assets/css/common.css">
 </head>
 <body>
     <div class="premission-container" id="premissionContainer">
@@ -38,8 +39,10 @@
                     <table>
                         <thead>
                             <tr>
+                                <th>ID</th>
                                 <th>权限名称</th>
-                                <th>等级范围</th>
+                                <th>项目</th>
+                                <th>等级</th>
                                 <th>正则匹配</th>
                                 <th>状态</th>
                                 <th>操作</th>
@@ -73,11 +76,6 @@
                 <div class="form-group">
                     <label>权限组名称：</label>
                     <input type="text" id="groupName" placeholder="输入权限组名称">
-                </div>
-                
-                <div class="form-group">
-                    <label>描述：</label>
-                    <input type="text" id="groupDescription" placeholder="输入权限组描述">
                 </div>
                 
                 <div class="form-group">

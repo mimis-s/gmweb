@@ -58,7 +58,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		// 权限管理
 		engine.PostWithStructParams("/api/gm_permission", "获取权限", webmodel.GetPermissionReq{}, controllerHandler.PostApiGetPermission)
 		engine.PostWithStructParams("/api/gm_permission/add", "增加权限", webmodel.AddPermissionReq{}, controllerHandler.PostApiAddPermission)
-		engine.PostWithStructParams("/api/gm_permission/modify", "修改权限", webmodel.ModifyPermissionReq{}, controllerHandler.PostApiModifyPermission) // 修改的场景不多, 不写了
+		engine.PostWithStructParams("/api/gm_permission/modify", "修改权限", webmodel.ModifyPermissionReq{}, controllerHandler.PostApiModifyPermission)
 		engine.PostWithStructParams("/api/gm_permission/del", "删除权限", webmodel.DelPermissionReq{}, controllerHandler.PostApiDelPermission)
 
 		// 权限组管理

@@ -42,8 +42,8 @@ function loadPermissionEvent(){
         updateLevelSelect();
         updateGroupSelect();
         updateGroupUserSelect();
-        // 初始化权限分配列表
 
+        // 初始化权限分配列表
         permissionGroups.forEach(permissionGroup => {
             permissionGroup.users.forEach(user => {
                 const newAssignment = {
@@ -83,57 +83,63 @@ function initPermissionBox(gridWrapper){
 function addPermission() {
     const permissionsBody = getpermissionsBody()
     const permissionName = permissionsBody.querySelector('#permissionName');
-    const permissionLevel = permissionsBody.querySelector('#permissionLevel');
+    const permissionProjectSelect = permissionsBody.querySelector('#permissionProjectSelect');
+    const permissionLevelSelect = permissionsBody.querySelector('#permissionLevelSelect');
+    const permissionOrderNameMatch = permissionsBody.querySelector('#permissionOrderNameMatch');
+
+    
     const commandCheckboxes = permissionsBody.querySelector('#commandCheckboxes');
 
     if (!permissionName.value.trim()) {
         alert('请输入权限名称');
         return;
     }
-    
-    // 获取选中的命令
-    // const selectedCommands = [];
-    // const selectedCheckboxes = commandCheckboxes.querySelectorAll('input[type="checkbox"]:checked');
-    
-    // if (selectedCheckboxes.length === 0) {
-    //     alert('请至少选择一个命令');
-    //     return;
-    // }
-    
-    // selectedCheckboxes.forEach(checkbox => {
-    //     const commandId = parseInt(checkbox.value);
-    //     const command = commands.find(cmd => cmd.id === commandId);
-    //     if (command) {
-    //         selectedCommands.push(command);
-    //     }
-    // });
-    
-    // 根据等级筛选选中的命令
-    // let filteredCommands = selectedCommands;
-    // if (permissionLevel.value) {
-    //     filteredCommands = selectedCommands.filter(cmd => cmd.level == permissionLevel.value);
-    // }
-    
+        
     // 创建权限
-    const newPermission = {
-        id: Date.now(),
+    var projectname;
+    if (permissionProjectSelect.textContent.split("-").count >= 2 )
+    {
+        projectname = permissionProjectSelect.textContent.split("-")[1];
+    }
+    const addPermissionReq = {
         name: permissionName.value.trim(),
-        levelFilter: permissionLevel.value || '全部',
-        // commands: filteredCommands,
-        status: 'active'
+        enable: true,
+        projectid: Number(permissionProjectSelect.value),
+        projectname: projectname,
+        name: permissionName.value.trim(),
+        level: Number(permissionLevelSelect.value),
+        ordernamematch: permissionOrderNameMatch.value.trim(),
     };
-    
-    permissions.push(newPermission);
-    // saveToLocalStorage('permissions', permissions);
-    updatePermissionsTable();
-    updatePermissionGroups();
-    
+    fetch('/api/gm_permission/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(addPermissionReq)
+      })
+      .then(response => {
+        return response.json().then(data => {
+          return data;
+        });
+      })
+      .then((data) => {
+        console.log('成功增加权限:', data);
+        permissions.push(data.message.data);
+        updatePermissionsTable();
+        updatePermissionGroups();
+        alert('权限添加成功！');
+        return;
+      })
+      .catch((error) => {
+          console.error('错误:', error);
+          alert('修改失败');
+    });
+
     // 清空表单
     permissionName.value = '';
-    permissionLevel.value = '';
+    permissionLevelSelect.value = '';
+    permissionProjectSelect.value = '';
     commandCheckboxes.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-    
-    alert('权限添加成功！');
 }
 
 // 更新权限表格
@@ -155,8 +161,10 @@ function updatePermissionsTable() {
     permissions.forEach(permission => {
         const row = document.createElement('tr');
         row.innerHTML = `
+            <td>${permission.id}</td>
             <td>${permission.name}</td>
-            <td>${permission.level === 0 ? '所有等级' : `等级 ${permission.level}`}</td>
+            <td>${permission.projectid === 0 ? '所有项目' : `${permission.projectname}`}</td>
+            <td>${permission.level === 0 ? '所有等级' : `${permission.level}`}</td>
             <td>${permission.ordernamematch}</td>
             <td class="${permission.enable === true ? 'status-active' : 'status-inactive'}">
                 ${permission.enable === true ? '启用' : '禁用'}
@@ -176,21 +184,69 @@ function updatePermissionsTable() {
 function togglePermissionStatus(id) {
     const permission = permissions.find(p => p.id === id);
     if (permission) {
-        permission.status = permission.status === 'active' ? 'inactive' : 'active';
-        // saveToLocalStorage('permissions', permissions);
-        updatePermissionsTable();
-        updatePermissionGroups();
+        permission.enable = permission.enable === true ? false : true;
+        const modifyPermissionReq = {
+            data: permission,
+        }
+        fetch('/api/gm_permission/modify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(modifyPermissionReq)
+          })
+          .then(response => {
+            return response.json().then(data => {
+              return data;
+            });
+          })
+          .then((data) => {
+            console.log('成功修改权限:', data);
+            permissions.forEach((permission, index) => {
+                if (permission.id == data.message.data.id) {
+                    permissions[index] = data.message.data;
+                }
+            });
+            updatePermissionsTable();
+            updatePermissionGroups();
+            return;
+          })
+          .catch((error) => {
+              console.error('错误:', error);
+              alert('修改失败');
+        });
     }
 }
 
 // 删除权限
 function deletePermission(id) {
     if (confirm('确定要删除这个权限吗？')) {
-        permissions = permissions.filter(p => p.id !== id);
-        // saveToLocalStorage('permissions', permissions);
-        updatePermissionsTable();
-        updatePermissionGroups();
-        alert('权限删除成功！');
+        const delPermissionReq = {
+            id: id,
+        }
+        fetch('/api/gm_permission/del', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(delPermissionReq)
+          })
+          .then(response => {
+            return response.json().then(data => {
+              return data;
+            });
+          })
+          .then((data) => {
+            console.log('成功删除权限:', data);
+            permissions = permissions.filter(p => p.id !== data.message.id);
+            updatePermissionsTable();
+            updatePermissionGroups();
+            return;
+          })
+          .catch((error) => {
+              console.error('错误:', error);
+              alert('修改失败');
+        });
     }
 }
 
@@ -207,7 +263,7 @@ function addPermissionGroup() {
     }
     
     // 获取选中的权限
-    const selectedPermissions = [];
+    const selectedPermissionIds = [];
     const selectedCheckboxes = permissionCheckboxes.querySelectorAll('input[type="checkbox"]:checked');
     
     if (selectedCheckboxes.length === 0) {
@@ -217,23 +273,17 @@ function addPermissionGroup() {
     
     selectedCheckboxes.forEach(checkbox => {
         const permissionId = parseInt(checkbox.value);
-        const permission = permissions.find(p => p.id === permissionId && p.status === 'active');
+        const permission = permissions.find(p => p.id === permissionId && p.enable === true);
         if (permission) {
-            selectedPermissions.push(permission);
+            selectedPermissionIds.push(permission.id);
         }
     });
 
-        // 创建权限组
+    // 创建权限组
     const addPermissionGroupReq = {
-    //     	Id       int64                      `json:"id"`
-	// Name     string                     `json:"name"`
-	// Enable   bool                       `json:"enable"` // 是否启用
-	// PowerIds []int64                    `json:"powerids"`
-        id: 1,
         name: groupName.value.trim(),
-        description: groupDescription.value.trim(),
-        permissions: selectedPermissions,
-        status: 'active'
+        enable: true,
+        powerids: selectedPermissionIds,
     };
 
     fetch('/api/gm_permission/group/add', {
@@ -249,10 +299,11 @@ function addPermissionGroup() {
       });
     })
     .then((data) => {
-        console.log('成功增加权限组:', data);
-        permissionGroups.push(data.message.data);
-        updateGroupsTable();
-        updateGroupSelect();
+      console.log('成功增加权限组:', data);
+      permissionGroups.push(data.message.data);
+      updateGroupsTable();
+      updateGroupSelect();
+      alert('权限组添加成功！');
       return;
     })
     .catch((error) => {
@@ -262,10 +313,7 @@ function addPermissionGroup() {
     
     // 清空表单
     groupName.value = '';
-    groupDescription.value = '';
     permissionCheckboxes.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-    
-    alert('权限组添加成功！');
 }
 
 // 更新权限组表格
@@ -339,7 +387,7 @@ function updateProjectSelect() {
     allprojects.forEach(project => {
             const option = document.createElement('option');
             option.value = project.projectid;
-            option.textContent = `${project.projectid} (${project.name})`;
+            option.textContent = `${project.projectid}-${project.name}`;
             permissionProjectSelect.appendChild(option);
         });
 }
@@ -386,21 +434,70 @@ function updatePermissionGroups() {
 function toggleGroupStatus(id) {
     const group = permissionGroups.find(g => g.id === id);
     if (group) {
-        group.status = group.status === 'active' ? 'inactive' : 'active';
-        // saveToLocalStorage('permissionGroups', permissionGroups);
-        updateGroupsTable();
-        updateGroupSelect();
+        group.enable = group.enable === true ? false : true;
+        const modifyPermissionGroupReq = {
+            data: group,
+        }
+        fetch('/api/gm_permission/group/modify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(modifyPermissionGroupReq)
+          })
+          .then(response => {
+            return response.json().then(data => {
+              return data;
+            });
+          })
+          .then((data) => {
+            console.log('成功修改权限组:', data);
+            permissionGroups.forEach((permissionGroup, index) => {
+                if (permissionGroup.id == data.message.data.id) {
+                    permissionGroups[index] = data.message.data;
+                }
+            });
+            updateGroupsTable();
+            updateGroupSelect();
+            return;
+          })
+          .catch((error) => {
+              console.error('错误:', error);
+              alert('修改失败');
+        });
+
     }
 }
 
 // 删除权限组
 function deleteGroup(id) {
     if (confirm('确定要删除这个权限组吗？')) {
-        permissionGroups = permissionGroups.filter(g => g.id !== id);
-        // saveToLocalStorage('permissionGroups', permissionGroups);
-        updateGroupsTable();
-        updateGroupSelect();
-        alert('权限组删除成功！');
+        const delPermissionGroupReq = {
+            id: id,
+        }
+        fetch('/api/gm_permission/group/del', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(delPermissionGroupReq)
+          })
+          .then(response => {
+            return response.json().then(data => {
+              return data;
+            });
+          })
+          .then((data) => {
+            console.log('成功删除权限组:', data);
+            permissionGroups = permissionGroups.filter(g => g.id !== id);
+            updateGroupsTable();
+            updateGroupSelect();
+            return;
+          })
+          .catch((error) => {
+              console.error('错误:', error);
+              alert('修改失败');
+        });
     }
 }
 
@@ -411,7 +508,7 @@ function assignPermission() {
     const groupId = permissionsBody.querySelector('#groupSelect');
     
     if (!playerId.value) {
-        alert('请选择玩家ID');
+        alert('请选择一个有效用户');
         return;
     }
     
@@ -420,40 +517,78 @@ function assignPermission() {
         return;
     }
     
+    // 查找用户
+    const user = permissionsAllUsers.find(g => g.id == playerId.value);
+    if (!user) {
+        alert('选择的用户不存在');
+        return;
+    }
+
     // 查找权限组
     const group = permissionGroups.find(g => g.id == groupId.value && g.enable === true);
-    
     if (!group) {
         alert('选择的权限组不存在或已禁用');
         return;
     }
     
-    // 检查是否已经分配过
+    // 检查UI上是否已经分配过
     const existingAssignment = assignments.find(a => a.playerId === playerId.value && a.groupId == groupId.value);
-    
     if (existingAssignment) {
         alert('该玩家已经分配了这个权限组');
         return;
     }
+    // 检查数据中是否已经分配过
+    const existUser = group.users.find(a => a.id == user.id)
+    if (existUser){
+        alert('该玩家已经分配了这个权限组');
+        return;
+    }
+
+    group.users.push({
+        id: user.id,
+        name: user.name,
+    })
+
+    const modifyPermissionGroupReq = {
+        data: group,
+    }
     
-    // 创建分配记录
-    const newAssignment = {
-        id: Date.now(),
-        playerId: playerId.value.trim(),
-        groupId: groupId.value,
-        groupName: group.name,
-        assignmentTime: new Date().toLocaleString(),
-    };
-    
-    assignments.push(newAssignment);
-    // saveToLocalStorage('assignments', assignments);
-    updateAssignmentsTable();
+    // 分配权限
+    fetch('/api/gm_permission/group/modify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(modifyPermissionGroupReq)
+      })
+      .then(response => {
+        return response.json().then(data => {
+          return data;
+        });
+      })
+      .then((data) => {
+        console.log('成功添加用户到权限组:', data);
+        const newAssignment = {
+            playerId: Number(user.id),
+            playerName: user.name,
+            groupId: group.id,
+            groupName: group.name,
+        };
+        
+        assignments.push(newAssignment);
+        updateAssignmentsTable();
+        alert(`权限组 "${group.name}" 已成功分配给玩家 ${playerId.value.trim()}`);
+        return;
+      })
+      .catch((error) => {
+          console.error('错误:', error);
+          alert('修改失败');
+    });
+
     
     // 清空表单
     playerId.value = '';
     group.value = '';
-    
-    alert(`权限组 "${group.name}" 已成功分配给玩家 ${playerId.value.trim()}`);
 }
 
 // 更新分配表格
@@ -478,7 +613,7 @@ function updateAssignmentsTable() {
             <td>${assignment.groupId}</td>
             <td>${assignment.groupName}</td>
             <td>
-                <button class="btn btn-small btn-warning" onclick="deleteAssignment(${assignment.id})">删除</button>
+                <button class="btn btn-small btn-warning" onclick="deleteAssignment(${assignment.playerId}, ${assignment.groupId})">删除</button>
             </td>
         `;
         assignmentsTableBody.appendChild(row);
@@ -496,12 +631,43 @@ function toggleAssignmentStatus(id) {
 }
 
 // 删除分配记录
-function deleteAssignment(id) {
+function deleteAssignment(playerId, groupId) {
     if (confirm('确定要删除这个分配记录吗？')) {
-        assignments = assignments.filter(a => a.id !== id);
-        // saveToLocalStorage('assignments', assignments);
-        updateAssignmentsTable();
-        alert('分配记录删除成功！');
+        // 查找权限组
+        const group = permissionGroups.find(g => g.id == groupId);
+        if (!group) {
+            alert('选择的权限组不存在');
+            return;
+        }
+    
+        group.users = group.users.filter(p => p.id != playerId);
+        const modifyPermissionGroupReq = {
+            data: group,
+        }
+        
+        // 分配权限
+        fetch('/api/gm_permission/group/modify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(modifyPermissionGroupReq)
+          })
+          .then(response => {
+            return response.json().then(data => {
+              return data;
+            });
+          })
+          .then((data) => {
+            console.log('成功删除用户到权限组:', playerId, groupId, data);
+            assignments = assignments.filter(p => p.playerId != playerId || p.groupId != groupId);
+            updateAssignmentsTable();
+            return;
+          })
+          .catch((error) => {
+              console.error('错误:', error);
+              alert('修改失败');
+        });
     }
 }
 
