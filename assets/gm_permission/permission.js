@@ -56,7 +56,6 @@ function loadPermissionEvent(){
             });
         });
         
-        // saveToLocalStorage('assignments', assignments);
         updateAssignmentsTable();
     })
     .catch((error) => {
