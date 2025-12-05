@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命令权限管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/assets/gm_permission/permission.css">
+</head>
+<body>
+    <div class="premission-container">
+        <div class="modules-container">
+            <!-- 权限模块 -->
+            <div class="module-card permissions">
+                <div class="module-header">
+                    <div class="module-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h2 class="module-title">权限管理</h2>
+                        <p class="module-subtitle">基于命令等级和名称创建权限规则</p>
+                    </div>
+                </div>
+                
+                <div class="permission-filter">
+                    <input type="text" id="permissionName" placeholder="权限名称">
+                    <select id="permissionLevel">
+                        <option value="">所有等级</option>
+                        <option value="1">等级 1</option>
+                        <option value="2">等级 2</option>
+                        <option value="3">等级 3</option>
+                        <option value="4">等级 4</option>
+                    </select>
+                    <button class="btn btn-primary" id="addPermissionBtn">添加权限</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>选择命令：</label>
+                    <div class="checkbox-group" id="commandCheckboxes">
+                        <!-- 命令复选框将通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <div id="permissionsList">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>权限名称</th>
+                                <th>等级范围</th>
+                                <th>命令数量</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="permissionsTableBody">
+                            <!-- 权限数据将通过JS动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="emptyPermissions" class="empty-state">
+                    <i class="fas fa-user-lock"></i>
+                    <h3>暂无权限规则</h3>
+                    <p>请添加新的权限规则以开始使用</p>
+                </div>
+            </div>
+
+            <!-- 权限组模块 -->
+            <div class="module-card permission-groups">
+                <div class="module-header">
+                    <div class="module-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h2 class="module-title">权限组管理</h2>
+                        <p class="module-subtitle">将权限组合为权限组，便于批量分配</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>权限组名称：</label>
+                    <input type="text" id="groupName" placeholder="输入权限组名称">
+                </div>
+                
+                <div class="form-group">
+                    <label>描述：</label>
+                    <input type="text" id="groupDescription" placeholder="输入权限组描述">
+                </div>
+                
+                <div class="form-group">
+                    <label>选择权限：</label>
+                    <div class="checkbox-group" id="permissionCheckboxes">
+                        <!-- 权限复选框将通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" id="addGroupBtn">添加权限组</button>
+                </div>
+                
+                <div id="groupsList">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>权限组名称</th>
+                                <th>描述</th>
+                                <th>权限数量</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="groupsTableBody">
+                            <!-- 权限组数据将通过JS动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="emptyGroups" class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h3>暂无权限组</h3>
+                    <p>请添加新的权限组以开始使用</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modules-container">
+            <!-- 权限分配模块 -->
+            <div class="module-card assignments">
+                <div class="module-header">
+                    <div class="module-icon">
+                        <i class="fas fa-id-card-alt"></i>
+                    </div>
+                    <div>
+                        <h2 class="module-title">权限分配</h2>
+                        <p class="module-subtitle">将权限组分配给玩家ID</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>玩家ID：</label>
+                    <input type="text" id="playerId" placeholder="输入玩家ID">
+                </div>
+                
+                <div class="form-group">
+                    <label>选择权限组：</label>
+                    <select id="groupSelect">
+                        <option value="">选择权限组</option>
+                        <!-- 权限组选项将通过JS动态生成 -->
+                    </select>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-warning" id="assignPermissionBtn">分配权限</button>
+                </div>
+                
+                <div id="assignmentsList">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>玩家ID</th>
+                                <th>权限组</th>
+                                <th>分配时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assignmentsTableBody">
+                            <!-- 分配数据将通过JS动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="emptyAssignments" class="empty-state">
+                    <i class="fas fa-user-check"></i>
+                    <h3>暂无分配记录</h3>
+                    <p>请为玩家分配权限组以开始使用</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
