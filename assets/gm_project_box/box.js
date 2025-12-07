@@ -58,9 +58,9 @@ function saveAddProjectModal(){
   .then((data) => {
       console.log('成功添加项目:', data);
       document.getElementById('projectAddModal').style.display = 'none';
-      const gridWrapper = document.getElementById('projectGridWrapper');
-      const gmProjectBox = gridWrapper.querySelector('#gmProjectBox');
-      loadGmProjectCard(gmProjectBox, data.message.data);
+      const dynamicContent = document.getElementById('dynamicContent');
+
+      loadGmProjectCard(dynamicContent, data.message.data);
       alert('新增成功');
     return;
   })

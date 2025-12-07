@@ -38,22 +38,10 @@ function gmOrderCardEvent(order, newBox) {
     const modalOverlayTip = newBox.querySelector('#modalOverlayTip');
     const closeBtn = newBox.querySelector('#closeBtn');
     const closeBtnTip = newBox.querySelector('#closeBtnTip');
-    const likeBtn = newBox.querySelector('#likeBtn');
-    const dislikeBtn = newBox.querySelector('#dislikeBtn');
-    const favoriteBtn = newBox.querySelector('#favoriteBtn');
-    
-    const likeCount = newBox.querySelector('#likeCount');
-    const dislikeCount = newBox.querySelector('#dislikeCount');
-    const favoriteCount = newBox.querySelector('#favoriteCount');
+
     const sendBtn = newBox.querySelector('#sendBtn');
     const modalJsonArgs = newBox.querySelector('#modalJsonArgs');
     renderJSONForm(modalJsonArgs, order);
-    // updatePreview(modalJsonArgs, order);
-
-    // 初始化计数器
-    let likeCounter = 0;
-    let dislikeCounter = 0;
-    let favoriteCounter = 0;
     
     // 打开模态框
     triggerBtn.addEventListener('click', () => {
@@ -83,39 +71,6 @@ function gmOrderCardEvent(order, newBox) {
         if (e.target === modalOverlayTip) {
             modalOverlayTip.classList.remove('active');
         }
-    });
-    
-    // 点赞功能
-    likeBtn.addEventListener('click', () => {
-        likeBtn.classList.toggle('active');
-        if (likeBtn.classList.contains('active')) {
-            likeCounter++;
-        } else {
-            likeCounter--;
-        }
-        likeCount.textContent = likeCounter;
-    });
-    
-    // 喝倒彩功能
-    dislikeBtn.addEventListener('click', () => {
-        dislikeBtn.classList.toggle('active');
-        if (dislikeBtn.classList.contains('active')) {
-            dislikeCounter++;
-        } else {
-            dislikeCounter--;
-        }
-        dislikeCount.textContent = dislikeCounter;
-    });
-    
-    // 收藏功能
-    favoriteBtn.addEventListener('click', () => {
-        favoriteBtn.classList.toggle('active');
-        if (favoriteBtn.classList.contains('active')) {
-            favoriteCounter++;
-        } else {
-            favoriteCounter--;
-        }
-        favoriteCount.textContent = favoriteCounter;
     });
 
     // 发送gm命令

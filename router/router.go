@@ -29,7 +29,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.Get("/", "index", controllerHandler.Index)
 		engine.Get("/login", "登陆", controllerHandler.Login)
 		engine.Get("/register", "注册", controllerHandler.Register)
-		engine.Get("/tab_home", "主页", controllerHandler.Home)
+		engine.Get("/gm_tab_home", "主页", controllerHandler.Home)
 		engine.Get("/gm_order_card.html", "gm命令卡片", controllerHandler.GmOrderCard)
 		engine.Get("/gm_order_box.html", "gm命令界面布局", controllerHandler.GmOrderBox)
 		engine.Get("/gm_project_card.html", "项目卡片", controllerHandler.GmProjectCard)
@@ -48,6 +48,8 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.PostWithStructParams("/api/gm_project_add", "新增gm项目", webmodel.AddGmProjectReq{}, controllerHandler.PostApiAddGmProject)
 		engine.PostWithStructParams("/api/gm_project_del", "删除gm项目", webmodel.DelGmProjectReq{}, controllerHandler.PostApiDelGmProject)
 		engine.PostWithStructParams("/api/gm_project_modify", "修改gm项目", webmodel.ModifyGmProjectReq{}, controllerHandler.PostApiModifyGmProject)
+
+		engine.PostWithStructParams("/api/gm_projects", "普通用户获取自己拥有的项目信息", webmodel.GetGmProjectBriefInfoReq{}, controllerHandler.PostApiGetGmProjectBriefInfo)
 
 		// 用户
 		engine.PostWithStructParams("/api/gm_user_mangement", "修改gm项目", webmodel.GetAllUsersReq{}, controllerHandler.PostApiGetAllUsers)

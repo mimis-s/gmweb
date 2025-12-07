@@ -28,7 +28,7 @@ func (c *ControllerHandler) Register(ctx *web.WebContext) {
 
 // 主界面
 func (c *ControllerHandler) Home(ctx *web.WebContext) {
-	ctx.GetGinContext().HTML(200, "tab_home.html", nil)
+	ctx.GetGinContext().HTML(200, "gm_tab_home.html", nil)
 }
 
 // 登录界面
@@ -453,6 +453,30 @@ func (c *ControllerHandler) PostApiModifyPermissionGroup(ctx *web.WebContext, re
 func (c *ControllerHandler) PostApiDelPermissionGroup(ctx *web.WebContext, req *webmodel.DelPermissionGroupReq) {
 	rsp := &webmodel.DelPermissionGroupRsp{
 		Id: req.Id,
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 普通用户获取自己拥有的所有项目信息
+func (c *ControllerHandler) PostApiGetGmProjectBriefInfo(ctx *web.WebContext, req *webmodel.GetGmProjectBriefInfoReq) {
+	rsp := &webmodel.GetGmProjectBriefInfoRsp{
+		Datas: []*webmodel.GmProjectBriefInfo{
+			{
+				ProjectId: 1,
+				Name:      "项目1",
+				Desc:      "项目1描述",
+			},
+			{
+				ProjectId: 2,
+				Name:      "项目2",
+				Desc:      "项目2描述",
+			},
+			{
+				ProjectId: 3,
+				Name:      "项目3",
+				Desc:      "项目3描述",
+			},
+		},
 	}
 	ctx.SuccessOk(rsp)
 }

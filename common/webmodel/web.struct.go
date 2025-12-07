@@ -26,11 +26,11 @@ type RoleGmOrder struct {
 type GmOrder struct {
 	OrderId     int64  `json:"orderid"` // 命令id
 	OrderName   string `json:"ordername"`
-	Path        string `json:"path"`   // 路径
-	Method      string `json:"method"` // POST / GET
+	Path        string `json:"path"`   // 路径(普通用户获取值为空)
+	Method      string `json:"method"` // POST / GET(普通用户获取值为空)
 	OrderDesc   string `json:"orderdesc"`
 	Level       int    `json:"level"`
-	OrderStruct string `json:"orderstruct"` // 命令结构
+	OrderStruct string `json:"orderstruct"` // 命令结构(普通用户获取值为空)
 }
 
 type SendGmOrderReq struct {
@@ -54,6 +54,12 @@ type GmProject struct {
 	Desc      string     `json:"desc"`      // 项目描述
 	GmAddr    string     `json:"gmaddr"`    // 项目Gm地址(普通用户没有权限查看修改地址)
 	Datas     []*GmOrder `json:"datas"`     // 项目id对应的所有命令数据
+}
+
+type GmProjectBriefInfo struct {
+	ProjectId int64  `json:"projectid"` // 项目id
+	Name      string `json:"name"`      // 项目名(不可重复)
+	Desc      string `json:"desc"`      // 项目描述
 }
 
 type DelGmOrderReq struct {
@@ -252,4 +258,12 @@ type ModifyPermissionGroupReq struct {
 
 type ModifyPermissionGroupRsp struct {
 	Data *PermissionGroupInfo `json:"data"`
+}
+
+// 获取项目简略信息(普通用户使用, 按照用户权限返回项目信息)
+type GetGmProjectBriefInfoReq struct {
+}
+
+type GetGmProjectBriefInfoRsp struct {
+	Datas []*GmProjectBriefInfo `json:"datas"`
 }

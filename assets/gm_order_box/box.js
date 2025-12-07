@@ -1,7 +1,7 @@
 // 读取数据
-function loadGmOrderBoxEvent(gridWrapper) {
+function loadGmOrderBoxEvent(gridWrapper, projectId) {
     var gmOrderBoxReq = {
-        ProjectId: Number(1),
+        ProjectId: Number(projectId),
     }
     fetch('/api/gm_order_box', {
       method: 'POST',
