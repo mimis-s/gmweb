@@ -6,6 +6,7 @@ import (
 
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
+	glog "github.com/mimis-s/gmweb/gLog"
 	"github.com/mimis-s/gmweb/modules/login"
 )
 
@@ -17,8 +18,7 @@ func Init() (*ControllerHandler, error) {
 }
 
 func (c *ControllerHandler) Index(ctx *web.WebContext) {
-	// ctx.GetGinContext().HTML(200, "index.html", nil)
-	c.Home(ctx)
+	ctx.GetGinContext().HTML(200, "index.html", nil)
 }
 
 // 注册界面
@@ -38,11 +38,15 @@ func (c *ControllerHandler) Login(ctx *web.WebContext) {
 
 // 登录界面
 func (c *ControllerHandler) PostApiLogin(ctx *web.WebContext, req *webmodel.GetUserReq) {
-	SetSeesion(ctx, req)
 	rsp := &webmodel.GetUserRsp{}
-	login.LoginHandler(ctx, req, rsp)
+	err := login.LoginHandler(ctx, req, rsp)
+	if err != nil {
+		glog.Error(0, "", "login is err:%v", err)
+		ctx.Err("login is err:%v", err)
+		return
+	}
+	SetSeesion(ctx, req)
 	ctx.SuccessOk(rsp)
-
 }
 
 // gm命令卡片界面

@@ -4,12 +4,14 @@ go 1.23.4
 
 require (
 	github.com/gin-gonic/gin v1.11.0
+	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gorilla/sessions v1.4.0
 	github.com/mimis-s/zpudding v0.0.0-20251116070920-f98fc07c088f
 	xorm.io/xorm v1.3.11
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alitto/pond v1.9.1 // indirect
 	github.com/apache/thrift v0.20.0 // indirect

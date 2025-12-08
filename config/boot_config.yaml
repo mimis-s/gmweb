@@ -1,1 +1,12 @@
-
+db:
+- tag: "all_in_one"
+  master:
+    addr: "127.0.0.1:3306"
+    db: "zhangbin_gmweb"
+    user: "root"
+    passwd: "dev123"
+  slaves:
+  - addr: "127.0.0.1:3306"
+    db: "zhangbin_gmweb"
+    user: "root"
+    passwd: "dev123"

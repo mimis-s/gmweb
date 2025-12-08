@@ -5,12 +5,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"os"
 	"strings"
 	"sync"
 
+	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/mimis-s/gmweb/common/boot_config"
+	"github.com/mimis-s/gmweb/common/common_client/xorm_mysql"
+	"github.com/mimis-s/gmweb/common/dbmodel"
 	"xorm.io/xorm"
 	"xorm.io/xorm/contexts"
+	"xorm.io/xorm/dialects"
 )
 
 func getOperationType(sql string) string {
@@ -90,10 +96,26 @@ func NewSqlClent(dbConfigs []boot_config.DBManageConfig, tag string) (*SqlClient
 				return nil, err
 			}
 			dbClientMap[tag] = client
+			syncDatabase(client, mysqlConfig.Master.DB)
 			return client, nil
 		}
 	}
 	strJson, _ := json.Marshal(dbConfigs)
 	errStr := fmt.Sprintf("mysql tag:%v url[%v] db New Engine is not found", tag, string(strJson))
 	return nil, fmt.Errorf(errStr)
+}
+
+// golang生成mysql结构
+func syncDatabase(db *SqlClient, database string) {
+
+	db.Exec(fmt.Sprintf("create database %v", database))
+	// 修复json转换变成text问题
+	dialects.RegisterDialect("mysql", func() dialects.Dialect { return &xorm_mysql.XormMysql{} })
+
+	err := dbmodel.InitSync(db.Engine)
+	if err != nil {
+		fmt.Printf("init database error:%v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("sync database ok\n")
 }

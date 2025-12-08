@@ -8,6 +8,8 @@ import (
 	"syscall"
 
 	"github.com/mimis-s/gmweb/common/boot_config"
+	"github.com/mimis-s/gmweb/common/common_client"
+	"github.com/mimis-s/gmweb/dao"
 	"github.com/mimis-s/gmweb/router"
 
 	"github.com/mimis-s/zpudding/pkg/app"
@@ -26,19 +28,12 @@ func newDefRegistry() *app.Registry {
 		app.AddRegistryGlobalCmdFlag(boot_config.GlobalCmdFlagData),
 	)
 
-	s.AddInitTask("初始化rpc调用客户端", func() error {
-		// 日志
-		// zlog.NewLogger(boot_config.BootConfigData.Log.Path + "/" + "log.log")
-		// 初始化数据库
-		// db, err := common_client.NewSqlClent(boot_config.BootConfigData.DB, "all_in_one")
-		// if err != nil {
-		// 	return err
-		// }
-		// err = dao.Init(db)
-		// if err != nil {
-		// 	return err
-		// }
-
+	s.AddInitTask("初始化数据库", func() error {
+		dbClient, err := common_client.NewSqlClent(boot_config.BootConfigData.DB, "all_in_one")
+		if err != nil {
+			return err
+		}
+		dao.Init(dbClient)
 		_, cancel := context.WithCancel(context.Background())
 		go GracefulStop(cancel)
 		return nil

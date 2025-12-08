@@ -1,6 +1,8 @@
 package dao
 
-import "github.com/mimis-s/gmweb/common/common_client"
+import (
+	"github.com/mimis-s/gmweb/common/common_client"
+)
 
 type dao struct {
 	db *common_client.SqlClient

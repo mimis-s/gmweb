@@ -7,6 +7,6 @@ import (
 
 func LoginHandler(ctx *web.WebContext, req *webmodel.GetUserReq, rsp *webmodel.GetUserRsp) error {
 	// 在Header中返回下一个页面路径
-	ctx.NextPage("/tab_home")
+	ctx.NextPage("/gm_tab_home_user")
 	return nil
 }
