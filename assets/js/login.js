@@ -12,9 +12,8 @@ function Login() {
         return false;
     }
     var loginReq = {
-        UserID: Number(userID.value),
+        Username: userID.value,
         Password: password.value,
-        remember: "on"
     }
     console.log("登录成功:" + String(JSON.stringify(loginReq)))
 
@@ -32,12 +31,13 @@ function Login() {
     })
     .then(response => {
       const nextPage = response.headers.get('next-page');
+            console.log('返回:', response);
       return response.json().then(data => {
         return { data, nextPage, response };
       });
     })
     .then(({ data, nextPage, response }) => {
-      console.log('成功:', data);
+      console.log('成功:', data, nextPage);
       window.location.href = nextPage;
     })
     .catch((error) => {

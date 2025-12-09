@@ -30,6 +30,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.Get("/login", "登陆", controllerHandler.Login)
 		engine.Get("/register", "注册", controllerHandler.Register)
 		engine.Get("/gm_tab_home", "主页", controllerHandler.Home)
+		engine.Get("/gm_tab_home_user", "主页", controllerHandler.HomeUser)
 		engine.Get("/gm_order_card.html", "gm命令卡片", controllerHandler.GmOrderCard)
 		engine.Get("/gm_order_box.html", "gm命令界面布局", controllerHandler.GmOrderBox)
 		engine.Get("/gm_project_card.html", "项目卡片", controllerHandler.GmProjectCard)

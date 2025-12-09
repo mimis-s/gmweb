@@ -6,8 +6,8 @@ import (
 
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
-	glog "github.com/mimis-s/gmweb/gLog"
-	"github.com/mimis-s/gmweb/modules/login"
+	"github.com/mimis-s/gmweb/modules/user"
+	"github.com/smallnest/rpcx/log"
 )
 
 type ControllerHandler struct {
@@ -26,26 +26,35 @@ func (c *ControllerHandler) Register(ctx *web.WebContext) {
 	ctx.GetGinContext().HTML(200, "register.html", nil)
 }
 
-// 主界面
+// 管理员主界面
 func (c *ControllerHandler) Home(ctx *web.WebContext) {
 	ctx.GetGinContext().HTML(200, "gm_tab_home.html", nil)
 }
 
-// 登录界面
-func (c *ControllerHandler) Login(ctx *web.WebContext) {
-	GetSession(ctx)
+// 普通用户主界面
+func (c *ControllerHandler) HomeUser(ctx *web.WebContext) {
+	ctx.GetGinContext().HTML(200, "gm_tab_home_user.html", nil)
 }
 
 // 登录界面
+func (c *ControllerHandler) Login(ctx *web.WebContext) {
+	err := user.LoginHandlerHtml(ctx)
+	if err != nil {
+		log.Errorf("login is err:%v", err)
+		return
+	}
+}
+
+// 登录
 func (c *ControllerHandler) PostApiLogin(ctx *web.WebContext, req *webmodel.GetUserReq) {
 	rsp := &webmodel.GetUserRsp{}
-	err := login.LoginHandler(ctx, req, rsp)
+	err := user.LoginHandler(ctx, req, rsp)
 	if err != nil {
-		glog.Error(0, "", "login is err:%v", err)
+		log.Errorf("login is err:%v", err)
 		ctx.Err("login is err:%v", err)
 		return
 	}
-	SetSeesion(ctx, req)
+	log.Infof("user:%v login is ok", req.Username)
 	ctx.SuccessOk(rsp)
 }
 
@@ -134,10 +143,6 @@ func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel
 
 // 发送gm命令
 func (c *ControllerHandler) PostApiSendGmOrder(ctx *web.WebContext, req *webmodel.SendGmOrderReq) {
-	session := GetSession(ctx)
-	if session == nil {
-		return
-	}
 	ctx.SuccessOk("成功")
 }
 
@@ -247,24 +252,11 @@ func (c *ControllerHandler) PostApiModifyGmProject(ctx *web.WebContext, req *web
 
 // 获取所有用户
 func (c *ControllerHandler) PostApiGetAllUsers(ctx *web.WebContext, req *webmodel.GetAllUsersReq) {
-	rsp := &webmodel.GetAllUsersRsp{
-		Datas: []*webmodel.User{
-			{
-				UserId:   1,
-				Name:     "小一",
-				Password: "342",
-			},
-			{
-				UserId:   2,
-				Name:     "寒风",
-				Password: "5678",
-			},
-			{
-				UserId:   3,
-				Name:     "小毛毛",
-				Password: "23",
-			},
-		},
+	rsp := &webmodel.GetAllUsersRsp{}
+	if err := user.GetAllUsersHandler(ctx, req, rsp); err != nil {
+		log.Errorf("get all users is err:%v", err)
+		ctx.Err("get all users is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }

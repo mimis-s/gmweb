@@ -13,7 +13,7 @@ func GetGmOrderBoxReq(ctx *web.WebContext, roleId int64, req *webmodel.GetGmOrde
 	rsp.Datas = make([]*webmodel.RoleGmOrder, 0)
 
 	// 获取玩家数据, 里面有玩家拥有的权限组, 玩家使用命令的记录(点赞等)
-	roleDBData, find, err := dao.GetRoleData(roleId)
+	roleDBData, find, err := dao.GetUserData(roleId)
 	if err != nil {
 		return err
 	}
@@ -52,31 +52,31 @@ func GetGmOrderBoxReq(ctx *web.WebContext, roleId int64, req *webmodel.GetGmOrde
 			levels = append(levels, data.Data.Level)
 		}
 	}
-	gmOrderDBDatas, err := dao.FindOrderDatas(req.ProjectId, levels)
-	if err != nil {
-		return err
-	}
+	// gmOrderDBDatas, err := dao.FindOrderDatas(req.ProjectId, levels)
+	// if err != nil {
+	// 	return err
+	// }
 
-	for _, data := range gmOrderDBDatas {
-		if data.Data == nil {
-			continue
-		}
-		lastRunArgs := ""
-		if roleDBData.OrderStatus != nil {
-			if len(roleDBData.OrderStatus.LastRunArgsMap) != 0 {
-				lastRunArgs = roleDBData.OrderStatus.LastRunArgsMap[data.Id]
-			}
-		}
-		rsp.Datas = append(rsp.Datas, &webmodel.RoleGmOrder{
-			GmOrderData: &webmodel.GmOrder{
-				OrderId:     data.Id,
-				OrderName:   data.Name,
-				OrderDesc:   data.Data.Desc,
-				Level:       data.Level,
-				OrderStruct: data.Data.OrderStruct,
-			},
-			LastRunArgs: lastRunArgs,
-		})
-	}
+	// for _, data := range gmOrderDBDatas {
+	// 	if data.Data == nil {
+	// 		continue
+	// 	}
+	// 	lastRunArgs := ""
+	// 	if roleDBData.OrderStatus != nil {
+	// 		if len(roleDBData.OrderStatus.LastRunArgsMap) != 0 {
+	// 			lastRunArgs = roleDBData.OrderStatus.LastRunArgsMap[data.Id]
+	// 		}
+	// 	}
+	// 	rsp.Datas = append(rsp.Datas, &webmodel.RoleGmOrder{
+	// 		GmOrderData: &webmodel.GmOrder{
+	// 			OrderId:     data.Id,
+	// 			OrderName:   data.Name,
+	// 			OrderDesc:   data.Data.Desc,
+	// 			Level:       data.Level,
+	// 			OrderStruct: data.Data.OrderStruct,
+	// 		},
+	// 		LastRunArgs: lastRunArgs,
+	// 	})
+	// }
 	return nil
 }

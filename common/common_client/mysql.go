@@ -2,6 +2,7 @@ package common_client
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -91,24 +92,41 @@ func NewSqlClent(dbConfigs []boot_config.DBManageConfig, tag string) (*SqlClient
 
 	for _, mysqlConfig := range dbConfigs {
 		if mysqlConfig.Tag == tag {
+			createDatabase(mysqlConfig.Master)
 			client, err := newMysqlClent(mysqlConfig)
 			if err != nil {
 				return nil, err
 			}
+			syncDatabase(client)
 			dbClientMap[tag] = client
-			syncDatabase(client, mysqlConfig.Master.DB)
 			return client, nil
 		}
 	}
 	strJson, _ := json.Marshal(dbConfigs)
-	errStr := fmt.Sprintf("mysql tag:%v url[%v] db New Engine is not found", tag, string(strJson))
-	return nil, fmt.Errorf(errStr)
+	return nil, fmt.Errorf("mysql tag:%v url[%v] db New Engine is not found", tag, string(strJson))
+}
+
+func createDatabase(dbConfig boot_config.DBConfig) {
+	dsn := fmt.Sprintf("%v:%v@tcp(%v)/", dbConfig.User, dbConfig.Passwd, dbConfig.Addr)
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		panic(fmt.Sprintf("无法连接到MySQL[%v] 连接字符串格式错误:%v", dbConfig, err))
+	}
+	defer db.Close()
+	err = db.Ping()
+	if err != nil {
+		panic(fmt.Sprintf("无法连接到MySQL[%v] 服务器:%v", dbConfig, err))
+	}
+
+	sql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s`", dbConfig.DB)
+	_, err = db.Exec(sql)
+	if err != nil {
+		panic(fmt.Sprintf("无法创建MySQL[%v] 服务器:%v", dbConfig, err))
+	}
 }
 
 // golang生成mysql结构
-func syncDatabase(db *SqlClient, database string) {
-
-	db.Exec(fmt.Sprintf("create database %v", database))
+func syncDatabase(db *SqlClient) {
 	// 修复json转换变成text问题
 	dialects.RegisterDialect("mysql", func() dialects.Dialect { return &xorm_mysql.XormMysql{} })
 
@@ -117,5 +135,4 @@ func syncDatabase(db *SqlClient, database string) {
 		fmt.Printf("init database error:%v\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("sync database ok\n")
 }

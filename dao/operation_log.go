@@ -1,6 +1,10 @@
 package dao
 
-import "github.com/mimis-s/gmweb/common/dbmodel"
+import (
+	"time"
+
+	"github.com/mimis-s/gmweb/common/dbmodel"
+)
 
 func FindOperationLogDatas(startTime int64, endTime int64) ([]*dbmodel.OperationLog, error) {
 	rets := make([]*dbmodel.OperationLog, 0)
@@ -12,10 +16,30 @@ func FindOperationLogDatas(startTime int64, endTime int64) ([]*dbmodel.Operation
 	return rets, nil
 }
 
-func InsertOperationLogData(data *dbmodel.OperationLog) error {
+func insertOperationLogData(data *dbmodel.OperationLog) error {
 	_, err := daoHandler.db.Table((&dbmodel.OperationLog{}).SubName()).Insert(data)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+type LogLevel int
+
+var (
+	LogLevel_Debug LogLevel = 1
+	LogLevel_Err   LogLevel = 2
+	LogLevel_Info  LogLevel = 3
+)
+
+func log(userId int64, userName string, ip string, logLevel LogLevel, logStr string) {
+	data := &dbmodel.OperationLog{
+		UserId:     userId,
+		UserName:   userName,
+		Ip:         ip,
+		LogLevel:   int(logLevel),
+		LogStr:     logStr,
+		UpdateDate: time.Now().Unix(),
+	}
+	insertOperationLogData(data)
 }
