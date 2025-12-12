@@ -1,9 +1,11 @@
 package dao
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/mimis-s/gmweb/common/dbmodel"
+	"github.com/mimis-s/gmweb/common/web"
 )
 
 func FindOperationLogDatas(startTime int64, endTime int64) ([]*dbmodel.OperationLog, error) {
@@ -42,4 +44,25 @@ func log(userId int64, userName string, ip string, logLevel LogLevel, logStr str
 		UpdateDate: time.Now().Unix(),
 	}
 	insertOperationLogData(data)
+}
+
+func Debug(ctx *web.WebContext, format string, args ...interface{}) {
+	user := GetSession(ctx)
+	if user != nil {
+		log(user.Rid, user.Name, user.Ip, LogLevel_Debug, fmt.Sprintf(format, args...))
+	}
+}
+
+func Error(ctx *web.WebContext, format string, args ...interface{}) {
+	user := GetSession(ctx)
+	if user != nil {
+		log(user.Rid, user.Name, user.Ip, LogLevel_Err, fmt.Sprintf(format, args...))
+	}
+}
+
+func Info(ctx *web.WebContext, format string, args ...interface{}) {
+	user := GetSession(ctx)
+	if user != nil {
+		log(user.Rid, user.Name, user.Ip, LogLevel_Info, fmt.Sprintf(format, args...))
+	}
 }

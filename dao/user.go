@@ -1,6 +1,9 @@
 package dao
 
-import "github.com/mimis-s/gmweb/common/dbmodel"
+import (
+	"github.com/mimis-s/gmweb/common/dbmodel"
+	"github.com/mimis-s/gmweb/common/define"
+)
 
 func GetUserData(userId int64) (*dbmodel.User, bool, error) {
 	ret := &dbmodel.User{}
@@ -20,6 +23,15 @@ func GetUserDataByName(userName string) (*dbmodel.User, bool, error) {
 	return ret, find, nil
 }
 
+func GetAllUserDataByRole(role define.EnumRole) ([]*dbmodel.User, error) {
+	rets := make([]*dbmodel.User, 0)
+	err := daoHandler.db.ReadEngine().Table((&dbmodel.User{}).SubTable(0)).Where("role=?", int(role)).Find(&rets)
+	if err != nil {
+		return nil, err
+	}
+	return rets, nil
+}
+
 func UpdateUserData(userId int64, data *dbmodel.User) error {
 	_, err := daoHandler.db.Table((&dbmodel.User{}).SubTable(0)).Where("rid=?", userId).Update(data)
 	if err != nil {
@@ -30,6 +42,14 @@ func UpdateUserData(userId int64, data *dbmodel.User) error {
 
 func InsertUserData(data *dbmodel.User) error {
 	_, err := daoHandler.db.Table((&dbmodel.User{}).SubTable(0)).Insert(data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DelUserData(userId int64) error {
+	_, err := daoHandler.db.Table((&dbmodel.User{}).SubTable(0)).Where("rid = ?", userId).Unscoped().Delete(&dbmodel.User{})
 	if err != nil {
 		return err
 	}

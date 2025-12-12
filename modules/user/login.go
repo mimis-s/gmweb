@@ -18,16 +18,18 @@ func LoginHandler(ctx *web.WebContext, req *webmodel.GetUserReq, rsp *webmodel.G
 	// 在Header中返回下一个页面路径
 	var err error
 	var find bool
-	userDBData := dao.GetSession(ctx)
-	if userDBData == nil {
-		userDBData, find, err = dao.GetUserDataByName(req.Username)
-		if err != nil {
-			return err
-		}
-		if !find {
-			return fmt.Errorf("user:%v login, but is not found", req.Username)
-		}
+	user := dao.GetSession(ctx)
+	if user != nil {
+		return nil
 	}
+	userDBData, find, err := dao.GetUserDataByName(req.Username)
+	if err != nil {
+		return err
+	}
+	if !find {
+		return fmt.Errorf("user:%v login, but is not found", req.Username)
+	}
+
 	passwd, err := encrypt.Decrypt(userDBData.Password)
 	if err != nil {
 		return fmt.Errorf("user:%v login is err:%v", req.Username, err)
@@ -35,9 +37,10 @@ func LoginHandler(ctx *web.WebContext, req *webmodel.GetUserReq, rsp *webmodel.G
 	if passwd != req.Password {
 		return fmt.Errorf("user:%v login, but passwd is err", req.Username)
 	}
-	session := dao.SetSeesion(ctx, userDBData)
 
-	ctx.NextPage(session.Values["tab_home"].(string))
+	userDBData.Custom.Ip = ctx.GetGinContext().ClientIP()
+	dao.UpdateUserData(userDBData.Rid, userDBData)
+	dao.SetSeesion(ctx, userDBData)
 
 	dao.Info(ctx, "login is success")
 	return nil

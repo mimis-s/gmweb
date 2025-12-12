@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,35 +9,47 @@ import (
 	"github.com/mimis-s/gmweb/common/web"
 
 	"github.com/gorilla/sessions"
-	"github.com/mimis-s/gmweb/common/webmodel"
 )
 
-var users = []*webmodel.GetUserReq{}
-var sessionStore = sessions.NewCookieStore([]byte("gmweb_session_key"))
+type CacheUser struct {
+	Rid      int64
+	Name     string
+	Password string
+	Role     define.EnumRole // 用户角色(管理员/普通用户)
+	Ip       string
+}
 
-func GetSession(ctx *web.WebContext) *dbmodel.User {
-	session, _ := sessionStore.Get(ctx.GetGinContext().Request, "user-session")
+var sessionStore = sessions.NewCookieStore([]byte("your-secret-key"))
+
+func GetSession(ctx *web.WebContext) *CacheUser {
+	session, _ := sessionStore.Get(ctx.GetGinContext().Request, "session1")
 	if auth, ok := session.Values["authenticated"].(bool); ok && auth {
-		user := session.Values["user"].(*dbmodel.User)
+		user := &CacheUser{
+			Rid:      session.Values["user_id"].(int64),
+			Name:     session.Values["user_name"].(string),
+			Password: session.Values["user_passwd"].(string),
+			Role:     define.EnumRole(session.Values["user_role"].(int)),
+			Ip:       session.Values["user_ip"].(string),
+		}
 		return user
 	}
 
 	return nil
 }
 
-// 如果用户缓存已经过期, 则强行改变用户界面到登陆界面
-func GetSessionAndRedirectInit(ctx *web.WebContext) bool {
-	session, _ := sessionStore.Get(ctx.GetGinContext().Request, "user-session")
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		ctx.GetGinContext().Redirect(http.StatusFound, "/login")
-		return true
-	}
+// // 如果用户缓存已经过期, 则强行改变用户界面到登陆界面
+// func GetSessionAndRedirectInit(ctx *web.WebContext) *sessions.Session {
+// 	session, _ := sessionStore.Get(ctx.GetGinContext().Request, "session1")
+// 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+// 		ctx.GetGinContext().Redirect(http.StatusFound, "/login")
+// 		return nil
+// 	}
 
-	return false
-}
+// 	return session
+// }
 
 func RedirectSession(ctx *web.WebContext) error {
-	session, _ := sessionStore.Get(ctx.GetGinContext().Request, "user-session")
+	session, _ := sessionStore.Get(ctx.GetGinContext().Request, "session1")
 	if auth, ok := session.Values["authenticated"].(bool); ok && auth {
 		ctx.GetGinContext().Redirect(http.StatusFound, session.Values["tab_home"].(string))
 		return nil
@@ -53,9 +64,13 @@ func RedirectSession(ctx *web.WebContext) error {
 
 func SetSeesion(ctx *web.WebContext, userData *dbmodel.User) *sessions.Session {
 	// 创建会话
-	session, _ := sessionStore.Get(ctx.GetGinContext().Request, "user-session")
+	session, _ := sessionStore.Get(ctx.GetGinContext().Request, "session1")
 	session.Values["authenticated"] = true
-	session.Values["user"] = userData
+	session.Values["user_id"] = userData.Rid
+	session.Values["user_name"] = userData.Name
+	session.Values["user_passwd"] = userData.Password
+	session.Values["user_role"] = userData.Role
+	session.Values["user_ip"] = userData.Custom.Ip
 
 	if userData.Role == int(define.EnumRole_Administrator) {
 		session.Values["tab_home"] = "/gm_tab_home"
@@ -66,30 +81,10 @@ func SetSeesion(ctx *web.WebContext, userData *dbmodel.User) *sessions.Session {
 	// 记住我 - 设置30天过期
 	session.Options = &sessions.Options{
 		Path:   "/",
-		MaxAge: 10, // 10s
+		MaxAge: 60, // 10s
 	}
 
 	session.Save(ctx.GetGinContext().Request, ctx.GetGinContext().Writer)
+	ctx.NextPage(session.Values["tab_home"].(string))
 	return session
-}
-
-func Debug(ctx *web.WebContext, format string, args ...interface{}) {
-	user := GetSession(ctx)
-	if user != nil {
-		log(user.Rid, user.Name, user.Custom.Ip, LogLevel_Debug, fmt.Sprintf(format, args...))
-	}
-}
-
-func Error(ctx *web.WebContext, format string, args ...interface{}) {
-	user := GetSession(ctx)
-	if user != nil {
-		log(user.Rid, user.Name, user.Custom.Ip, LogLevel_Err, fmt.Sprintf(format, args...))
-	}
-}
-
-func Info(ctx *web.WebContext, format string, args ...interface{}) {
-	user := GetSession(ctx)
-	if user != nil {
-		log(user.Rid, user.Name, user.Custom.Ip, LogLevel_Info, fmt.Sprintf(format, args...))
-	}
 }

@@ -263,33 +263,33 @@ func (c *ControllerHandler) PostApiGetAllUsers(ctx *web.WebContext, req *webmode
 
 // 增加用户
 func (c *ControllerHandler) PostApiAddUser(ctx *web.WebContext, req *webmodel.AddUserReq) {
-	userId := rand.Intn(100000)
-	rsp := &webmodel.AddUserRsp{
-		Data: &webmodel.User{
-			UserId:   int64(userId),
-			Name:     req.Name,
-			Password: req.Password,
-		},
+	rsp := &webmodel.AddUserRsp{}
+	if err := user.AddUserHandler(ctx, req, rsp); err != nil {
+		log.Errorf("add user is err:%v", err)
+		ctx.Err("add user is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
 
 // 删除用户
 func (c *ControllerHandler) PostApiDelUser(ctx *web.WebContext, req *webmodel.DelUserReq) {
-	rsp := &webmodel.DelUserRsp{
-		UserId: req.UserId,
+	rsp := &webmodel.DelUserRsp{}
+	if err := user.DelUserHandler(ctx, req, rsp); err != nil {
+		log.Errorf("del user is err:%v", err)
+		ctx.Err("del user is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
 
 // 修改用户信息
 func (c *ControllerHandler) PostApiModifyUser(ctx *web.WebContext, req *webmodel.ModifyUserReq) {
-	rsp := &webmodel.ModifyUserRsp{
-		Data: &webmodel.User{
-			UserId:   req.UserId,
-			Name:     req.Name,
-			Password: req.Password,
-		},
+	rsp := &webmodel.ModifyUserRsp{}
+	if err := user.ModifyUserHandler(ctx, req, rsp); err != nil {
+		log.Errorf("modify user is err:%v", err)
+		ctx.Err("modify user is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
