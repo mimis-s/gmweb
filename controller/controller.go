@@ -6,6 +6,9 @@ import (
 
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
+	"github.com/mimis-s/gmweb/modules/order"
+	"github.com/mimis-s/gmweb/modules/power"
+	"github.com/mimis-s/gmweb/modules/project"
 	"github.com/mimis-s/gmweb/modules/user"
 	"github.com/smallnest/rpcx/log"
 )
@@ -95,50 +98,13 @@ func (c *ControllerHandler) GmPermission(ctx *web.WebContext) {
 
 // 获取当前的gm命令
 func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq) {
-	// session := GetSession(ctx)
-	// if session == nil {
-	// 	return
-	// }
-	// roleId := session.Values["user_id"].(int64)
-
-	// 现在暂时不接入mysql, 先造一个假数据把界面展示做了
 	rsp := &webmodel.GetGmOrderBoxRsp{}
-	rsp.ProjectId = 1
-	rsp.Datas = make([]*webmodel.RoleGmOrder, 0)
-	for i := 0; i < 10; i++ {
-		orderId := int64(i)
-		orderName := fmt.Sprintf("名字:%v", i)
-		orderDesc := fmt.Sprintf("GM发邮件:%v", i)
-
-		rsp.Datas = append(rsp.Datas, &webmodel.RoleGmOrder{
-			GmOrderData: &webmodel.GmOrder{
-				OrderId:   orderId,
-				OrderName: orderName,
-				OrderDesc: orderDesc,
-				Level:     1,
-				OrderStruct: ` {
-                            "id": 101,
-                            "title": "JavaScript高级程序设计",
-                            "author": "Nicholas C. Zakas",
-                            "price": 89.50,
-                            "inStock": true,
-                            "tags": ["编程", "前端", "JavaScript"]
-							}`,
-				Path:   "/api/test",
-				Method: "POST",
-			},
-			LastRunArgs: "",
-		})
+	if err := order.GetGmOrderBoxReq(ctx, req, rsp); err != nil {
+		log.Errorf("get gm orders is err:%v", err)
+		ctx.Err("add gm orders is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
-	return
-
-	// err := order.GetGmOrderReq(ctx, roleId, req, rsp)
-	// if err != nil {
-	// 	ctx.Err("roleId:%v post gm order is err:%v", roleId, err)
-	// 	return
-	// }
-	// ctx.SuccessOk(rsp)
 }
 
 // 发送gm命令
@@ -220,32 +186,33 @@ func (c *ControllerHandler) PostApiModifyGmOrder(ctx *web.WebContext, req *webmo
 
 // 新增gm项目
 func (c *ControllerHandler) PostApiAddGmProject(ctx *web.WebContext, req *webmodel.AddGmProjectReq) {
-	rsp := &webmodel.AddGmProjectRsp{
-		Data: &webmodel.GmProject{
-			ProjectId: 1,
-			Name:      req.Name,
-			Desc:      req.Desc,
-			GmAddr:    req.GmAddr,
-		},
+	rsp := &webmodel.AddGmProjectRsp{}
+	if err := project.AddGmProjectHandler(ctx, req, rsp); err != nil {
+		log.Errorf("add project is err:%v", err)
+		ctx.Err("add project is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
 
 // 删除gm项目
 func (c *ControllerHandler) PostApiDelGmProject(ctx *web.WebContext, req *webmodel.DelGmProjectReq) {
-	rsp := &webmodel.DelGmProjectRsp{
-		ProjectId: req.ProjectId,
+	rsp := &webmodel.DelGmProjectRsp{}
+	if err := project.DelGmProjectReqHandler(ctx, req, rsp); err != nil {
+		log.Errorf("del project is err:%v", err)
+		ctx.Err("del project is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
 
-// 删除gm项目
+// 修改gm项目
 func (c *ControllerHandler) PostApiModifyGmProject(ctx *web.WebContext, req *webmodel.ModifyGmProjectReq) {
-	rsp := &webmodel.ModifyGmProjectRsp{
-		ProjectId: req.ProjectId,
-		Name:      req.Name,
-		Desc:      req.Desc,
-		GmAddr:    req.GmAddr,
+	rsp := &webmodel.ModifyGmProjectRsp{}
+	if err := project.ModifyGmProjectHandler(ctx, req, rsp); err != nil {
+		log.Errorf("modify project is err:%v", err)
+		ctx.Err("modify project is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
@@ -303,74 +270,11 @@ func (c *ControllerHandler) PostApiGetPermission(ctx *web.WebContext, req *webmo
 		AllProjects:          make([]*webmodel.PermissionProject, 0),
 		AllLevels:            make([]int, 0),
 	}
-	// 权限
-	rsp.PermissionDatas = append(rsp.PermissionDatas, &webmodel.PermissionInfo{
-		Id:             1,
-		Name:           "测试服等级为1的所有命令",
-		Enable:         true,
-		ProjectId:      1,
-		ProjectName:    "测试服",
-		Level:          2,
-		OrderNameMatch: "*",
-	})
-	rsp.PermissionDatas = append(rsp.PermissionDatas, &webmodel.PermissionInfo{
-		Id:             2,
-		Name:           "线上服gm发邮件",
-		Enable:         false,
-		ProjectId:      2,
-		ProjectName:    "线上服",
-		Level:          2,
-		OrderNameMatch: "邮件",
-	})
-
-	// 权限组
-	rsp.PermissionGroupDatas = append(rsp.PermissionGroupDatas, &webmodel.PermissionGroupInfo{
-		Id:       1,
-		Name:     "线上线下1,2权限",
-		Enable:   true,
-		PowerIds: []int64{1, 2},
-		Users:    []*webmodel.PermissionGroupUserInfo{},
-	})
-	rsp.PermissionGroupDatas = append(rsp.PermissionGroupDatas, &webmodel.PermissionGroupInfo{
-		Id:       2,
-		Name:     "线上权限",
-		Enable:   false,
-		PowerIds: []int64{2},
-		Users: []*webmodel.PermissionGroupUserInfo{
-			{
-				Id:   1,
-				Name: "zhangbin",
-			},
-		},
-	})
-
-	// 所有玩家
-	rsp.AllUsers = append(rsp.AllUsers, &webmodel.PermissionGroupUserInfo{
-		Id:   1,
-		Name: "zhangbin",
-	})
-	rsp.AllUsers = append(rsp.AllUsers, &webmodel.PermissionGroupUserInfo{
-		Id:   2,
-		Name: "xiaoming",
-	})
-	rsp.AllUsers = append(rsp.AllUsers, &webmodel.PermissionGroupUserInfo{
-		Id:   3,
-		Name: "hongsefengbao",
-	})
-
-	// 所有项目
-	rsp.AllProjects = append(rsp.AllProjects, &webmodel.PermissionProject{
-		ProjectId: 1,
-		Name:      "测试服GM命令",
-	})
-	rsp.AllProjects = append(rsp.AllProjects, &webmodel.PermissionProject{
-		ProjectId: 1,
-		Name:      "线上服GM命令",
-	})
-
-	// 所有等级
-	rsp.AllLevels = append(rsp.AllLevels, []int{1, 2, 3, 4, 5}...)
-
+	if err := power.GetPermissionHandler(ctx, req, rsp); err != nil {
+		log.Errorf("get permission is err:%v", err)
+		ctx.Err("get permission is err:%v", err)
+		return
+	}
 	ctx.SuccessOk(rsp)
 }
 

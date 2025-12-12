@@ -8,17 +8,30 @@ import (
 	"github.com/mimis-s/gmweb/dao"
 )
 
-func GetGmOrderBoxReq(ctx *web.WebContext, roleId int64, req *webmodel.GetGmOrderBoxReq, rsp *webmodel.GetGmOrderBoxRsp) error {
+func GetGmOrderBoxReq(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq, rsp *webmodel.GetGmOrderBoxRsp) error {
+
+	user := dao.GetSession(ctx)
+	if user == nil {
+		return nil
+	}
+
+	// if user.Role != define.EnumRole_Administrator {
+	// 	// 权限不够
+	// 	err := fmt.Errorf("add power group but role:%v power is err", user.Role)
+	// 	dao.Error(ctx, err.Error())
+	// 	return err
+	// }
+
 	rsp.ProjectId = req.ProjectId
 	rsp.Datas = make([]*webmodel.RoleGmOrder, 0)
 
 	// 获取玩家数据, 里面有玩家拥有的权限组, 玩家使用命令的记录(点赞等)
-	roleDBData, find, err := dao.GetUserData(roleId)
+	roleDBData, find, err := dao.GetUserData(user.Rid)
 	if err != nil {
 		return err
 	}
 	if !find {
-		return fmt.Errorf("role:%v get gm order but not found db", roleId)
+		return fmt.Errorf("role:%v get gm order but not found db", user.Rid)
 	}
 
 	// 权限组, 权限组里面有大量实际的权限
@@ -48,7 +61,7 @@ func GetGmOrderBoxReq(ctx *web.WebContext, roleId int64, req *webmodel.GetGmOrde
 
 	levels := make([]int, 0)
 	for _, data := range powerDBDatas {
-		if data.Data != nil && data.Data.ProjectId == req.ProjectId {
+		if data.Data != nil && data.ProjectId == req.ProjectId {
 			levels = append(levels, data.Data.Level)
 		}
 	}

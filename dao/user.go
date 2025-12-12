@@ -14,6 +14,15 @@ func GetUserData(userId int64) (*dbmodel.User, bool, error) {
 	return ret, find, nil
 }
 
+func FindUserDatas(userIds []int64) ([]*dbmodel.User, error) {
+	rets := make([]*dbmodel.User, 0)
+	err := daoHandler.db.ReadEngine().Table((&dbmodel.User{}).SubTable(0)).In("rid", userIds).Find(&rets)
+	if err != nil {
+		return nil, err
+	}
+	return rets, nil
+}
+
 func GetUserDataByName(userName string) (*dbmodel.User, bool, error) {
 	ret := &dbmodel.User{}
 	find, err := daoHandler.db.ReadEngine().Table(ret.SubTable(0)).Where("name=?", userName).Get(ret)

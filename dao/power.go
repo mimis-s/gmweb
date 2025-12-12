@@ -20,6 +20,15 @@ func FindPowerDatas(powerIds []int64) ([]*dbmodel.Power, error) {
 	return rets, nil
 }
 
+func GetAllPowerDatas() ([]*dbmodel.Power, error) {
+	rets := make([]*dbmodel.Power, 0)
+	err := daoHandler.db.ReadEngine().Table((&dbmodel.Power{}).SubName()).Find(&rets)
+	if err != nil {
+		return nil, err
+	}
+	return rets, nil
+}
+
 func UpdatePowerData(Id int64, data *dbmodel.Power) error {
 	_, err := daoHandler.db.Table((&dbmodel.Power{}).SubName()).Where("power_id=?", Id).Update(data)
 	if err != nil {
@@ -30,6 +39,22 @@ func UpdatePowerData(Id int64, data *dbmodel.Power) error {
 
 func InsertPowerData(data *dbmodel.Power) error {
 	_, err := daoHandler.db.Table((&dbmodel.Power{}).SubName()).Insert(data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DelPowers(powerIds []int64) error {
+	_, err := daoHandler.db.Table((&dbmodel.Power{}).SubName()).In("power_id", powerIds).Unscoped().Delete(&dbmodel.Power{})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DelPowersByProjectId(projectIds []int64) error {
+	_, err := daoHandler.db.Table((&dbmodel.Power{}).SubName()).In("project_id", projectIds).Unscoped().Delete(&dbmodel.Power{})
 	if err != nil {
 		return err
 	}

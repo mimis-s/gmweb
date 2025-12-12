@@ -13,7 +13,16 @@ func GetPowerGroupData(groupId int64) (*dbmodel.PowerGroup, bool, error) {
 
 func FindPowerGroupDatas(groupIds []int64) ([]*dbmodel.PowerGroup, error) {
 	rets := make([]*dbmodel.PowerGroup, 0)
-	err := daoHandler.db.ReadEngine().Table((&dbmodel.PowerGroup{}).SubName()).In("group_id", groupIds).Find(&rets)
+	err := daoHandler.db.ReadEngine().Table((&dbmodel.PowerGroup{}).SubTable(0)).In("group_id", groupIds).Find(&rets)
+	if err != nil {
+		return nil, err
+	}
+	return rets, nil
+}
+
+func GetAllPowerGroupDatas() ([]*dbmodel.PowerGroup, error) {
+	rets := make([]*dbmodel.PowerGroup, 0)
+	err := daoHandler.db.ReadEngine().Table((&dbmodel.PowerGroup{}).SubTable(0)).Find(&rets)
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +30,7 @@ func FindPowerGroupDatas(groupIds []int64) ([]*dbmodel.PowerGroup, error) {
 }
 
 func UpdatePowerGroupData(groupId int64, data *dbmodel.PowerGroup) error {
-	_, err := daoHandler.db.Table((&dbmodel.PowerGroup{}).SubName()).Where("group_id=?", groupId).Update(data)
+	_, err := daoHandler.db.Table((&dbmodel.PowerGroup{}).SubTable(0)).Where("group_id=?", groupId).Update(data)
 	if err != nil {
 		return err
 	}
@@ -29,7 +38,15 @@ func UpdatePowerGroupData(groupId int64, data *dbmodel.PowerGroup) error {
 }
 
 func InsertPowerGroupData(data *dbmodel.PowerGroup) error {
-	_, err := daoHandler.db.Table((&dbmodel.PowerGroup{}).SubName()).Insert(data)
+	_, err := daoHandler.db.Table((&dbmodel.PowerGroup{}).SubTable(0)).Insert(data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DelPowerGroupData(groupId int64) error {
+	_, err := daoHandler.db.Table((&dbmodel.PowerGroup{}).SubTable(0)).Where("group_id=?", groupId).Unscoped().Delete(&dbmodel.PowerGroup{})
 	if err != nil {
 		return err
 	}

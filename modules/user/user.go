@@ -26,6 +26,7 @@ func GetAllUsersHandler(ctx *web.WebContext, req *webmodel.GetAllUsersReq, rsp *
 
 	userDBDatas, err := dao.GetAllUserDataByRole(define.EnumRole_Regular)
 	if err != nil {
+		dao.Error(ctx, "user:%v name:%v get all user is err:%v", user.Rid, user.Name, err)
 		return err
 	}
 

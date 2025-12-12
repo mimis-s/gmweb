@@ -46,6 +46,8 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.PostWithStructParams("/api/gm_order_del", "删除gm命令", webmodel.DelGmOrderReq{}, controllerHandler.PostApiDelGmOrder)
 		engine.PostWithStructParams("/api/gm_order_add", "增加gm命令", webmodel.AddGmOrderReq{}, controllerHandler.PostApiAddGmOrder)
 		engine.PostWithStructParams("/api/gm_order_modify", "修改gm命令", webmodel.ModifyGmOrderReq{}, controllerHandler.PostApiModifyGmOrder)
+
+		// 项目
 		engine.PostWithStructParams("/api/gm_project_add", "新增gm项目", webmodel.AddGmProjectReq{}, controllerHandler.PostApiAddGmProject)
 		engine.PostWithStructParams("/api/gm_project_del", "删除gm项目", webmodel.DelGmProjectReq{}, controllerHandler.PostApiDelGmProject)
 		engine.PostWithStructParams("/api/gm_project_modify", "修改gm项目", webmodel.ModifyGmProjectReq{}, controllerHandler.PostApiModifyGmProject)

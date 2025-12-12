@@ -34,6 +34,7 @@ type PowerGroup struct {
 type Power struct {
 	PowerId   int64                `xorm:"power_id not null pk autoincr comment('主键') BIGINT"`
 	Name      string               `xorm:"not null VARCHAR(255)"`
+	ProjectId int64                `xorm:"BIGINT"` // 项目id(为0匹配所有项目)
 	Data      *db_extra.PowerExtra `xorm:"comment('#*db_extra.PowerExtra#') JSON" json:"data,omitempty"`
 	CreatedAt time.Time            `xorm:"created"`
 	UpdatedAt time.Time            `xorm:"updated"`
