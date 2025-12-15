@@ -166,8 +166,8 @@ function saveAddItemModal() {
     const outputArea = projectTableAddModal.querySelector('#addDescription');
     const addLevel = projectTableAddModal.querySelector('#addLevel');
     const addDesc = projectTableAddModal.querySelector('#addDesc');
-    const addPath = projectTableEditModal.querySelector('#addPath');
-    const addMethod = projectTableEditModal.querySelector('#addSelectMethod');
+    const addPath = projectTableAddModal.querySelector('#addPath');
+    const addMethod = projectTableAddModal.querySelector('#addSelectMethod');
     var addGmOrderReq = {
         ProjectId: 1, // 项目id
 	    OrderName: addName.value, // 命令名字(不允许重名)
@@ -240,7 +240,7 @@ function addGmOrderData(addGmOrderReq) {
 }
 
 // 打开添加模态框
-function openAddModal() {
+function openAddOrderTableModal() {
     document.getElementById('projectTableAddModal').style.display = 'flex';
 }
 

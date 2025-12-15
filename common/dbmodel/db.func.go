@@ -73,3 +73,15 @@ func (tb *OperationLog) String() string {
 	}
 	return string(data)
 }
+
+func (tb *PowerAssignMent) SubName() string {
+	return "power_assign_ment"
+}
+
+func (tb *PowerAssignMent) String() string {
+	data, err := json.Marshal(tb)
+	if err != nil {
+		return err.Error()
+	}
+	return string(data)
+}

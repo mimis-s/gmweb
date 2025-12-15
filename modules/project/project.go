@@ -12,6 +12,96 @@ import (
 	"github.com/mimis-s/gmweb/dao"
 )
 
+// 普通用户获取自己拥有的所有项目信息
+func GetGmProjectBriefInfoHandler(ctx *web.WebContext, req *webmodel.GetGmProjectBriefInfoReq, rsp *webmodel.GetGmProjectBriefInfoRsp) error {
+	user := dao.GetSession(ctx)
+	if user == nil {
+		return nil
+	}
+
+	// 获取玩家数据
+	userDBData, find, err := dao.GetUserData(user.Rid)
+	if err != nil {
+		dao.Error(ctx, err.Error())
+		return err
+	}
+	if !find {
+		err := fmt.Errorf("get gm orders but role:%v not found", user.Role)
+		dao.Error(ctx, err.Error())
+		return err
+	}
+
+	// 检查玩家是否有权限组
+	if userDBData.RolePowerData == nil || len(userDBData.RolePowerData.PowerGroups) == 0 {
+		return nil
+	}
+
+	// 查询权限组数据
+	powerGroupDBDatas, err := dao.FindEnabelPowerGroupDatas(userDBData.RolePowerData.PowerGroups)
+	if err != nil {
+		dao.Error(ctx, err.Error())
+		return err
+	}
+
+	// 收集所有权限ID
+	allPowerIds := make([]int64, 0, len(powerGroupDBDatas))
+	for _, data := range powerGroupDBDatas {
+		bFindUser := false
+		for _, userId := range data.ExtraData.UserIds {
+			if userId == user.Rid {
+				bFindUser = true
+				break
+			}
+		}
+		if data.ExtraData == nil && bFindUser {
+			continue
+		}
+		allPowerIds = append(allPowerIds, data.ExtraData.PowerIds...)
+	}
+
+	// 如果没有权限ID，则直接返回
+	if len(allPowerIds) == 0 {
+		return nil
+	}
+
+	// 查询权限数据
+	powerDBDatas, err := dao.FindEnablePowerDatas(allPowerIds)
+	if err != nil {
+		dao.Error(ctx, err.Error())
+		return err
+	}
+	bAll := false
+	projectIDs := make([]int64, 0, len(powerDBDatas))
+	for _, powerDBData := range powerDBDatas {
+		if powerDBData.ProjectId == 0 {
+			bAll = true
+			break
+		}
+		projectIDs = append(projectIDs, powerDBData.ProjectId)
+	}
+	projectDatas := make([]*dbmodel.Project, 0)
+	if bAll {
+		projectDatas, err = dao.GetAllProjectDatas()
+	} else {
+		projectDatas, err = dao.GetProjectDataByIds(projectIDs)
+	}
+	if err != nil {
+		dao.Error(ctx, err.Error())
+		return err
+	}
+	rsp.Datas = make([]*webmodel.GmProjectBriefInfo, 0)
+	for _, projectData := range projectDatas {
+		rsp.Datas = append(rsp.Datas, &webmodel.GmProjectBriefInfo{
+			ProjectId: projectData.Id,
+			Name:      projectData.Name,
+			Desc:      projectData.Data.Desc,
+		})
+	}
+	dao.Info(ctx, "get project brief info is ok")
+
+	return nil
+}
+
 func AddGmProjectHandler(ctx *web.WebContext, req *webmodel.AddGmProjectReq, rsp *webmodel.AddGmProjectRsp) error {
 	user := dao.GetSession(ctx)
 	if user == nil {
@@ -177,5 +267,63 @@ func ModifyGmProjectHandler(ctx *web.WebContext, req *webmodel.ModifyGmProjectRe
 	strProject, _ := json.Marshal(rsp)
 	dao.Info(ctx, "modify project:%v is ok", string(strProject))
 
+	return nil
+}
+
+func GetGmProjectBoxHandler(ctx *web.WebContext, req *webmodel.GetGmProjectBoxReq, rsp *webmodel.GetGmProjectBoxRsp) error {
+	user := dao.GetSession(ctx)
+	if user == nil {
+		return nil
+	}
+
+	if user.Role != define.EnumRole_Administrator {
+		// 权限不够
+		err := fmt.Errorf("user:%v get project box, but power:%v is err", user.Rid, user.Role)
+		dao.Error(ctx, err.Error())
+		return err
+	}
+
+	projectDatas, err := dao.GetAllProjectDatas()
+	if err != nil {
+		dao.Error(ctx, "get project box is err:%v", err)
+		return err
+	}
+
+	allOrderDatas, err := dao.GetAllOrderDatas()
+	if err != nil {
+		dao.Error(ctx, "get project box is err:%v", err)
+		return err
+	}
+
+	orderMap := make(map[int64][]*dbmodel.GmOrder)
+	for _, orderData := range allOrderDatas {
+		orderMap[orderData.ProjectId] = append(orderMap[orderData.ProjectId], orderData)
+	}
+
+	rsp.Datas = make([]*webmodel.GmProject, 0)
+	for _, projectData := range projectDatas {
+		retProjectData := &webmodel.GmProject{
+			ProjectId: projectData.Id,
+			Name:      projectData.Name,
+			Desc:      projectData.Data.Desc,
+			GmAddr:    projectData.Data.GmAddr,
+			Datas:     make([]*webmodel.GmOrder, 0),
+		}
+
+		for _, orderData := range orderMap[projectData.Id] {
+			retOrderData := &webmodel.GmOrder{
+				OrderId:     orderData.Id,
+				OrderName:   orderData.Name,
+				Path:        orderData.Data.Path,
+				Method:      orderData.Data.Method,
+				OrderDesc:   orderData.Data.Desc,
+				Level:       orderData.Level,
+				OrderStruct: orderData.Data.OrderStruct,
+			}
+			retProjectData.Datas = append(retProjectData.Datas, retOrderData)
+		}
+		rsp.Datas = append(rsp.Datas, retProjectData)
+	}
+	dao.Info(ctx, "get all project box is ok")
 	return nil
 }

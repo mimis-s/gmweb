@@ -72,18 +72,17 @@ function saveAddProjectModal(){
 
 function gmProjectBoxEvent(gmProjectBox, projectDatas){
 
-  projectDatas.datas.forEach(projectData => {
-    loadGmProjectCard(gmProjectBox, projectData);
-    const gmProjectBoxAddBtn = gmProjectBox.querySelector('#gmProjectBoxAddBtn');
-
-    // 打开模态框
-    gmProjectBoxAddBtn.addEventListener('click', () => {
-      projectAddModal.style.display = 'flex';
-      console.debug("打开模态框");
-    });
+  if (projectDatas.datas != null){
+      projectDatas.datas.forEach(projectData => {
+        loadGmProjectCard(gmProjectBox, projectData);
+      });
+  }
+  const gmProjectBoxAddBtn = gmProjectBox.querySelector('#gmProjectBoxAddBtn');
+  // 打开模态框
+  gmProjectBoxAddBtn.addEventListener('click', () => {
+    projectAddModal.style.display = 'flex';
+    console.debug("打开模态框");
   });
-
-
 
   const projectAddModal = document.getElementById('projectAddModal');
 

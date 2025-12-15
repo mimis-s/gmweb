@@ -20,6 +20,15 @@ func FindPowerDatas(powerIds []int64) ([]*dbmodel.Power, error) {
 	return rets, nil
 }
 
+func FindEnablePowerDatas(powerIds []int64) ([]*dbmodel.Power, error) {
+	rets := make([]*dbmodel.Power, 0)
+	err := daoHandler.db.ReadEngine().Table((&dbmodel.Power{}).SubName()).Where("enable=?", true).In("power_id", powerIds).Find(&rets)
+	if err != nil {
+		return nil, err
+	}
+	return rets, nil
+}
+
 func GetAllPowerDatas() ([]*dbmodel.Power, error) {
 	rets := make([]*dbmodel.Power, 0)
 	err := daoHandler.db.ReadEngine().Table((&dbmodel.Power{}).SubName()).Find(&rets)

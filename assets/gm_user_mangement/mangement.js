@@ -246,7 +246,7 @@ function togglePassword(userId) {
 }
 
 // 打开新增用户弹窗
-function openAddModal() {
+function openAddUserModal() {
     isEditing = false;
     currentUserId = null;
     document.getElementById('modalTitle').textContent = '新增用户';

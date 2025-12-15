@@ -74,6 +74,8 @@ type AddGmOrderReq struct {
 	ProjectId   int64  `json:"projectid"` // 项目id
 	OrderName   string `json:"ordername"` // 命令名字(不允许重名)
 	Level       int    `json:"level"`
+	Path        string `json:"path"`
+	Method      string `json:"method"`
 	OrderDesc   string `json:"orderdesc"`
 	OrderStruct string `json:"orderstruct"` // 命令结构
 }

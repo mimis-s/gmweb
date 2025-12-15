@@ -24,16 +24,27 @@ type User struct {
 type PowerGroup struct {
 	GroupId   int64                     `xorm:"group_id not null pk autoincr comment('主键') BIGINT"`
 	Name      string                    `xorm:"not null VARCHAR(255)"`
+	Enable    bool                      `xorm:"BOOL"` // 是否启用
 	ExtraData *db_extra.PowerGroupExtra `xorm:"comment('#*db_extra.PowerGroupExtra#') JSON" json:"extra_data,omitempty"`
 	CreatedAt time.Time                 `xorm:"created"`
 	UpdatedAt time.Time                 `xorm:"updated"`
 	DeletedAt time.Time                 `xorm:"deleted"`
 }
 
+// 权限分配表
+type PowerAssignMent struct {
+	UserId    int64     `xorm:"group_id not null pk(user_group) comment('主键') BIGINT"`
+	GroupId   int64     `xorm:"group_id not null pk(user_group) comment('主键') BIGINT"`
+	CreatedAt time.Time `xorm:"created"`
+	UpdatedAt time.Time `xorm:"updated"`
+	DeletedAt time.Time `xorm:"deleted"`
+}
+
 // 权限表
 type Power struct {
 	PowerId   int64                `xorm:"power_id not null pk autoincr comment('主键') BIGINT"`
 	Name      string               `xorm:"not null VARCHAR(255)"`
+	Enable    bool                 `xorm:"BOOL"`   // 是否启用
 	ProjectId int64                `xorm:"BIGINT"` // 项目id(为0匹配所有项目)
 	Data      *db_extra.PowerExtra `xorm:"comment('#*db_extra.PowerExtra#') JSON" json:"data,omitempty"`
 	CreatedAt time.Time            `xorm:"created"`

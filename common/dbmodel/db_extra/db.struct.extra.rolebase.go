@@ -13,5 +13,5 @@ type RolePowerInfo struct {
 
 // 玩家的gm命令状态
 type RoleGmOrderStatus struct {
-	LastRunArgsMap map[int64]string `json:"last_run_args_map"` // 玩家上一次执行的参数(大量的数据其实都是重复写入的, 所以这里记录玩家上一次执行命令)
+	LastRunArgsMap map[int64]map[int64]string `json:"last_run_args_map"` // 玩家上一次执行的参数(大量的数据其实都是重复写入的, 所以这里记录玩家上一次执行命令)
 }

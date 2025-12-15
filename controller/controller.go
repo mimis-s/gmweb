@@ -1,9 +1,6 @@
 package controller
 
 import (
-	"fmt"
-	"math/rand"
-
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
 	"github.com/mimis-s/gmweb/modules/order"
@@ -113,74 +110,45 @@ func (c *ControllerHandler) PostApiSendGmOrder(ctx *web.WebContext, req *webmode
 }
 
 func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *webmodel.GetGmProjectBoxReq) {
-	// session := GetSession(ctx)
-	// if session == nil {
-	// 	return
-	// }
-	rsp := &webmodel.GetGmProjectBoxRsp{
-		Datas: make([]*webmodel.GmProject, 0),
+	rsp := &webmodel.GetGmProjectBoxRsp{}
+	if err := project.GetGmProjectBoxHandler(ctx, req, rsp); err != nil {
+		log.Errorf("get all project orders is err:%v", err)
+		ctx.Err("get all project orders is err:%v", err)
+		return
 	}
-	retData := &webmodel.GmProject{}
-	retData.ProjectId = 1
-	retData.GmAddr = "127.0.0.1:2001"
-	retData.Name = "C3内网压测"
-	retData.Desc = "描述"
-	retData.Datas = make([]*webmodel.GmOrder, 0)
-	for i := 0; i < 10; i++ {
-		orderId := int64(i)
-		orderName := fmt.Sprintf("名字:%v", i)
-		orderDesc := fmt.Sprintf("GM发邮件:%v", i)
-
-		retData.Datas = append(retData.Datas, &webmodel.GmOrder{
-			OrderId:   orderId,
-			OrderName: orderName,
-			OrderDesc: orderDesc,
-			Level:     1,
-			OrderStruct: ` {
-                            "id": 101,
-                            "title": "JavaScript高级程序设计",
-                            "author": "Nicholas C. Zakas",
-                            "price": 89.50,
-                            "inStock": true,
-                            "tags": ["编程", "前端", "JavaScript"]
-							}`,
-			Path:   "/api/test",
-			Method: "POST",
-		})
-	}
-	rsp.Datas = append(rsp.Datas, retData)
-	rsp.Datas = append(rsp.Datas, retData)
-
 	ctx.SuccessOk(rsp)
 }
 
 // 删除gm命令
 func (c *ControllerHandler) PostApiDelGmOrder(ctx *web.WebContext, req *webmodel.DelGmOrderReq) {
-	fmt.Printf("删除gm命令成功%v\n", req)
-	ctx.SuccessOk("成功")
+	rsp := &webmodel.DelGmOrderRsp{}
+	if err := order.DelGmOrderHandler(ctx, req, rsp); err != nil {
+		log.Errorf("del gm orders is err:%v", err)
+		ctx.Err("del gm orders is err:%v", err)
+		return
+	}
+	ctx.SuccessOk(rsp)
 }
 
 // 新增gm命令
 func (c *ControllerHandler) PostApiAddGmOrder(ctx *web.WebContext, req *webmodel.AddGmOrderReq) {
-	rsp := &webmodel.AddGmOrderRsp{
-		Data: &webmodel.GmOrder{
-			Level:       req.Level,
-			OrderDesc:   req.OrderDesc,
-			OrderId:     1,
-			OrderStruct: req.OrderStruct,
-			OrderName:   req.OrderName,
-		},
+	rsp := &webmodel.AddGmOrderRsp{}
+	if err := order.AddGmOrderHandler(ctx, req, rsp); err != nil {
+		log.Errorf("add gm orders is err:%v", err)
+		ctx.Err("add gm orders is err:%v", err)
+		return
 	}
-	rsp.ProjectId = req.ProjectId
 	ctx.SuccessOk(rsp)
 }
 
 // 修改gm命令
 func (c *ControllerHandler) PostApiModifyGmOrder(ctx *web.WebContext, req *webmodel.ModifyGmOrderReq) {
-	rsp := &webmodel.ModifyGmOrderRsp{
-		Data: req.Data,
+	rsp := &webmodel.ModifyGmOrderRsp{}
+	if err := order.ModifyGmOrderHandler(ctx, req, rsp); err != nil {
+		log.Errorf("modify gm orders is err:%v", err)
+		ctx.Err("modify gm orders is err:%v", err)
+		return
 	}
-	rsp.ProjectId = req.ProjectId
 	ctx.SuccessOk(rsp)
 }
 
@@ -280,103 +248,76 @@ func (c *ControllerHandler) PostApiGetPermission(ctx *web.WebContext, req *webmo
 
 // 增加权限
 func (c *ControllerHandler) PostApiAddPermission(ctx *web.WebContext, req *webmodel.AddPermissionReq) {
-	id := rand.Intn(100000)
-	if req.OrderNameMatch == "" {
-		req.OrderNameMatch = "*"
-	}
-	rsp := &webmodel.AddPermissionRsp{
-		Data: &webmodel.PermissionInfo{
-			Id:             int64(id),
-			Name:           req.Name,
-			Enable:         req.Enable,
-			ProjectId:      req.ProjectId,
-			ProjectName:    req.ProjectName,
-			Level:          req.Level,
-			OrderNameMatch: req.OrderNameMatch,
-		},
+	rsp := &webmodel.AddPermissionRsp{}
+	if err := power.AddPermissionHandler(ctx, req, rsp); err != nil {
+		log.Errorf("add power is err:%v", err)
+		ctx.Err("add power is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
 
 func (c *ControllerHandler) PostApiModifyPermission(ctx *web.WebContext, req *webmodel.ModifyPermissionReq) {
-	rsp := &webmodel.ModifyPermissionRsp{
-		Data: &webmodel.PermissionInfo{
-			Id:             req.Data.Id,
-			Name:           req.Data.Name,
-			Enable:         req.Data.Enable,
-			ProjectId:      req.Data.ProjectId,
-			ProjectName:    req.Data.ProjectName,
-			Level:          req.Data.Level,
-			OrderNameMatch: req.Data.OrderNameMatch,
-		},
+	rsp := &webmodel.ModifyPermissionRsp{}
+	if err := power.ModifyPermissionHandler(ctx, req, rsp); err != nil {
+		log.Errorf("modify power is err:%v", err)
+		ctx.Err("modify power is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
 
 // 删除权限
 func (c *ControllerHandler) PostApiDelPermission(ctx *web.WebContext, req *webmodel.DelPermissionReq) {
-	rsp := &webmodel.DelPermissionRsp{
-		Id: req.Id,
+	rsp := &webmodel.DelPermissionRsp{}
+	if err := power.DelPermissionHandler(ctx, req, rsp); err != nil {
+		log.Errorf("del power is err:%v", err)
+		ctx.Err("del power is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
 
 // 增加权限组
 func (c *ControllerHandler) PostApiAddPermissionGroup(ctx *web.WebContext, req *webmodel.AddPermissionGroupReq) {
-	rsp := &webmodel.AddPermissionGroupRsp{
-		Data: &webmodel.PermissionGroupInfo{
-			Id:       req.Id,
-			Name:     req.Name,
-			Enable:   req.Enable,
-			PowerIds: req.PowerIds,
-			Users:    make([]*webmodel.PermissionGroupUserInfo, 0),
-		},
+	rsp := &webmodel.AddPermissionGroupRsp{}
+	if err := power.AddPermissionGroupHandler(ctx, req, rsp); err != nil {
+		log.Errorf("del power group is err:%v", err)
+		ctx.Err("del power group is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
 
 // 修改权限组
 func (c *ControllerHandler) PostApiModifyPermissionGroup(ctx *web.WebContext, req *webmodel.ModifyPermissionGroupReq) {
-	rsp := &webmodel.ModifyPermissionGroupRsp{
-		Data: &webmodel.PermissionGroupInfo{
-			Id:       req.Data.Id,
-			Name:     req.Data.Name,
-			Enable:   req.Data.Enable,
-			PowerIds: req.Data.PowerIds,
-			Users:    req.Data.Users,
-		},
+	rsp := &webmodel.ModifyPermissionGroupRsp{}
+	if err := power.ModifyPermissionGroupHandler(ctx, req, rsp); err != nil {
+		log.Errorf("modify power group is err:%v", err)
+		ctx.Err("modify power group is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
 
 // 删除权限组
 func (c *ControllerHandler) PostApiDelPermissionGroup(ctx *web.WebContext, req *webmodel.DelPermissionGroupReq) {
-	rsp := &webmodel.DelPermissionGroupRsp{
-		Id: req.Id,
+	rsp := &webmodel.DelPermissionGroupRsp{}
+	if err := power.DelPermissionGroupHandler(ctx, req, rsp); err != nil {
+		log.Errorf("del power group is err:%v", err)
+		ctx.Err("del power group is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }
 
 // 普通用户获取自己拥有的所有项目信息
 func (c *ControllerHandler) PostApiGetGmProjectBriefInfo(ctx *web.WebContext, req *webmodel.GetGmProjectBriefInfoReq) {
-	rsp := &webmodel.GetGmProjectBriefInfoRsp{
-		Datas: []*webmodel.GmProjectBriefInfo{
-			{
-				ProjectId: 1,
-				Name:      "项目1",
-				Desc:      "项目1描述",
-			},
-			{
-				ProjectId: 2,
-				Name:      "项目2",
-				Desc:      "项目2描述",
-			},
-			{
-				ProjectId: 3,
-				Name:      "项目3",
-				Desc:      "项目3描述",
-			},
-		},
+	rsp := &webmodel.GetGmProjectBriefInfoRsp{}
+	if err := project.GetGmProjectBriefInfoHandler(ctx, req, rsp); err != nil {
+		log.Errorf("get project brief is err:%v", err)
+		ctx.Err("get project brief is err:%v", err)
+		return
 	}
 	ctx.SuccessOk(rsp)
 }

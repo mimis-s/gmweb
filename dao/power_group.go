@@ -11,9 +11,9 @@ func GetPowerGroupData(groupId int64) (*dbmodel.PowerGroup, bool, error) {
 	return ret, find, nil
 }
 
-func FindPowerGroupDatas(groupIds []int64) ([]*dbmodel.PowerGroup, error) {
+func FindEnabelPowerGroupDatas(groupIds []int64) ([]*dbmodel.PowerGroup, error) {
 	rets := make([]*dbmodel.PowerGroup, 0)
-	err := daoHandler.db.ReadEngine().Table((&dbmodel.PowerGroup{}).SubTable(0)).In("group_id", groupIds).Find(&rets)
+	err := daoHandler.db.ReadEngine().Table((&dbmodel.PowerGroup{}).SubTable(0)).Where("enable=?", true).In("group_id", groupIds).Find(&rets)
 	if err != nil {
 		return nil, err
 	}

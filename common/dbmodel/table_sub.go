@@ -81,3 +81,16 @@ func (tb *OperationLog) SubTable(baseValue int64) string {
 func (tb *OperationLog) BindSubTreasury() ShardGroup {
 	return ShardGroupTag_AllInOne
 }
+
+// 权限分配表
+func (tb *PowerAssignMent) SubTableNum() int {
+	return 1
+}
+
+func (tb *PowerAssignMent) SubTable(baseValue int64) string {
+	return subName(tb.SubName(), baseValue, tb.SubTableNum())
+}
+
+func (tb *PowerAssignMent) BindSubTreasury() ShardGroup {
+	return ShardGroupTag_AllInOne
+}

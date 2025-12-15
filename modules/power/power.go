@@ -104,7 +104,7 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 		rsp.PermissionDatas = append(rsp.PermissionDatas, &webmodel.PermissionInfo{
 			Id:             powerData.PowerId,
 			Name:           powerData.Name,
-			Enable:         powerData.Data.Enable,
+			Enable:         powerData.Enable,
 			ProjectId:      powerData.ProjectId,
 			ProjectName:    tmpProjectName,
 			Level:          powerData.Data.Level,
@@ -157,7 +157,7 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 		rsp.PermissionGroupDatas = append(rsp.PermissionGroupDatas, &webmodel.PermissionGroupInfo{
 			Id:       powerGroup.GroupId,
 			Name:     powerGroup.Name,
-			Enable:   powerGroup.ExtraData.Enable,
+			Enable:   powerGroup.Enable,
 			PowerIds: powerGroup.ExtraData.PowerIds,
 			Users:    retGroupUsers,
 		})
@@ -211,8 +211,8 @@ func AddPermissionHandler(ctx *web.WebContext, req *webmodel.AddPermissionReq, r
 	insertData := &dbmodel.Power{
 		Name:      req.Name,
 		ProjectId: req.ProjectId,
+		Enable:    req.Enable,
 		Data: &db_extra.PowerExtra{
-			Enable:         req.Enable,
 			Level:          req.Level,
 			OrderNameMatch: req.OrderNameMatch,
 		},
@@ -226,7 +226,7 @@ func AddPermissionHandler(ctx *web.WebContext, req *webmodel.AddPermissionReq, r
 	rsp.Data = &webmodel.PermissionInfo{
 		Id:             insertData.PowerId,
 		Name:           insertData.Name,
-		Enable:         insertData.Data.Enable,
+		Enable:         insertData.Enable,
 		ProjectId:      insertData.ProjectId,
 		ProjectName:    projectName,
 		Level:          insertData.Data.Level,
@@ -261,7 +261,7 @@ func ModifyPermissionHandler(ctx *web.WebContext, req *webmodel.ModifyPermission
 	}
 
 	powerData.Name = req.Data.Name
-	powerData.Data.Enable = req.Data.Enable
+	powerData.Enable = req.Data.Enable
 	powerData.Data.Level = req.Data.Level
 	powerData.Data.OrderNameMatch = req.Data.OrderNameMatch
 	powerData.ProjectId = req.Data.ProjectId
@@ -327,9 +327,9 @@ func AddPermissionGroupHandler(ctx *web.WebContext, req *webmodel.AddPermissionG
 		return err
 	}
 	insertData := &dbmodel.PowerGroup{
-		Name: req.Name,
+		Name:   req.Name,
+		Enable: req.Enable,
 		ExtraData: &db_extra.PowerGroupExtra{
-			Enable:   req.Enable,
 			PowerIds: req.PowerIds,
 			UserIds:  make([]int64, 0),
 		},
@@ -386,10 +386,6 @@ func ModifyPermissionGroupHandler(ctx *web.WebContext, req *webmodel.ModifyPermi
 		return err
 	}
 
-	for _, modifyGroupUser := range req.Data.Users {
-		powerGroupData.ExtraData.UserIds = append(powerGroupData.ExtraData.UserIds, modifyGroupUser.Id)
-	}
-
 	// 查询这些玩家是否真实存在
 	userDatas, err := dao.FindUserDatas(powerGroupData.ExtraData.UserIds)
 	if err != nil {
@@ -403,10 +399,23 @@ func ModifyPermissionGroupHandler(ctx *web.WebContext, req *webmodel.ModifyPermi
 	}
 
 	powerGroupData.Name = req.Data.Name
-	powerGroupData.ExtraData.Enable = req.Data.Enable
+	powerGroupData.Enable = req.Data.Enable
 	powerGroupData.ExtraData.PowerIds = req.Data.PowerIds
-	powerGroupData.ExtraData.UserIds = make([]int64, 0, len(req.Data.Users))
+	for _, modifyGroupUser := range req.Data.Users {
+		bFindUser := false
+		for _, id := range powerGroupData.ExtraData.UserIds {
+			if id == modifyGroupUser.Id {
+				bFindUser = true
+				break
+			}
+		}
+		if !bFindUser {
+			powerGroupData.ExtraData.UserIds = append(powerGroupData.ExtraData.UserIds, modifyGroupUser.Id)
 
+			// 更新玩家权限数据
+
+		}
+	}
 	err = dao.UpdatePowerGroupData(powerGroupData.GroupId, powerGroupData)
 	if err != nil {
 		dao.Error(ctx, "modify power group is err:%v", err)

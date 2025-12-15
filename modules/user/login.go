@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 
+	"github.com/mimis-s/gmweb/common/dbmodel/db_extra"
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
 	"github.com/mimis-s/gmweb/dao"
@@ -36,6 +37,10 @@ func LoginHandler(ctx *web.WebContext, req *webmodel.GetUserReq, rsp *webmodel.G
 	}
 	if passwd != req.Password {
 		return fmt.Errorf("user:%v login, but passwd is err", req.Username)
+	}
+
+	if userDBData.Custom == nil {
+		userDBData.Custom = &db_extra.CustomInfo{}
 	}
 
 	userDBData.Custom.Ip = ctx.GetGinContext().ClientIP()
