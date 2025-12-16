@@ -178,16 +178,23 @@ type PermissionInfo struct {
 }
 
 type PermissionGroupUserInfo struct {
-	Id   int64  `json:"id"`
-	Name string `json:"name"`
+	UserId int64  `json:"userid"`
+	Name   string `json:"username"`
+}
+
+type PermissionGroupUserAssignmentInfo struct {
+	Id        int64  `json:"id"`
+	UserId    int64  `json:"userid"`
+	Name      string `json:"username"`
+	GroupId   int64  `json:"groupid"`
+	GroupName string `json:"groupname"`
 }
 
 type PermissionGroupInfo struct {
-	Id       int64                      `json:"id"`
-	Name     string                     `json:"name"`
-	Enable   bool                       `json:"enable"` // 是否启用
-	PowerIds []int64                    `json:"powerids"`
-	Users    []*PermissionGroupUserInfo `json:"users"` // 拥有权限组的用户
+	Id       int64   `json:"id"`
+	Name     string  `json:"name"`
+	Enable   bool    `json:"enable"` // 是否启用
+	PowerIds []int64 `json:"powerids"`
 }
 
 type PermissionProject struct {
@@ -199,11 +206,12 @@ type GetPermissionReq struct {
 }
 
 type GetPermissionRsp struct {
-	PermissionDatas      []*PermissionInfo          `json:"permissiondatas"`      // 权限列表
-	PermissionGroupDatas []*PermissionGroupInfo     `json:"permissiongroupdatas"` // 权限组列表
-	AllUsers             []*PermissionGroupUserInfo `json:"allusers"`             // 所有玩家(做权限筛选)
-	AllProjects          []*PermissionProject       `json:"allprojects"`          // 所有项目(做权限筛选)
-	AllLevels            []int                      `json:"allLevels"`            // 所有可选命令等级(做权限筛选)
+	PermissionDatas      []*PermissionInfo                    `json:"permissiondatas"`      // 权限列表
+	PermissionGroupDatas []*PermissionGroupInfo               `json:"permissiongroupdatas"` // 权限组列表
+	AllUsers             []*PermissionGroupUserInfo           `json:"allusers"`             // 所有玩家(做权限筛选)
+	AllProjects          []*PermissionProject                 `json:"allprojects"`          // 所有项目(做权限筛选)
+	AllLevels            []int                                `json:"allLevels"`            // 所有可选命令等级(做权限筛选)
+	Assignment           []*PermissionGroupUserAssignmentInfo `json:"assignment"`           // 拥有权限组的用户
 }
 
 type AddPermissionReq struct {
@@ -268,4 +276,23 @@ type GetGmProjectBriefInfoReq struct {
 
 type GetGmProjectBriefInfoRsp struct {
 	Datas []*GmProjectBriefInfo `json:"datas"`
+}
+
+// 删除权限分配数据
+type DelPowerAssignmentReq struct {
+	Id int64 `json:"id"`
+}
+
+type DelPowerAssignmentRsp struct {
+	Id int64 `json:"id"`
+}
+
+// 添加权限分配数据
+type AddPowerAssignmentReq struct {
+	UserId  int64 `json:"userid"`
+	GroupId int64 `json:"groupid"`
+}
+
+type AddPowerAssignmentRsp struct {
+	Data *PermissionGroupUserAssignmentInfo `json:"data"`
 }

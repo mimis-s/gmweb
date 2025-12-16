@@ -12,48 +12,37 @@ import (
 	"github.com/mimis-s/gmweb/dao"
 )
 
-// 普通用户获取自己拥有的所有项目信息
-func GetGmProjectBriefInfoHandler(ctx *web.WebContext, req *webmodel.GetGmProjectBriefInfoReq, rsp *webmodel.GetGmProjectBriefInfoRsp) error {
-	user := dao.GetSession(ctx)
-	if user == nil {
-		return nil
-	}
-
+// 获取普通用户权限的project
+func getRegularUserPermissionProjects(ctx *web.WebContext, user *dao.CacheUser) ([]*dbmodel.Project, error) {
 	// 获取玩家数据
-	userDBData, find, err := dao.GetUserData(user.Rid)
+	powerAssignmentDatas, err := dao.GetPowerAssignmentDataByUserId(user.Rid)
 	if err != nil {
 		dao.Error(ctx, err.Error())
-		return err
+		return nil, err
 	}
-	if !find {
-		err := fmt.Errorf("get gm orders but role:%v not found", user.Role)
-		dao.Error(ctx, err.Error())
-		return err
+
+	powerGroups := make([]int64, 0)
+	for _, powerAssignmentData := range powerAssignmentDatas {
+		powerGroups = append(powerGroups, powerAssignmentData.GroupId)
 	}
 
 	// 检查玩家是否有权限组
-	if userDBData.RolePowerData == nil || len(userDBData.RolePowerData.PowerGroups) == 0 {
-		return nil
+	if len(powerGroups) == 0 {
+		dao.Info(ctx, "get project brief info is ok")
+		return []*dbmodel.Project{}, nil
 	}
 
 	// 查询权限组数据
-	powerGroupDBDatas, err := dao.FindEnabelPowerGroupDatas(userDBData.RolePowerData.PowerGroups)
+	powerGroupDBDatas, err := dao.FindEnabelPowerGroupDatas(powerGroups)
 	if err != nil {
 		dao.Error(ctx, err.Error())
-		return err
+		return nil, err
 	}
 
 	// 收集所有权限ID
 	allPowerIds := make([]int64, 0, len(powerGroupDBDatas))
 	for _, data := range powerGroupDBDatas {
-		bFindUser := false
-		for _, userId := range data.ExtraData.UserIds {
-			if userId == user.Rid {
-				bFindUser = true
-				break
-			}
-		}
-		if data.ExtraData == nil && bFindUser {
+		if data.ExtraData == nil {
 			continue
 		}
 		allPowerIds = append(allPowerIds, data.ExtraData.PowerIds...)
@@ -61,14 +50,15 @@ func GetGmProjectBriefInfoHandler(ctx *web.WebContext, req *webmodel.GetGmProjec
 
 	// 如果没有权限ID，则直接返回
 	if len(allPowerIds) == 0 {
-		return nil
+		dao.Info(ctx, "get project brief info is ok")
+		return []*dbmodel.Project{}, nil
 	}
 
 	// 查询权限数据
 	powerDBDatas, err := dao.FindEnablePowerDatas(allPowerIds)
 	if err != nil {
 		dao.Error(ctx, err.Error())
-		return err
+		return nil, err
 	}
 	bAll := false
 	projectIDs := make([]int64, 0, len(powerDBDatas))
@@ -87,8 +77,43 @@ func GetGmProjectBriefInfoHandler(ctx *web.WebContext, req *webmodel.GetGmProjec
 	}
 	if err != nil {
 		dao.Error(ctx, err.Error())
-		return err
+		return nil, err
 	}
+	return projectDatas, nil
+}
+
+func getAdminUserPermissionProjects(ctx *web.WebContext, user *dao.CacheUser) ([]*dbmodel.Project, error) {
+	projectDatas, err := dao.GetAllProjectDatas()
+	if err != nil {
+		dao.Error(ctx, err.Error())
+		return nil, err
+	}
+	return projectDatas, nil
+}
+
+// 普通用户获取自己拥有的所有项目信息
+func GetGmProjectBriefInfoHandler(ctx *web.WebContext, req *webmodel.GetGmProjectBriefInfoReq, rsp *webmodel.GetGmProjectBriefInfoRsp) error {
+	user := dao.GetSession(ctx)
+	if user == nil {
+		return nil
+	}
+	var err error
+	var projectDatas []*dbmodel.Project
+	switch user.Role {
+	case define.EnumRole_Administrator:
+		projectDatas, err = getAdminUserPermissionProjects(ctx, user)
+		if err != nil {
+			dao.Error(ctx, err.Error())
+			return err
+		}
+	default:
+		projectDatas, err = getRegularUserPermissionProjects(ctx, user)
+		if err != nil {
+			dao.Error(ctx, err.Error())
+			return err
+		}
+	}
+
 	rsp.Datas = make([]*webmodel.GmProjectBriefInfo, 0)
 	for _, projectData := range projectDatas {
 		rsp.Datas = append(rsp.Datas, &webmodel.GmProjectBriefInfo{

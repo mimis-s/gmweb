@@ -31,6 +31,7 @@ function loadPermissionEvent(){
         permissionsAllUsers = data.message.allusers;
         allprojects = data.message.allprojects;
         allLevels = data.message.allLevels;
+        assignments = data.message.assignment;
 
         // 初始化权限列表
         updatePermissionsTable();
@@ -42,20 +43,6 @@ function loadPermissionEvent(){
         updateLevelSelect();
         updateGroupSelect();
         updateGroupUserSelect();
-
-        // 初始化权限分配列表
-        permissionGroups.forEach(permissionGroup => {
-            permissionGroup.users.forEach(user => {
-                const newAssignment = {
-                    playerId: user.id,
-                    playerName: user.name,
-                    groupId: permissionGroup.id,
-                    groupName: permissionGroup.name,
-                };
-                assignments.push(newAssignment);
-            });
-        });
-        
         updateAssignmentsTable();
     })
     .catch((error) => {
@@ -372,8 +359,8 @@ function updateGroupUserSelect() {
     
     permissionsAllUsers.forEach(user => {
             const option = document.createElement('option');
-            option.value = user.id;
-            option.textContent = `${user.id} (${user.name})`;
+            option.value = user.userid;
+            option.textContent = `${user.userid} (${user.username})`;
             playerIdSelect.appendChild(option);
         });
 }
@@ -518,7 +505,7 @@ function assignPermission() {
     }
     
     // 查找用户
-    const user = permissionsAllUsers.find(g => g.id == playerId.value);
+    const user = permissionsAllUsers.find(g => g.userid == playerId.value);
     if (!user) {
         alert('选择的用户不存在');
         return;
@@ -532,34 +519,24 @@ function assignPermission() {
     }
     
     // 检查UI上是否已经分配过
-    const existingAssignment = assignments.find(a => a.playerId === playerId.value && a.groupId == groupId.value);
+    const existingAssignment = assignments.find(a => a.userid === playerId.value && a.groupid == groupId.value);
     if (existingAssignment) {
         alert('该玩家已经分配了这个权限组');
         return;
     }
-    // 检查数据中是否已经分配过
-    const existUser = group.users.find(a => a.id == user.id)
-    if (existUser){
-        alert('该玩家已经分配了这个权限组');
-        return;
-    }
 
-    group.users.push({
-        id: user.id,
-        name: user.name,
-    })
-
-    const modifyPermissionGroupReq = {
-        data: group,
+    const addPermissionAssignmentReq = {
+        userid: Number(playerId.value),
+        groupid: Number(groupId.value),
     }
     
     // 分配权限
-    fetch('/api/gm_permission/group/modify', {
+    fetch('/api/gm_permission/assign/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(modifyPermissionGroupReq)
+        body: JSON.stringify(addPermissionAssignmentReq)
       })
       .then(response => {
         return response.json().then(data => {
@@ -567,15 +544,8 @@ function assignPermission() {
         });
       })
       .then((data) => {
-        console.log('成功添加用户到权限组:', data);
-        const newAssignment = {
-            playerId: Number(user.id),
-            playerName: user.name,
-            groupId: group.id,
-            groupName: group.name,
-        };
-        
-        assignments.push(newAssignment);
+        console.log('成功添加用户到权限组:', data);        
+        assignments.push(data.message.data);
         updateAssignmentsTable();
         alert(`权限组 "${group.name}" 已成功分配给玩家 ${playerId.value.trim()}`);
         return;
@@ -608,50 +578,32 @@ function updateAssignmentsTable() {
     assignments.forEach(assignment => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${assignment.playerId}</td>
-            <td>${assignment.playerName}</td>
-            <td>${assignment.groupId}</td>
-            <td>${assignment.groupName}</td>
+            <td>${assignment.userid}</td>
+            <td>${assignment.username}</td>
+            <td>${assignment.groupid}</td>
+            <td>${assignment.groupname}</td>
             <td>
-                <button class="btn btn-small btn-warning" onclick="deleteAssignment(${assignment.playerId}, ${assignment.groupId})">删除</button>
+                <button class="btn btn-small btn-warning" onclick="deleteAssignment(${assignment.id})">删除</button>
             </td>
         `;
         assignmentsTableBody.appendChild(row);
     });
 }
 
-// 切换分配状态
-function toggleAssignmentStatus(id) {
-    const assignment = assignments.find(a => a.id === id);
-    if (assignment) {
-        assignment.status = assignment.status === 'active' ? 'inactive' : 'active';
-        // saveToLocalStorage('assignments', assignments);
-        updateAssignmentsTable();
-    }
-}
-
 // 删除分配记录
-function deleteAssignment(playerId, groupId) {
+function deleteAssignment(assignmentId) {
     if (confirm('确定要删除这个分配记录吗？')) {
-        // 查找权限组
-        const group = permissionGroups.find(g => g.id == groupId);
-        if (!group) {
-            alert('选择的权限组不存在');
-            return;
-        }
-    
-        group.users = group.users.filter(p => p.id != playerId);
-        const modifyPermissionGroupReq = {
-            data: group,
+        const delPermissionAssignmentReq = {
+            id: assignmentId,
         }
         
         // 分配权限
-        fetch('/api/gm_permission/group/modify', {
+        fetch('/api/gm_permission/assign/del', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(modifyPermissionGroupReq)
+            body: JSON.stringify(delPermissionAssignmentReq)
           })
           .then(response => {
             return response.json().then(data => {
@@ -660,7 +612,7 @@ function deleteAssignment(playerId, groupId) {
           })
           .then((data) => {
             console.log('成功删除用户到权限组:', playerId, groupId, data);
-            assignments = assignments.filter(p => p.playerId != playerId || p.groupId != groupId);
+            assignments = assignments.filter(p => p.id != assignmentId);
             updateAssignmentsTable();
             return;
           })

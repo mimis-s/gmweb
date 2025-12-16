@@ -22,7 +22,7 @@ func GetProjectDataByName(name string) (*dbmodel.Project, bool, error) {
 
 func GetProjectDataByIds(ids []int64) ([]*dbmodel.Project, error) {
 	rets := make([]*dbmodel.Project, 0)
-	_, err := daoHandler.db.ReadEngine().Table((&dbmodel.Project{}).SubName()).In("id", ids).Get(&rets)
+	err := daoHandler.db.ReadEngine().Table((&dbmodel.Project{}).SubName()).In("id", ids).Find(&rets)
 	if err != nil {
 		return nil, err
 	}

@@ -1,7 +1,6 @@
 package power
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/mimis-s/gmweb/common/dbmodel"
@@ -34,8 +33,8 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 
 	for _, userData := range allUsers {
 		rsp.AllUsers = append(rsp.AllUsers, &webmodel.PermissionGroupUserInfo{
-			Id:   userData.Rid,
-			Name: userData.Name,
+			UserId: userData.Rid,
+			Name:   userData.Name,
 		})
 	}
 
@@ -127,6 +126,46 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 		dao.Error(ctx, "get all power group is err:%v", err)
 		return err
 	}
+	findPowerGroup := func(powerGroupId int64) *dbmodel.PowerGroup {
+		for _, powerGroupData := range allPowerGroups {
+			if powerGroupId == powerGroupData.GroupId {
+				return powerGroupData
+			}
+		}
+		return nil
+	}
+	// 获取所有的权限分配情况
+	allPowerAssignmentDatas, err := dao.GetAllPowerAssignmentDatas()
+	if err != nil {
+		dao.Error(ctx, "del over power:%v is err:%v", delPowerIds, err)
+		return err
+	}
+	// 权限分配
+	delPowerAssignmentIds := make([]int64, 0)
+	for _, powerAssignment := range allPowerAssignmentDatas {
+		userData := findUser(powerAssignment.UserId)
+		powerGroupData := findPowerGroup(powerAssignment.GroupId)
+		if userData == nil || powerGroupData == nil {
+			delPowerAssignmentIds = append(delPowerAssignmentIds, powerAssignment.Id)
+			continue
+		}
+
+		rsp.Assignment = append(rsp.Assignment, &webmodel.PermissionGroupUserAssignmentInfo{
+			Id:        powerAssignment.Id,
+			UserId:    powerAssignment.UserId,
+			Name:      userData.Name,
+			GroupId:   powerGroupData.GroupId,
+			GroupName: powerGroupData.Name,
+		})
+	}
+	if len(delPowerAssignmentIds) > 0 {
+		err := dao.DelPowerAssignmentDataByIds(delPowerAssignmentIds)
+		if err != nil {
+			dao.Error(ctx, "del power assignment:%v is err:%v", delPowerIds, err)
+			return err
+		}
+	}
+
 	for _, powerGroup := range allPowerGroups {
 		bUpdatePowerGroup := false
 		// 检查是否有不正确的poweid
@@ -137,29 +176,11 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 				indexPowerId--
 			}
 		}
-
-		// 检查是否有不正确的用户id
-		retGroupUsers := make([]*webmodel.PermissionGroupUserInfo, 0)
-		for indexPowerGroupUser := 0; indexPowerGroupUser < len(powerGroup.ExtraData.UserIds); indexPowerGroupUser++ {
-			userId := powerGroup.ExtraData.UserIds[indexPowerGroupUser]
-			tmpUser := findUser(userId)
-			if tmpUser == nil {
-				bUpdatePowerGroup = true
-				powerGroup.ExtraData.UserIds = append(powerGroup.ExtraData.UserIds[:indexPowerGroupUser], powerGroup.ExtraData.UserIds[indexPowerGroupUser+1:]...)
-				indexPowerGroupUser--
-			} else {
-				retGroupUsers = append(retGroupUsers, &webmodel.PermissionGroupUserInfo{
-					Id:   tmpUser.Rid,
-					Name: tmpUser.Name,
-				})
-			}
-		}
 		rsp.PermissionGroupDatas = append(rsp.PermissionGroupDatas, &webmodel.PermissionGroupInfo{
 			Id:       powerGroup.GroupId,
 			Name:     powerGroup.Name,
 			Enable:   powerGroup.Enable,
 			PowerIds: powerGroup.ExtraData.PowerIds,
-			Users:    retGroupUsers,
 		})
 
 		if bUpdatePowerGroup {
@@ -298,184 +319,5 @@ func DelPermissionHandler(ctx *web.WebContext, req *webmodel.DelPermissionReq, r
 	}
 	rsp.Id = req.Id
 	dao.Info(ctx, "del power:%v is ok", req.Id)
-	return nil
-}
-
-// 权限组
-func AddPermissionGroupHandler(ctx *web.WebContext, req *webmodel.AddPermissionGroupReq, rsp *webmodel.AddPermissionGroupRsp) error {
-	user := dao.GetSession(ctx)
-	if user == nil {
-		return nil
-	}
-
-	if user.Role != define.EnumRole_Administrator {
-		// 权限不够
-		err := fmt.Errorf("add power group but role:%v power is err", user.Role)
-		dao.Error(ctx, err.Error())
-		return err
-	}
-
-	// 查询这些添加的权限是否真实存在
-	powerDatas, err := dao.FindPowerDatas(req.PowerIds)
-	if err != nil {
-		dao.Error(ctx, "add power group is err:%v", err)
-		return err
-	}
-	if len(powerDatas) != len(req.PowerIds) {
-		err := fmt.Errorf("add power group powers:%v real len:%v is not equal", req.PowerIds, len(powerDatas))
-		dao.Error(ctx, err.Error())
-		return err
-	}
-	insertData := &dbmodel.PowerGroup{
-		Name:   req.Name,
-		Enable: req.Enable,
-		ExtraData: &db_extra.PowerGroupExtra{
-			PowerIds: req.PowerIds,
-			UserIds:  make([]int64, 0),
-		},
-	}
-	err = dao.InsertPowerGroupData(insertData)
-	if err != nil {
-		dao.Error(ctx, "add power group is err:%v", err)
-		return err
-	}
-	rsp.Data = &webmodel.PermissionGroupInfo{
-		Id:       insertData.GroupId,
-		Name:     req.Name,
-		Enable:   req.Enable,
-		PowerIds: req.PowerIds,
-		Users:    make([]*webmodel.PermissionGroupUserInfo, 0),
-	}
-	dao.Info(ctx, "add power group:%v name:%v powerids:%v is ok", insertData.GroupId, req.Name, req.PowerIds)
-	return nil
-}
-
-func ModifyPermissionGroupHandler(ctx *web.WebContext, req *webmodel.ModifyPermissionGroupReq, rsp *webmodel.ModifyPermissionGroupRsp) error {
-	user := dao.GetSession(ctx)
-	if user == nil {
-		return nil
-	}
-
-	if user.Role != define.EnumRole_Administrator {
-		// 权限不够
-		err := fmt.Errorf("modify power group but role:%v power is err", user.Role)
-		dao.Error(ctx, err.Error())
-		return err
-	}
-
-	powerGroupData, find, err := dao.GetPowerGroupData(req.Data.Id)
-	if err != nil {
-		dao.Error(ctx, "modify power group is err:%v", err)
-		return err
-	}
-
-	if !find {
-		dao.Error(ctx, "modify power group:%v is not found", req.Data.Id)
-		return err
-	}
-
-	// 查询这些添加的权限是否真实存在
-	powerDatas, err := dao.FindPowerDatas(req.Data.PowerIds)
-	if err != nil {
-		dao.Error(ctx, "modify power group is err:%v", err)
-		return err
-	}
-	if len(powerDatas) != len(req.Data.PowerIds) {
-		err := fmt.Errorf("modify power group powers:%v real len:%v is not equal", req.Data.PowerIds, len(powerDatas))
-		dao.Error(ctx, err.Error())
-		return err
-	}
-
-	// 查询这些玩家是否真实存在
-	userDatas, err := dao.FindUserDatas(powerGroupData.ExtraData.UserIds)
-	if err != nil {
-		dao.Error(ctx, "modify power group is err:%v", err)
-		return err
-	}
-	if len(userDatas) != len(powerGroupData.ExtraData.UserIds) {
-		err := fmt.Errorf("modify power group users:%v real len:%v is not equal", powerGroupData.ExtraData.UserIds, len(userDatas))
-		dao.Error(ctx, err.Error())
-		return err
-	}
-
-	powerGroupData.Name = req.Data.Name
-	powerGroupData.Enable = req.Data.Enable
-	powerGroupData.ExtraData.PowerIds = req.Data.PowerIds
-	for _, modifyGroupUser := range req.Data.Users {
-		bFindUser := false
-		for _, id := range powerGroupData.ExtraData.UserIds {
-			if id == modifyGroupUser.Id {
-				bFindUser = true
-				break
-			}
-		}
-		if !bFindUser {
-			powerGroupData.ExtraData.UserIds = append(powerGroupData.ExtraData.UserIds, modifyGroupUser.Id)
-
-			// 更新玩家权限数据
-
-		}
-	}
-	err = dao.UpdatePowerGroupData(powerGroupData.GroupId, powerGroupData)
-	if err != nil {
-		dao.Error(ctx, "modify power group is err:%v", err)
-		return err
-	}
-	rsp.Data = req.Data
-	strGroup, _ := json.Marshal(rsp.Data)
-	dao.Info(ctx, "modify power group:%v is ok", string(strGroup))
-	return nil
-}
-
-func DelPermissionGroupHandler(ctx *web.WebContext, req *webmodel.DelPermissionGroupReq, rsp *webmodel.DelPermissionGroupRsp) error {
-	user := dao.GetSession(ctx)
-	if user == nil {
-		return nil
-	}
-
-	if user.Role != define.EnumRole_Administrator {
-		// 权限不够
-		err := fmt.Errorf("del power group but role:%v power is err", user.Role)
-		dao.Error(ctx, err.Error())
-		return err
-	}
-
-	powerGroupData, find, err := dao.GetPowerGroupData(req.Id)
-	if err != nil {
-		dao.Error(ctx, "del power group is err:%v", err)
-		return err
-	}
-
-	if !find {
-		dao.Error(ctx, "del power group:%v is not found", req.Id)
-		return err
-	}
-
-	// 删除玩家身上的权限组标记
-	for _, userId := range powerGroupData.ExtraData.UserIds {
-		tmpUpdateUser, find, err := dao.GetUserData(userId)
-		if err != nil {
-			dao.Error(ctx, "del power group user:%v is err:%v", userId, err)
-			continue
-		}
-		if !find {
-			dao.Error(ctx, "del power group user:%v is not found", userId)
-			continue
-		}
-		err = dao.UpdateUserData(tmpUpdateUser.Rid, tmpUpdateUser)
-		if err != nil {
-			dao.Error(ctx, "del power group user:%v update is err:%v", userId, err)
-			continue
-		}
-	}
-
-	err = dao.DelPowerGroupData(powerGroupData.GroupId)
-	if err != nil {
-		dao.Error(ctx, "del power group:%v is err:%v", powerGroupData.GroupId, err)
-		return err
-	}
-	rsp.Id = req.Id
-
-	dao.Info(ctx, "del power group:%v is ok", req.Id)
 	return nil
 }

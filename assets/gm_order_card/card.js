@@ -10,6 +10,7 @@ function loadGmOrderCard(gridWrapper, gmOrderData){
         const orderList = gmOrderData.datas;
         for (let i = 0; i < orderList.length; i++) {
             const order = orderList[i].gmorderdata;
+            const lastrunargs = orderList[i].lastrunargs;
             const newBox = document.createElement('div');
             newBox.className = "gm_card_layout"
 		    newBox.innerHTML = html;
@@ -22,14 +23,14 @@ function loadGmOrderCard(gridWrapper, gmOrderData){
             
 
             gridWrapper.appendChild(newBox);
-            gmOrderCardEvent(order, newBox); // 卡片事件
+            gmOrderCardEvent(order,lastrunargs, newBox); // 卡片事件
         }
     }).catch(error => {
         console.error('加载 gm_order_box.html 时出现问题:', error);
     });
 }
 
-function gmOrderCardEvent(order, newBox) {
+function gmOrderCardEvent(order,lastrunargs, newBox) {
 
 
     // 获取DOM元素
@@ -41,7 +42,8 @@ function gmOrderCardEvent(order, newBox) {
 
     const sendBtn = newBox.querySelector('#sendBtn');
     const modalJsonArgs = newBox.querySelector('#modalJsonArgs');
-    renderJSONForm(modalJsonArgs, order);
+    const lastrunargsObj = JSON.parse(lastrunargs);
+    renderJSONForm(modalJsonArgs, lastrunargsObj);
     
     // 打开模态框
     triggerBtn.addEventListener('click', () => {

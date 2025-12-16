@@ -237,6 +237,7 @@ func (c *ControllerHandler) PostApiGetPermission(ctx *web.WebContext, req *webmo
 		AllUsers:             make([]*webmodel.PermissionGroupUserInfo, 0),
 		AllProjects:          make([]*webmodel.PermissionProject, 0),
 		AllLevels:            make([]int, 0),
+		Assignment:           make([]*webmodel.PermissionGroupUserAssignmentInfo, 0),
 	}
 	if err := power.GetPermissionHandler(ctx, req, rsp); err != nil {
 		log.Errorf("get permission is err:%v", err)
@@ -317,6 +318,28 @@ func (c *ControllerHandler) PostApiGetGmProjectBriefInfo(ctx *web.WebContext, re
 	if err := project.GetGmProjectBriefInfoHandler(ctx, req, rsp); err != nil {
 		log.Errorf("get project brief is err:%v", err)
 		ctx.Err("get project brief is err:%v", err)
+		return
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 删除权限分配数据
+func (c *ControllerHandler) PostApiDelPowerAssignment(ctx *web.WebContext, req *webmodel.DelPowerAssignmentReq) {
+	rsp := &webmodel.DelPowerAssignmentRsp{}
+	if err := power.DelPermissionAssignmentHandler(ctx, req, rsp); err != nil {
+		log.Errorf("del power assignment is err:%v", err)
+		ctx.Err("del power assignment is err:%v", err)
+		return
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 添加权限分配数据
+func (c *ControllerHandler) PostApiAddPowerAssignment(ctx *web.WebContext, req *webmodel.AddPowerAssignmentReq) {
+	rsp := &webmodel.AddPowerAssignmentRsp{}
+	if err := power.AddPermissionAssignmentHandler(ctx, req, rsp); err != nil {
+		log.Errorf("add power assignment is err:%v", err)
+		ctx.Err("add power assignment is err:%v", err)
 		return
 	}
 	ctx.SuccessOk(rsp)

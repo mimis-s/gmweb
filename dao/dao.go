@@ -38,9 +38,6 @@ func Init(db *common_client.SqlClient) error {
 				},
 				Role:   int(define.EnumRole_Administrator),
 				Custom: &db_extra.CustomInfo{},
-				RolePowerData: &db_extra.RolePowerInfo{
-					PowerGroups: make([]int64, 0),
-				},
 			})
 			if err != nil {
 				return err

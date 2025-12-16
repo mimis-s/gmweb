@@ -71,6 +71,9 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.PostWithStructParams("/api/gm_permission/group/modify", "修改权限组", webmodel.ModifyPermissionGroupReq{}, controllerHandler.PostApiModifyPermissionGroup)
 		engine.PostWithStructParams("/api/gm_permission/group/del", "删除权限组", webmodel.DelPermissionGroupReq{}, controllerHandler.PostApiDelPermissionGroup)
 
+		// 权限分配
+		engine.PostWithStructParams("/api/gm_permission/assign/add", "权限分配增加", webmodel.AddPowerAssignmentReq{}, controllerHandler.PostApiAddPowerAssignment)
+		engine.PostWithStructParams("/api/gm_permission/assign/del", "权限分配删除", webmodel.DelPowerAssignmentReq{}, controllerHandler.PostApiDelPowerAssignment)
 		a.AddServer("gmweb", engine)
 		return nil
 	}))

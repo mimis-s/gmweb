@@ -7,17 +7,16 @@ import (
 )
 
 type User struct {
-	Rid           int64                       `xorm:"rid not null pk autoincr BIGINT"`
-	Name          string                      `xorm:"not null VARCHAR(255)"`
-	Password      string                      `xorm:"VARCHAR(255)"`
-	Role          int                         `xorm:"INT"` // 用户角色(管理员/普通用户)
-	Custom        *db_extra.CustomInfo        `xorm:"comment('#*db_extra.CustomInfo#') JSON" json:"custom,omitempty"`
-	BaseData      *db_extra.RoleBase          `xorm:"comment('#*db_extra.RoleBase#') JSON" json:"base_data,omitempty"`
-	RolePowerData *db_extra.RolePowerInfo     `xorm:"comment('#*db_extra.RolePowerInfo#') JSON" json:"role_power_data,omitempty"`
-	OrderStatus   *db_extra.RoleGmOrderStatus `xorm:"comment('#*db_extra.RoleGmOrderStatus#') JSON" json:"order_status,omitempty"`
-	CreatedAt     time.Time                   `xorm:"created"`
-	UpdatedAt     time.Time                   `xorm:"updated"`
-	DeletedAt     time.Time                   `xorm:"deleted"`
+	Rid         int64                       `xorm:"rid not null pk autoincr BIGINT"`
+	Name        string                      `xorm:"not null VARCHAR(255)"`
+	Password    string                      `xorm:"VARCHAR(255)"`
+	Role        int                         `xorm:"INT"` // 用户角色(管理员/普通用户)
+	Custom      *db_extra.CustomInfo        `xorm:"comment('#*db_extra.CustomInfo#') JSON" json:"custom,omitempty"`
+	BaseData    *db_extra.RoleBase          `xorm:"comment('#*db_extra.RoleBase#') JSON" json:"base_data,omitempty"`
+	OrderStatus *db_extra.RoleGmOrderStatus `xorm:"comment('#*db_extra.RoleGmOrderStatus#') JSON" json:"order_status,omitempty"`
+	CreatedAt   time.Time                   `xorm:"created"`
+	UpdatedAt   time.Time                   `xorm:"updated"`
+	DeletedAt   time.Time                   `xorm:"deleted"`
 }
 
 // 权限组表
@@ -33,8 +32,9 @@ type PowerGroup struct {
 
 // 权限分配表
 type PowerAssignMent struct {
-	UserId    int64     `xorm:"group_id not null pk(user_group) comment('主键') BIGINT"`
-	GroupId   int64     `xorm:"group_id not null pk(user_group) comment('主键') BIGINT"`
+	Id        int64     `xorm:"not null pk autoincr comment('主键') BIGINT"`
+	UserId    int64     `xorm:"user_id not null index(user_group) BIGINT"`
+	GroupId   int64     `xorm:"group_id not null index(user_group) BIGINT"`
 	CreatedAt time.Time `xorm:"created"`
 	UpdatedAt time.Time `xorm:"updated"`
 	DeletedAt time.Time `xorm:"deleted"`
