@@ -36,7 +36,7 @@ function initGmRederTableDatagmOrderData(newBox, gmOrderData){
     // 为"添加新数据"按钮添加事件监听器
     const addButton = newBox.querySelector('#projectTableAddDataBtn');
     addButton.addEventListener('click', () =>{
-        openAddOrderTableModal(projectTableAddModal);
+        openAddOrderTableModal(gmOrderData.projectid, projectTableAddModal);
     });
     const projectTableDataCloseBottomBtn = newBox.querySelector('#projectTableDataCloseBottomBtn')
     projectTableDataCloseBottomBtn.addEventListener('click', () =>{
@@ -48,7 +48,7 @@ function initGmRederTableDatagmOrderData(newBox, gmOrderData){
     });
     const projectTableDataSaveBtn = newBox.querySelector('#projectTableDataSaveBtn')
     projectTableDataSaveBtn.addEventListener('click', () =>{
-        saveAddItemModal(projectTableAddModal);
+        saveAddItemModal(newBox, projectTableAddModal);
     });    
 }
 
@@ -161,7 +161,7 @@ function saveEditItemModal() {
     const outputArea = projectTableEditModal.querySelector('#editDescription')
     const editPath = projectTableEditModal.querySelector('#editPath');
     const editMethod = projectTableEditModal.querySelector('#editSelectMethod');
-    const projectId = projectTableEditModal.querySelector('#projectTableAddModalTitle').value;
+    const projectId = projectTableEditModal.querySelector('#projectTableEditModal').value;
 
     var modifyGmOrderReq = {
         ProjectId: Number(projectId), // 项目id
@@ -178,7 +178,7 @@ function saveEditItemModal() {
 }
 
 // 保存新增的gm命令内容
-function saveAddItemModal(projectTableAddModal) {
+function saveAddItemModal(newBox, projectTableAddModal) {
     // 你的保存逻辑
     // 关闭当前模态框
     projectTableAddModal.style.display = 'none';
@@ -188,8 +188,9 @@ function saveAddItemModal(projectTableAddModal) {
     const addDesc = projectTableAddModal.querySelector('#addDesc');
     const addPath = projectTableAddModal.querySelector('#addPath');
     const addMethod = projectTableAddModal.querySelector('#addSelectMethod');
+    const projectId = projectTableAddModal.querySelector('#projectTableAddModalTitle').value;
     var addGmOrderReq = {
-        ProjectId: Number(projectTableAddModal.value), // 项目id
+        ProjectId: Number(projectId), // 项目id
 	    OrderName: addName.value, // 命令名字(不允许重名)
 	    Level: Number(addLevel.value),
 	    OrderDesc: addDesc.value,
@@ -197,7 +198,7 @@ function saveAddItemModal(projectTableAddModal) {
         Path: addPath.value,
         Method: addMethod.value,
     }
-    addGmOrderData(addGmOrderReq)
+    addGmOrderData(newBox, addGmOrderReq)
 }
 
 // 发送服务器gm修改命令
@@ -235,7 +236,7 @@ function modifyGmOrderData(modifyGmOrderReq) {
 }
 
 // 发送服务器添加gm命令
-function addGmOrderData(addGmOrderReq) {
+function addGmOrderData(newBox, addGmOrderReq) {
     fetch('/api/gm_order_add', {
       method: 'POST',
       headers: {
@@ -250,7 +251,6 @@ function addGmOrderData(addGmOrderReq) {
     })
     .then((data) => {
       console.log('成功:', data);
-      const newBox = document.getElementById('projectTableContainer');
       createTableItem(newBox, data.projectid, data.message.data)
       return;
     })
@@ -260,7 +260,8 @@ function addGmOrderData(addGmOrderReq) {
 }
 
 // 打开添加模态框
-function openAddOrderTableModal(projectTableAddModal) {
+function openAddOrderTableModal(projectId, projectTableAddModal) {
+    projectTableAddModal.querySelector('#projectTableAddModalTitle').value = projectId;
     projectTableAddModal.style.display = 'flex';
 }
 
