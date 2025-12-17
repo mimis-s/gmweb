@@ -41,7 +41,7 @@ function gmProjectCardEvent(gridWrapper, gmOrderData, newBox){
   // 详情模态框
   projectCardBtn.addEventListener('click', () => {
     modalOverlay.classList.add('active');
-    console.debug("打开模态框");
+    console.debug("命令详情模态框", gmOrderData);
     loadGmOrderTable(modalJsonArgs, gmOrderData);
   });
   closeBtn.addEventListener('click', () => {

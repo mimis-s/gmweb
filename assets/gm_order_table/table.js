@@ -16,7 +16,7 @@ function loadGmOrderTable(gridWrapper, gmOrderData){
         newBox.className = "project-table-container";
         newBox.id = "projectTableContainer";
         newBox.innerHTML = html;
-        gridWrapper.appendChild(newBox);
+        gridWrapper.appendChild(newBox);        
         // 卡片事件
         initGmRederTableDatagmOrderData(newBox, gmOrderData);
     }).catch(error => {
@@ -28,12 +28,31 @@ function loadGmOrderTable(gridWrapper, gmOrderData){
 function initGmRederTableDatagmOrderData(newBox, gmOrderData){
     if (gmOrderData.datas != null){
         gmOrderData.datas.forEach(data => {
-            createTableItem(newBox, data);
+            createTableItem(newBox, gmOrderData.projectid, data);
         });
     }
+
+    const projectTableAddModal = newBox.querySelector('#projectTableAddModal')
+    // 为"添加新数据"按钮添加事件监听器
+    const addButton = newBox.querySelector('#projectTableAddDataBtn');
+    addButton.addEventListener('click', () =>{
+        openAddOrderTableModal(projectTableAddModal);
+    });
+    const projectTableDataCloseBottomBtn = newBox.querySelector('#projectTableDataCloseBottomBtn')
+    projectTableDataCloseBottomBtn.addEventListener('click', () =>{
+        closeAddOrderTableModal(projectTableAddModal);
+    });
+    const projectTableDataCloseTopBtn = newBox.querySelector('#projectTableDataCloseTopBtn')
+    projectTableDataCloseTopBtn.addEventListener('click', () =>{
+        closeAddOrderTableModal(projectTableAddModal);
+    });
+    const projectTableDataSaveBtn = newBox.querySelector('#projectTableDataSaveBtn')
+    projectTableDataSaveBtn.addEventListener('click', () =>{
+        saveAddItemModal(projectTableAddModal);
+    });    
 }
 
-function createTableItem(newBox, gmorderdata){
+function createTableItem(newBox, projectId, gmorderdata){
     const listContainer = newBox.querySelector('#projectTableDataList');
     const index = listContainer.querySelectorAll("#projectTableListItem").length;
     gmOrderTableMap.set(gmorderdata.ordername, gmorderdata);
@@ -60,6 +79,7 @@ function createTableItem(newBox, gmorderdata){
         const projectTableEditModal =  document.getElementById('projectTableEditModal');
         projectTableEditModal.style.display = 'flex';
         console.debug('点击按钮:',data.ordername);
+        projectTableEditModal.querySelector('#projectTableEditModalTitle').value = data.projectId;
         projectTableEditModal.querySelector('#editName').value = data.ordername;
         projectTableEditModal.querySelector('#editLevel').value = data.level;
         projectTableEditModal.querySelector('#editDesc').value = data.orderdesc;
@@ -141,8 +161,10 @@ function saveEditItemModal() {
     const outputArea = projectTableEditModal.querySelector('#editDescription')
     const editPath = projectTableEditModal.querySelector('#editPath');
     const editMethod = projectTableEditModal.querySelector('#editSelectMethod');
+    const projectId = projectTableEditModal.querySelector('#projectTableAddModalTitle').value;
+
     var modifyGmOrderReq = {
-        ProjectId: 1, // 项目id
+        ProjectId: Number(projectId), // 项目id
         "data":{
 	        OrderName: editName.value, // 命令名字(不允许重名)
 	        Level: Number(editLevel.value),
@@ -156,10 +178,8 @@ function saveEditItemModal() {
 }
 
 // 保存新增的gm命令内容
-function saveAddItemModal() {
+function saveAddItemModal(projectTableAddModal) {
     // 你的保存逻辑
-    console.log('保存数据...');
-    const projectTableAddModal = document.getElementById('projectTableAddModal');
     // 关闭当前模态框
     projectTableAddModal.style.display = 'none';
     const addName = projectTableAddModal.querySelector('#addName')
@@ -169,7 +189,7 @@ function saveAddItemModal() {
     const addPath = projectTableAddModal.querySelector('#addPath');
     const addMethod = projectTableAddModal.querySelector('#addSelectMethod');
     var addGmOrderReq = {
-        ProjectId: 1, // 项目id
+        ProjectId: Number(projectTableAddModal.value), // 项目id
 	    OrderName: addName.value, // 命令名字(不允许重名)
 	    Level: Number(addLevel.value),
 	    OrderDesc: addDesc.value,
@@ -231,7 +251,7 @@ function addGmOrderData(addGmOrderReq) {
     .then((data) => {
       console.log('成功:', data);
       const newBox = document.getElementById('projectTableContainer');
-      createTableItem(newBox, data.message.data)
+      createTableItem(newBox, data.projectid, data.message.data)
       return;
     })
     .catch((error) => {
@@ -240,13 +260,13 @@ function addGmOrderData(addGmOrderReq) {
 }
 
 // 打开添加模态框
-function openAddOrderTableModal() {
-    document.getElementById('projectTableAddModal').style.display = 'flex';
+function openAddOrderTableModal(projectTableAddModal) {
+    projectTableAddModal.style.display = 'flex';
 }
 
 // 关闭添加模态框
-function closeAddModal() {
-    document.getElementById('projectTableAddModal').style.display = 'none';
+function closeAddOrderTableModal(projectTableAddModal) {
+    projectTableAddModal.style.display = 'none';
 }
 
 

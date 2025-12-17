@@ -15,14 +15,14 @@
         </div>
     </div>
     <div>
-        <button class="project-card-btn project-card-btn-add" onclick="openAddOrderTableModal()">添加新数据</button>
+        <button class="project-card-btn project-card-btn-add" id="projectTableAddDataBtn">添加新数据</button>
     </div>
         
     <!-- 编辑模态框 -->
     <div class="project-table-modal" id="projectTableEditModal">
         <div class="project-table-modal-content">
             <div class="project-table-modal-header">
-                <h2 class="project-table-modal-title">修改GM命令</h2>
+                <h2 class="project-table-modal-title" id="projectTableEditModalTitle">修改GM命令</h2>
                 <button class="project-table-close-btn" onclick="closeEditItemModal()">&times;</button>
             </div>
             <form id="editForm">
@@ -69,8 +69,8 @@
     <div class="project-table-modal" id="projectTableAddModal">
         <div class="project-table-modal-content">
             <div class="project-table-modal-header">
-                <h2 class="project-table-modal-title">新增GM命令</h2>
-                <button class="project-table-close-btn" onclick="closeAddModal()">&times;</button>
+                <h2 class="project-table-modal-title" id="projectTableAddModalTitle">新增GM命令</h2>
+                <button class="project-table-close-btn" id="projectTableDataCloseTopBtn">&times;</button>
             </div>
             <form id="addForm">
                 <div class="project-table-form-group">
@@ -105,8 +105,8 @@
                 <!-- <div id="editDescription" class="project-table-json-textarea"></div> -->
                 </div>
                 <div class="project-table-form-actions">
-                    <button type="button" class="project-table-btn project-table-btn-cancel" onclick="closeAddModal()">取消</button>
-                    <button type="button" class="project-table-btn project-table-btn-save" onclick="saveAddItemModal()">保存</button>
+                    <button type="button" class="project-table-btn project-table-btn-cancel" id="projectTableDataCloseBottomBtn">取消</button>
+                    <button type="button" class="project-table-btn project-table-btn-save" id="projectTableDataSaveBtn"">保存</button>
                 </div>
             </form>
         </div>
