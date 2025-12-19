@@ -1,57 +1,4 @@
-// (function() {
-// 	var menuEl = document.getElementById('ml-menu'),
-// 		mlmenu = new MLMenu(menuEl, {
-// 			backCtrl : false,
-// 			onItemClick: loadDummyData
-// 		});
-// 	// mobile menu toggle
-// 	var openMenuCtrl = document.querySelector('.action--open'),
-// 		closeMenuCtrl = document.querySelector('.action--close');
-// 	openMenuCtrl.addEventListener('click', openMenu);
-// 	closeMenuCtrl.addEventListener('click', closeMenu);
-// 	function openMenu() {
-// 		classie.add(menuEl, 'menu--open');
-// 	}
-// 	function closeMenu() {
-// 		classie.remove(menuEl, 'menu--open');
-// 	}
-
-//     const projectBriefBox = ev.querySelector('#submenu2');
-//     projectBriefBox.addEventListener('click', openMenu2);
-//     function openMenu2() {
-//         console.log("打开按钮", menuEl);
-
-// 	}
-// 	// simulate grid content loading
-// 	var gridWrapper = document.querySelector('.content');
-// 	function loadDummyData(ev, itemName) {
-//         console.log("点击按钮", itemName);
-//         ev.preventDefault();
-//         closeMenu();
-//         gridWrapper.innerHTML = `<p class="info" id="gridWrapper">GM管理平台欢迎你</p>`;
-//         // classie.add(gridWrapper, 'content--loading');
-// 		if (itemName == "GM操作")
-// 		{
-//             //动态添加项目
-// 			loadGmOrderProjectBriefModule(ev, gridWrapper, classie)
-// 		}
-// 		if (itemName == "项目管理")
-// 		{
-// 			loadGmProjectModule(ev, gridWrapper, classie)
-// 		}
-// 		if (itemName == "用户管理")
-// 		{
-// 			loadUserMangementModule(ev, gridWrapper, classie)
-// 		}
-// 		if (itemName == "权限管理")
-// 		{
-// 			loadPermissionModule(ev, gridWrapper, classie)
-// 		}
-// 	}
-// })();
-
 function loadGmOrderProjectBriefModule(tabProject){
-    console.log("点击gm操作")
     var getGmProjectBriefInfoReq = {}
     fetch('/api/gm_projects', {
       method: 'POST',
@@ -61,6 +8,10 @@ function loadGmOrderProjectBriefModule(tabProject){
       body: JSON.stringify(getGmProjectBriefInfoReq)
     })
     .then(response => {
+        const nextPage = response.headers.get('next-page');
+        if (nextPage != null) {
+            window.location.href = nextPage;
+        }
       return response.json().then(data => {
         return data;
       });
@@ -70,14 +21,10 @@ function loadGmOrderProjectBriefModule(tabProject){
       data.message.datas.forEach(briefData => {
         const projectBriefBox = document.createElement("li");
         projectBriefBox.className = "submenu-item";
-        projectBriefBox.innerHTML = `<a class="nav-link" data-content="sales" onclick="loadGmOrderModule(${briefData.projectid})">
-        <span class="nav-text">${briefData.name}</span>`
-        
+        projectBriefBox.innerHTML = `<a class="nav-link" data-content="sales" onclick="loadGmOrderModule(${briefData.projectid})"><span class="nav-text">${briefData.name}</span></a>`
         tabProject.appendChild(projectBriefBox);
-        tabProject.classList.toggle('show');
       });
-
-      return;
+      tabProject.classList.toggle('show');
     })
     .catch((error) => {
       console.error('错误:', error);
@@ -85,11 +32,15 @@ function loadGmOrderProjectBriefModule(tabProject){
 }
 
 function loadGmOrderModule(projectId){
-    setTimeout(function() {
+    // setTimeout(function() {
         fetch('gm_order_box.html')
         .then(response => {
             if (!response.ok) {
                 throw new Error('网络响应不正常');
+            }
+            const nextPage = response.headers.get('next-page');
+            if (nextPage != null) {
+                window.location.href = nextPage;
             }
             return response.text();
         })
@@ -108,7 +59,7 @@ function loadGmOrderModule(projectId){
         .catch(error => {
             console.error('加载 header.html 时出现问题:', error);
         });
-    }, 100);
+    // }, 100);
 }
 
 function loadGmProjectModule(){
@@ -117,6 +68,10 @@ function loadGmProjectModule(){
         .then(response => {
             if (!response.ok) {
                 throw new Error('网络响应不正常');
+            }
+            const nextPage = response.headers.get('next-page');
+            if (nextPage != null) {
+                window.location.href = nextPage;
             }
             return response.text();
         })
@@ -144,6 +99,10 @@ function loadUserMangementModule(){
             if (!response.ok) {
                 throw new Error('网络响应不正常');
             }
+            const nextPage = response.headers.get('next-page');
+            if (nextPage != null) {
+                window.location.href = nextPage;
+            }
             return response.text();
         })
         .then(html => {
@@ -168,6 +127,10 @@ function loadPermissionModule(){
         .then(response => {
             if (!response.ok) {
                 throw new Error('网络响应不正常');
+            }
+            const nextPage = response.headers.get('next-page');
+            if (nextPage != null) {
+                window.location.href = nextPage;
             }
             return response.text();
         })

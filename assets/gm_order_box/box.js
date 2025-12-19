@@ -11,6 +11,10 @@ function loadGmOrderBoxEvent(gridWrapper, projectId) {
       body: JSON.stringify(gmOrderBoxReq)
     })
     .then(response => {
+      const nextPage = response.headers.get('next-page');
+      if (nextPage != null) {
+          window.location.href = nextPage;
+      }
       return response.json().then(data => {
         return data;
       });

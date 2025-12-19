@@ -14,6 +14,10 @@ function loadUsersBoxEvent(gridWrapper) {
       body: JSON.stringify(getAllUsersReq)
     })
     .then(response => {
+        const nextPage = response.headers.get('next-page');
+        if (nextPage != null) {
+            window.location.href = nextPage;
+        }
       return response.json().then(data => {
         return data;
       });
@@ -50,6 +54,10 @@ function saveUsersToEvent(userIndex, userName, userPassword) {
     body: JSON.stringify(modifyUserReq)
   })
   .then(response => {
+      const nextPage = response.headers.get('next-page');
+      if (nextPage != null) {
+          window.location.href = nextPage;
+      }
     return response.json().then(data => {
       return data;
     });
@@ -86,6 +94,10 @@ function delUsersToEvent(userId) {
     body: JSON.stringify(delUserReq)
   })
   .then(response => {
+      const nextPage = response.headers.get('next-page');
+      if (nextPage != null) {
+          window.location.href = nextPage;
+      }
     return response.json().then(data => {
       return data;
     });
@@ -122,6 +134,10 @@ function addUsersToEvent(userName, userPassword) {
     body: JSON.stringify(addUserReq)
   })
   .then(response => {
+      const nextPage = response.headers.get('next-page');
+      if (nextPage != null) {
+          window.location.href = nextPage;
+      }
     return response.json().then(data => {
       return data;
     });

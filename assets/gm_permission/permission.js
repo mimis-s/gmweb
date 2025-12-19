@@ -20,9 +20,13 @@ function loadPermissionEvent(){
       body: JSON.stringify(getPermissionReq)
     })
     .then(response => {
-      return response.json().then(data => {
-        return data;
-      });
+        const nextPage = response.headers.get('next-page');
+        if (nextPage != null) {
+            window.location.href = nextPage;
+        }
+        return response.json().then(data => {
+          return data;
+        });
     })
     .then((data) => {
         console.log('获取用户权限数据:', data);
@@ -105,6 +109,10 @@ function addPermission() {
         body: JSON.stringify(addPermissionReq)
       })
       .then(response => {
+          const nextPage = response.headers.get('next-page');
+          if (nextPage != null) {
+              window.location.href = nextPage;
+          }
         return response.json().then(data => {
           return data;
         });
@@ -183,6 +191,10 @@ function togglePermissionStatus(id) {
             body: JSON.stringify(modifyPermissionReq)
           })
           .then(response => {
+              const nextPage = response.headers.get('next-page');
+              if (nextPage != null) {
+                  window.location.href = nextPage;
+              }
             return response.json().then(data => {
               return data;
             });
@@ -219,6 +231,10 @@ function deletePermission(id) {
             body: JSON.stringify(delPermissionReq)
           })
           .then(response => {
+              const nextPage = response.headers.get('next-page');
+              if (nextPage != null) {
+                  window.location.href = nextPage;
+              }
             return response.json().then(data => {
               return data;
             });
@@ -281,6 +297,10 @@ function addPermissionGroup() {
       body: JSON.stringify(addPermissionGroupReq)
     })
     .then(response => {
+        const nextPage = response.headers.get('next-page');
+        if (nextPage != null) {
+            window.location.href = nextPage;
+        }
       return response.json().then(data => {
         return data;
       });
@@ -433,6 +453,10 @@ function toggleGroupStatus(id) {
             body: JSON.stringify(modifyPermissionGroupReq)
           })
           .then(response => {
+              const nextPage = response.headers.get('next-page');
+              if (nextPage != null) {
+                  window.location.href = nextPage;
+              }
             return response.json().then(data => {
               return data;
             });
@@ -470,6 +494,10 @@ function deleteGroup(id) {
             body: JSON.stringify(delPermissionGroupReq)
           })
           .then(response => {
+              const nextPage = response.headers.get('next-page');
+              if (nextPage != null) {
+                  window.location.href = nextPage;
+              }
             return response.json().then(data => {
               return data;
             });
@@ -539,6 +567,10 @@ function assignPermission() {
         body: JSON.stringify(addPermissionAssignmentReq)
       })
       .then(response => {
+          const nextPage = response.headers.get('next-page');
+          if (nextPage != null) {
+              window.location.href = nextPage;
+          }
         return response.json().then(data => {
           return data;
         });
@@ -606,6 +638,10 @@ function deleteAssignment(assignmentId) {
             body: JSON.stringify(delPermissionAssignmentReq)
           })
           .then(response => {
+              const nextPage = response.headers.get('next-page');
+              if (nextPage != null) {
+                  window.location.href = nextPage;
+              }
             return response.json().then(data => {
               return data;
             });
@@ -622,8 +658,3 @@ function deleteAssignment(assignmentId) {
         });
     }
 }
-
-// // 保存到本地存储
-// function saveToLocalStorage(key, data) {
-//     localStorage.setItem(key, JSON.stringify(data));
-// }

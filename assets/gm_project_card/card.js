@@ -5,13 +5,17 @@ function loadGmProjectCard(gridWrapper, gmOrderData){
           if (!response.ok) {
               throw new Error('网络响应不正常');
           }
+          const nextPage = response.headers.get('next-page');
+          if (nextPage != null) {
+              window.location.href = nextPage;
+          }
           return response.text();
       }).then(html => {
-              const newBox = document.createElement('div');
-              newBox.className = "gm_card_layout"
-              newBox.innerHTML = html;
-              gridWrapper.appendChild(newBox);
-              gmProjectCardEvent(gridWrapper, gmOrderData, newBox); // 卡片事件
+          const newBox = document.createElement('div');
+          newBox.className = "gm_card_layout"
+          newBox.innerHTML = html;
+          gridWrapper.appendChild(newBox);
+          gmProjectCardEvent(gridWrapper, gmOrderData, newBox); // 卡片事件
       }).catch(error => {
           console.error('加载 gm_project_card.html 时出现问题:', error);
       });
@@ -102,6 +106,10 @@ function saveEditProjectModal(gmOrderData){
     body: JSON.stringify(editProjectDataReq)
   })
   .then(response => {
+      const nextPage = response.headers.get('next-page');
+      if (nextPage != null) {
+          window.location.href = nextPage;
+      }
     return response.json().then(data => {
       return data;
     });
@@ -135,6 +143,10 @@ function delEditProjectModal(delProjectDataReq, newBox, gridWrapper){
     body: JSON.stringify(delProjectDataReq)
   })
   .then(response => {
+      const nextPage = response.headers.get('next-page');
+      if (nextPage != null) {
+          window.location.href = nextPage;
+      }
     return response.json().then(data => {
       return data;
     });

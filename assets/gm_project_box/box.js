@@ -9,6 +9,10 @@ function loadGmProjectBoxEvent(gmProjectBox) {
       body: JSON.stringify(gmProjectBoxReq)
     })
     .then(response => {
+        const nextPage = response.headers.get('next-page');
+        if (nextPage != null) {
+            window.location.href = nextPage;
+        }
       return response.json().then(data => {
         return data;
       });
@@ -51,6 +55,10 @@ function saveAddProjectModal(){
     body: JSON.stringify(addGmProjectReq)
   })
   .then(response => {
+      const nextPage = response.headers.get('next-page');
+      if (nextPage != null) {
+          window.location.href = nextPage;
+      }
     return response.json().then(data => {
       return data;
     });

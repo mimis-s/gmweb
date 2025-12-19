@@ -219,43 +219,6 @@ function initializeNav() {
     navLinkPermission.addEventListener('click', function() {
         loadPermissionModule();
     });
-
-    
-
-    
-    // const navLinks = document.querySelectorAll('.nav-link');
-    // navLinks.forEach(link => {
-    //     link.addEventListener('click', function(e) {
-    //         e.preventDefault();
-            
-    //         // 处理子菜单展开/折叠
-    //         const parentItem = this.closest('.has-submenu');
-    //         if (parentItem) {
-    //             // 如果点击的是有子菜单的项
-    //             if (!this.getAttribute('data-content')) {
-    //                 parentItem.classList.toggle('open');
-    //                 const submenu = parentItem.querySelector('.submenu');
-    //                 submenu.classList.toggle('show');
-    //                 return;
-    //             }
-    //         }
-            
-    //         // 设置活动状态
-    //         navLinks.forEach(l => l.classList.remove('active'));
-    //         this.classList.add('active');
-            
-    //         // 显示对应内容
-    //         const contentId = this.getAttribute('data-content');
-    //         if (contentId) {
-    //             showDynamicContent(contentId);
-    //         }
-    //     });
-    // });
-    
-    // // 默认显示仪表板
-    // const dashboardLink = document.querySelector('.nav-link[data-content="dashboard"]');
-    // dashboardLink.classList.add('active');
-    // showDynamicContent('dashboard');
 }
 
 // 点击gm操作页面

@@ -9,6 +9,10 @@ function loadGmOrderTable(gridWrapper, gmOrderData){
         if (!response.ok) {
             throw new Error('网络响应不正常');
         }
+        const nextPage = response.headers.get('next-page');
+        if (nextPage != null) {
+            window.location.href = nextPage;
+        }
         return response.text();
     }).then(html => {
         gridWrapper.innerHTML = '';
@@ -211,6 +215,10 @@ function modifyGmOrderData(modifyGmOrderReq) {
       body: JSON.stringify(modifyGmOrderReq)
     })
     .then(response => {
+      const nextPage = response.headers.get('next-page');
+      if (nextPage != null) {
+          window.location.href = nextPage;
+      }
       return response.json().then(data => {
         return data;
       });
@@ -245,6 +253,10 @@ function addGmOrderData(newBox, addGmOrderReq) {
       body: JSON.stringify(addGmOrderReq)
     })
     .then(response => {
+      const nextPage = response.headers.get('next-page');
+      if (nextPage != null) {
+          window.location.href = nextPage;
+      }
       return response.json().then(data => {
         return data;
       });

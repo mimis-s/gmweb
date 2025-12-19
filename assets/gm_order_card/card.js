@@ -5,6 +5,10 @@ function loadGmOrderCard(gridWrapper, gmOrderData){
         if (!response.ok) {
             throw new Error('网络响应不正常');
         }
+        const nextPage = response.headers.get('next-page');
+        if (nextPage != null) {
+            window.location.href = nextPage;
+        }
         return response.text();
     }).then(html => {
         const orderList = gmOrderData.datas;
@@ -96,6 +100,10 @@ function sendGmOrder(orderid, sendData, modalOverlayTip){
       body: JSON.stringify(sendGmOrderReq)
     })
     .then(response => {
+      const nextPage = response.headers.get('next-page');
+      if (nextPage != null) {
+          window.location.href = nextPage;
+      }
       return response.json().then(data => {
         return data;
       });
