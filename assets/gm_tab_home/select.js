@@ -28,6 +28,7 @@ function loadGmOrderProjectBriefModule(tabProject){
     })
     .catch((error) => {
       console.error('错误:', error);
+        window.showToast(error.message, "error");
     });
 }
 
@@ -58,6 +59,7 @@ function loadGmOrderModule(projectId){
         })
         .catch(error => {
             console.error('加载 header.html 时出现问题:', error);
+            window.showToast(error.message, "error");
         });
     // }, 100);
 }
@@ -88,6 +90,7 @@ function loadGmProjectModule(){
         })
         .catch(error => {
             console.error('加载 header.html 时出现问题:', error);
+            window.showToast(error.message, "error");
         });
     }, 100);
 }
@@ -116,6 +119,7 @@ function loadUserMangementModule(){
         })
         .catch(error => {
             console.error('加载 header.html 时出现问题:', error);
+            window.showToast(error.message, "error");
         });
     }, 100);
 }
@@ -147,6 +151,7 @@ function loadPermissionModule(){
         })
         .catch(error => {
             console.error('加载 header.html 时出现问题:', error);
+            window.showToast(error.message, "error");
         });
     }, 100);
 }

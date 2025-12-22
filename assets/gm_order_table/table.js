@@ -25,6 +25,7 @@ function loadGmOrderTable(gridWrapper, gmOrderData){
         initGmRederTableDatagmOrderData(newBox, gmOrderData);
     }).catch(error => {
         console.error('加载 gm_order_table.html 时出现问题:', error);
+        window.showToast(error.message, "error");
     });
 }
 
@@ -128,6 +129,7 @@ function parseGmJsonEdit(){
     } catch (error) {
         // 处理JSON解析错误
         editDescriptionWarn.textContent = '错误：无效的JSON格式\n' + error.message;
+        window.showToast(editDescriptionWarn.textContent, "error");
     }
 }
 
@@ -144,6 +146,7 @@ function parseGmJsonAdd(){
     } catch (error) {
         // 处理JSON解析错误
         addDescriptionWarn.textContent = '错误：无效的JSON格式\n' + error.message;
+        window.showToast(addDescriptionWarn.textContent, "error");
     }
 }
 
@@ -234,12 +237,12 @@ function modifyGmOrderData(modifyGmOrderReq) {
                 gmOrderTableMap.set(editName.value, data.message.data);
             }
         });
-        alert('修改成功');
+        window.showToast("修改成功");
       return;
     })
     .catch((error) => {
         console.error('错误:', error);
-        alert('修改失败');
+        window.showToast(error.message, "error");
     });
 }
 
@@ -263,11 +266,13 @@ function addGmOrderData(newBox, addGmOrderReq) {
     })
     .then((data) => {
       console.log('成功:', data);
-      createTableItem(newBox, data.projectid, data.message.data)
+        window.showToast("添加成功");
+        createTableItem(newBox, data.projectid, data.message.data)
       return;
     })
     .catch((error) => {
       console.error('错误:', error);
+        window.showToast(error.message, "error");
     });
 }
 
@@ -303,11 +308,11 @@ function postDelGmOrder(projectId, orderId) {
     })
     .then((data) => {
       console.log('成功:', data);
-      alert('命令删除成功');
+      window.showToast("删除成功");
       return;
     })
     .catch((error) => {
       console.error('错误:', error);
-      alert('执行错误:', error);
+      window.showToast(error.message, "error");
     });
 }

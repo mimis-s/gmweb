@@ -33,6 +33,7 @@ func GetSession(ctx *web.WebContext) *CacheUser {
 		}
 		return user
 	}
+	ctx.NextPage("/login")
 
 	return nil
 }

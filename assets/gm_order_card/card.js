@@ -31,7 +31,8 @@ function loadGmOrderCard(gridWrapper, gmOrderData){
         }
     }).catch(error => {
         console.error('加载 gm_order_box.html 时出现问题:', error);
-    });
+      window.showToast(error.message, "error");
+  });
 }
 
 function gmOrderCardEvent(order,lastrunargs, newBox) {
@@ -126,6 +127,5 @@ function sendGmOrder(orderid, sendData, modalOverlayTip){
       retTitle.textContent = "操作失败🤡 💩"
       const retMsg = modalOverlayTip.querySelector('#modalOverlayTipShow');
       retMsg.textContent = error;
-      console.error('错误:', error);
     });
 }

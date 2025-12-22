@@ -26,5 +26,6 @@ function loadGmOrderBoxEvent(gridWrapper, projectId) {
     })
     .catch((error) => {
       console.error('错误:', error);
+      window.showToast(error.message, "error");
     });
 }

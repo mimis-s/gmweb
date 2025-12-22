@@ -24,6 +24,7 @@ function loadGmProjectBoxEvent(gmProjectBox) {
     })
     .catch((error) => {
       console.error('错误:', error);
+        window.showToast(error.message, "error");
     });
 }
 
@@ -69,12 +70,12 @@ function saveAddProjectModal(){
       const dynamicContent = document.getElementById('dynamicContent');
 
       loadGmProjectCard(dynamicContent, data.message.data);
-      alert('新增成功');
-    return;
+      window.showToast("成功添加项目");
+      return;
   })
   .catch((error) => {
       console.error('错误:', error);
-      alert('修改失败');
+      window.showToast(error.message, "error");
   });
 }
 

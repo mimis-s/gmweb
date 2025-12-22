@@ -51,7 +51,7 @@ function loadPermissionEvent(){
     })
     .catch((error) => {
         console.error('错误:', error);
-        alert('修改失败');
+        window.showToast(error.message, "error");
     });
 }
 
@@ -119,16 +119,17 @@ function addPermission() {
       })
       .then((data) => {
         console.log('成功增加权限:', data);
-        permissions.push(data.message.data);
+          window.showToast("权限添加成功");
+          permissions.push(data.message.data);
         updatePermissionsTable();
         updatePermissionGroups();
-        alert('权限添加成功！');
         return;
       })
       .catch((error) => {
           console.error('错误:', error);
           alert('修改失败');
-    });
+          window.showToast(error.message, "error");
+      });
 
     // 清空表单
     permissionName.value = '';
@@ -201,7 +202,8 @@ function togglePermissionStatus(id) {
           })
           .then((data) => {
             console.log('成功修改权限:', data);
-            permissions.forEach((permission, index) => {
+              window.showToast("成功修改权限");
+              permissions.forEach((permission, index) => {
                 if (permission.id == data.message.data.id) {
                     permissions[index] = data.message.data;
                 }
@@ -212,8 +214,8 @@ function togglePermissionStatus(id) {
           })
           .catch((error) => {
               console.error('错误:', error);
-              alert('修改失败');
-        });
+              window.showToast(error.message, "error");
+          });
     }
 }
 
@@ -241,14 +243,15 @@ function deletePermission(id) {
           })
           .then((data) => {
             console.log('成功删除权限:', data);
-            permissions = permissions.filter(p => p.id !== data.message.id);
+              window.showToast("成功删除权限");
+              permissions = permissions.filter(p => p.id !== data.message.id);
             updatePermissionsTable();
             updatePermissionGroups();
             return;
           })
           .catch((error) => {
               console.error('错误:', error);
-              alert('修改失败');
+              window.showToast(error.message, "error");
         });
     }
 }
@@ -310,12 +313,12 @@ function addPermissionGroup() {
       permissionGroups.push(data.message.data);
       updateGroupsTable();
       updateGroupSelect();
-      alert('权限组添加成功！');
-      return;
+        window.showToast("权限组添加成功");
+        return;
     })
     .catch((error) => {
         console.error('错误:', error);
-        alert('修改失败');
+        window.showToast(error.message, "error");
     });
     
     // 清空表单
@@ -463,7 +466,8 @@ function toggleGroupStatus(id) {
           })
           .then((data) => {
             console.log('成功修改权限组:', data);
-            permissionGroups.forEach((permissionGroup, index) => {
+              window.showToast("成功修改权限组");
+              permissionGroups.forEach((permissionGroup, index) => {
                 if (permissionGroup.id == data.message.data.id) {
                     permissionGroups[index] = data.message.data;
                 }
@@ -474,7 +478,7 @@ function toggleGroupStatus(id) {
           })
           .catch((error) => {
               console.error('错误:', error);
-              alert('修改失败');
+              window.showToast(error.message, "error");
         });
 
     }
@@ -504,14 +508,15 @@ function deleteGroup(id) {
           })
           .then((data) => {
             console.log('成功删除权限组:', data);
-            permissionGroups = permissionGroups.filter(g => g.id !== id);
+              window.showToast("成功删除权限组");
+              permissionGroups = permissionGroups.filter(g => g.id !== id);
             updateGroupsTable();
             updateGroupSelect();
             return;
           })
           .catch((error) => {
               console.error('错误:', error);
-              alert('修改失败');
+              window.showToast(error.message, "error");
         });
     }
 }
@@ -576,15 +581,15 @@ function assignPermission() {
         });
       })
       .then((data) => {
-        console.log('成功添加用户到权限组:', data);        
-        assignments.push(data.message.data);
+        console.log('成功添加用户到权限组:', data);
+          assignments.push(data.message.data);
         updateAssignmentsTable();
-        alert(`权限组 "${group.name}" 已成功分配给玩家 ${playerId.value.trim()}`);
+        window.showToast(`权限组 "${group.name}" 已成功分配给玩家 ${playerId.value.trim()}`);
         return;
       })
       .catch((error) => {
           console.error('错误:', error);
-          alert('修改失败');
+          window.showToast(error.message, "error");
     });
 
     
@@ -650,11 +655,12 @@ function deleteAssignment(assignmentId) {
             console.log('成功删除用户到权限组:', playerId, groupId, data);
             assignments = assignments.filter(p => p.id != assignmentId);
             updateAssignmentsTable();
-            return;
+              window.showToast(`成功删除用户到权限组${playerId}-${groupId}`);
+              return;
           })
           .catch((error) => {
               console.error('错误:', error);
-              alert('修改失败');
+              window.showToast(error.message, "error");
         });
     }
 }

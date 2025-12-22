@@ -18,7 +18,8 @@ function loadGmProjectCard(gridWrapper, gmOrderData){
           gmProjectCardEvent(gridWrapper, gmOrderData, newBox); // 卡片事件
       }).catch(error => {
           console.error('加载 gm_project_card.html 时出现问题:', error);
-      });
+        window.showToast(error.message, "error");
+    });
 }
 
 function gmProjectCardEvent(gridWrapper, gmOrderData, newBox){
@@ -126,11 +127,12 @@ function saveEditProjectModal(gmOrderData){
     gmOrderData.desc = data.message.desc;
     gmOrderData.gmaddr = data.message.gmaddr;
     projectEditModal.style.display = 'none';
-    return;
+      window.showToast("修改项目成功");
+      return;
   })
   .catch((error) => {
       console.error('错误:', error);
-      alert('修改失败');
+      window.showToast(error.message, "error");
   });
 }
 
@@ -154,10 +156,11 @@ function delEditProjectModal(delProjectDataReq, newBox, gridWrapper){
   .then((data) => {
     console.log('删除项目成功:', data);
     gridWrapper.removeChild(newBox);
-    return;
+      window.showToast("删除项目成功");
+      return;
   })
   .catch((error) => {
       console.error('错误:', error);
-      alert('修改失败');
+      window.showToast(error.message, "error");
   });
 }
