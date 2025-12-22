@@ -55,7 +55,12 @@ func getRegularUserOrder(ctx *web.WebContext, projectId int64, user *dao.CacheUs
 	}
 
 	// 提取符合条件的命令
-	orderDatas, err := dao.GetOrderDatasByProjectId(projectId)
+	orderDatas := make([]*dbmodel.GmOrder, 0)
+	if projectId == 0 {
+		orderDatas, err = dao.GetAllOrderDatas()
+	} else {
+		orderDatas, err = dao.GetOrderDatasByProjectId(projectId)
+	}
 	if err != nil {
 		dao.Error(ctx, err.Error())
 		return nil, err
@@ -279,5 +284,79 @@ func ModifyGmOrderHandler(ctx *web.WebContext, req *webmodel.ModifyGmOrderReq, r
 		OrderStruct: orderData.Data.OrderStruct,
 	}
 	dao.Info(ctx, "modify project:%v order:%v-%v Path:%v Method:%v is ok", req.ProjectId, orderData.Id, req.Data.OrderName, req.Data.Path, req.Data.Method)
+	return nil
+}
+
+func SendGmOrderHandler(ctx *web.WebContext, req *webmodel.SendGmOrderReq, rsp *webmodel.SendGmOrderRsp) error {
+	user := dao.GetSession(ctx)
+	if user == nil {
+		return nil
+	}
+
+	orderData, find, err := dao.GetOrderData(req.OrderId)
+	if err != nil {
+		dao.Error(ctx, err.Error())
+		return err
+	}
+	if !find {
+		err := fmt.Errorf("send order:%v is not found", req.OrderId)
+		dao.Error(ctx, err.Error())
+		return err
+	}
+
+	projectData, find, err := dao.GetProjectData(orderData.ProjectId)
+	if err != nil {
+		dao.Error(ctx, err.Error())
+		return err
+	}
+	if !find {
+		err := fmt.Errorf("send order:%v project:%v is not found", req.OrderId, orderData.ProjectId)
+		dao.Error(ctx, err.Error())
+		return err
+	}
+
+	bSend := false
+	switch user.Role {
+	case define.EnumRole_Regular:
+		orderDatas, err := getRegularUserOrder(ctx, orderData.ProjectId, user)
+		if err != nil {
+			return err
+		}
+		for _, order := range orderDatas {
+			if order.Id == orderData.Id {
+				bSend = true
+				break
+			}
+		}
+	case define.EnumRole_Administrator:
+		bSend = true
+	}
+
+	if !bSend {
+		err := fmt.Errorf("send order:%v name:%v project:%v ip:%v path:%v msg:%v power is not enough", orderData.Id,
+			orderData.Name, projectData.Name, projectData.Data.GmAddr, orderData.Data.Path, req.Msg)
+		dao.Error(ctx, err.Error())
+		// 权限不足
+		return fmt.Errorf("send order:%v name:%v project:%v power is not enough", orderData.Id,
+			orderData.Name, projectData.Name)
+	}
+	var gmRsp *ApiResponse
+	if orderData.Data.Method == "GET" {
+		gmRsp, err = SendGetGmOrder(projectData.Data.GmAddr, req.Msg)
+	} else if orderData.Data.Method == "POST" {
+		gmRsp, err = SendPostGmOrder(projectData.Data.GmAddr, req.Msg, "")
+	}
+	if err != nil {
+		dao.Error(ctx, err.Error())
+		return err
+	}
+	if gmRsp != nil {
+		rsp.Code = gmRsp.Code
+		rsp.Data = gmRsp.Data
+		rsp.Message = gmRsp.Message
+	}
+
+	dao.Info(ctx, "send order:%v Method[%v] name:%v project:%v ip:%v path:%v msg:%v", orderData.Data.Method, orderData.Id,
+		orderData.Name, projectData.Name, projectData.Data.GmAddr, orderData.Data.Path, req.Msg)
 	return nil
 }

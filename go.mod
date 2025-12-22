@@ -7,6 +7,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gorilla/sessions v1.4.0
 	github.com/mimis-s/zpudding v0.0.0-20251116070920-f98fc07c088f
+	github.com/smallnest/rpcx v1.8.32
 	xorm.io/xorm v1.3.11
 )
 
@@ -56,7 +57,6 @@ require (
 	github.com/rpcxio/rpcx-etcd v0.4.2 // indirect
 	github.com/rs/cors v1.11.0 // indirect
 	github.com/smallnest/quick v0.2.0 // indirect
-	github.com/smallnest/rpcx v1.8.32 // indirect
 	github.com/soheilhy/cmux v0.1.5 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/templexxx/cpufeat v0.0.0-20180724012125-cef66df7f161 // indirect

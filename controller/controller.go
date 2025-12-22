@@ -98,7 +98,7 @@ func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel
 	rsp := &webmodel.GetGmOrderBoxRsp{}
 	if err := order.GetGmOrderBoxReq(ctx, req, rsp); err != nil {
 		log.Errorf("get gm orders is err:%v", err)
-		ctx.Err("add gm orders is err:%v", err)
+		ctx.Err("get gm orders is err:%v", err)
 		return
 	}
 	ctx.SuccessOk(rsp)
@@ -106,7 +106,13 @@ func (c *ControllerHandler) PostApiGmOrderBox(ctx *web.WebContext, req *webmodel
 
 // 发送gm命令
 func (c *ControllerHandler) PostApiSendGmOrder(ctx *web.WebContext, req *webmodel.SendGmOrderReq) {
-	ctx.SuccessOk("成功")
+	rsp := &webmodel.SendGmOrderRsp{}
+	if err := order.SendGmOrderHandler(ctx, req, rsp); err != nil {
+		log.Errorf("send gm orders is err:%v", err)
+		ctx.Err("send gm orders is err:%v", err)
+		return
+	}
+	ctx.SuccessOk(rsp)
 }
 
 func (c *ControllerHandler) PostApiGetGmProjectBox(ctx *web.WebContext, req *webmodel.GetGmProjectBoxReq) {

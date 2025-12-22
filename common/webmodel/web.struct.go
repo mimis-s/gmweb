@@ -39,6 +39,9 @@ type SendGmOrderReq struct {
 }
 
 type SendGmOrderRsp struct {
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
 }
 
 type GetGmProjectBoxReq struct {
