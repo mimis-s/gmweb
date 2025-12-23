@@ -39,7 +39,7 @@ func GetAllUsersHandler(ctx *web.WebContext, req *webmodel.GetAllUsersReq, rsp *
 			Password: passwd,
 		})
 	}
-	dao.Info(ctx, "get all regular users info")
+	dao.Debug(ctx, "get all regular users info")
 	return nil
 }
 

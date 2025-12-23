@@ -29,7 +29,7 @@ function initLogBox() {
     // 设置日期范围默认值
     const today = new Date().toISOString().split('T')[0];
     const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 1);
     const oneWeekAgoStr = oneWeekAgo.toISOString().split('T')[0];
 
     const projectLogContainer = document.getElementById('projectLogContainer');
@@ -43,9 +43,7 @@ function initLogBox() {
     // 绑定事件
     projectLogContainer.querySelector('#queryForm').addEventListener('submit', handleQuery);
     projectLogContainer.querySelector('#resetBtn').addEventListener('click', resetQuery);
-    projectLogContainer.querySelector('#exportBtn').addEventListener('click', exportData);
     projectLogContainer.querySelector('#tableViewBtn').addEventListener('click', () => switchView('table'));
-    projectLogContainer.querySelector('#cardViewBtn').addEventListener('click', () => switchView('card'));
     projectLogContainer.querySelector('#prevPage').addEventListener('click', prevPage);
     projectLogContainer.querySelector('#nextPage').addEventListener('click', nextPage);
 
@@ -236,11 +234,9 @@ function switchView(view) {
 
     // 更新按钮状态
     projectLogContainer.querySelector('#tableViewBtn').classList.toggle('active', view === 'table');
-    projectLogContainer.querySelector('#cardViewBtn').classList.toggle('active', view === 'card');
 
     // 显示/隐藏视图
     projectLogContainer.querySelector('#tableView').classList.toggle('hidden', view !== 'table');
-    projectLogContainer.querySelector('#cardView').classList.toggle('active', view === 'card');
 
     // 重新渲染
     renderLogs();

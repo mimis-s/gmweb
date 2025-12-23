@@ -148,7 +148,7 @@ func GetGmOrderBoxReq(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq, rsp *
 			LastRunArgs: lastRunArgs,
 		})
 	}
-	dao.Error(ctx, "get project:%v orders is ok", req.ProjectId)
+	dao.Debug(ctx, "get project:%v orders is ok", req.ProjectId)
 
 	return nil
 }

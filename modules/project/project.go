@@ -122,7 +122,7 @@ func GetGmProjectBriefInfoHandler(ctx *web.WebContext, req *webmodel.GetGmProjec
 			Desc:      projectData.Data.Desc,
 		})
 	}
-	dao.Info(ctx, "get project brief info is ok")
+	dao.Debug(ctx, "get project brief info is ok")
 
 	return nil
 }
@@ -349,6 +349,6 @@ func GetGmProjectBoxHandler(ctx *web.WebContext, req *webmodel.GetGmProjectBoxRe
 		}
 		rsp.Datas = append(rsp.Datas, retProjectData)
 	}
-	dao.Info(ctx, "get all project box is ok")
+	dao.Debug(ctx, "get all project box is ok")
 	return nil
 }

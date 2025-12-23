@@ -196,7 +196,7 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 	// 所有level等级
 	rsp.AllLevels = []int{1, 2, 3, 4, 5}
 
-	dao.Info(ctx, "get all power is ok")
+	dao.Debug(ctx, "get all power is ok")
 
 	return nil
 }

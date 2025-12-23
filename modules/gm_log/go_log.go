@@ -29,6 +29,7 @@ func GetGmLogHandler(ctx *web.WebContext, req *webmodel.GetGmLogReq, rsp *webmod
 		dao.Error(ctx, "find gm log is err:%v", err)
 		return err
 	}
+	rsp.Datas = make([]*webmodel.GmLogInfo, 0)
 	for _, gmLog := range gmLogs {
 		rsp.Datas = append(rsp.Datas, &webmodel.GmLogInfo{
 			Ip:      gmLog.Ip,

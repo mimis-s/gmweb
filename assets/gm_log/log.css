@@ -170,6 +170,7 @@
 table {
     width: 100%;
     border-collapse: collapse;
+    align-items: center;
 }
 
 thead {
@@ -178,7 +179,7 @@ thead {
 
 th {
     padding: 18px 15px;
-    text-align: left;
+    text-align: center;
     font-weight: 700;
     color: var(--primary-color);
     border-bottom: 1px solid var(--border-color);
