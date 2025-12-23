@@ -156,3 +156,32 @@ function loadPermissionModule(){
     }, 100);
 }
 
+function loadGmLogModule(){
+    fetch('gm_log.html')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('网络响应不正常');
+            }
+            const nextPage = response.headers.get('next-page');
+            if (nextPage != null) {
+                window.location.href = nextPage;
+            }
+            return response.text();
+        })
+        .then(html => {
+            const defaultContent = document.querySelector('.default-content');
+            const dynamicContent = document.getElementById('dynamicContent');
+
+            defaultContent.style.display = 'none';
+            dynamicContent.style.display = 'block';
+            dynamicContent.innerHTML = html;
+            initLogBox(dynamicContent);
+
+            // 添加进入动画
+            dynamicContent.style.animation = 'fadeInUp 0.5s ease';
+        })
+        .catch(error => {
+            console.error('加载 header.html 时出现问题:', error);
+            window.showToast(error.message, "error");
+        });
+}

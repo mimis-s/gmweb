@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
+	"github.com/mimis-s/gmweb/modules/gm_log"
 	"github.com/mimis-s/gmweb/modules/order"
 	"github.com/mimis-s/gmweb/modules/power"
 	"github.com/mimis-s/gmweb/modules/project"
@@ -43,6 +44,11 @@ func (c *ControllerHandler) Login(ctx *web.WebContext) {
 		log.Errorf("login is err:%v", err)
 		return
 	}
+}
+
+// 日志管理界面
+func (c *ControllerHandler) GmLog(ctx *web.WebContext) {
+	ctx.GetGinContext().HTML(200, "gm_log.html", nil)
 }
 
 // 登录
@@ -346,6 +352,17 @@ func (c *ControllerHandler) PostApiAddPowerAssignment(ctx *web.WebContext, req *
 	if err := power.AddPermissionAssignmentHandler(ctx, req, rsp); err != nil {
 		log.Errorf("add power assignment is err:%v", err)
 		ctx.Err("add power assignment is err:%v", err)
+		return
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 搜索日志
+func (c *ControllerHandler) PostApiGetGmLog(ctx *web.WebContext, req *webmodel.GetGmLogReq) {
+	rsp := &webmodel.GetGmLogRsp{}
+	if err := gm_log.GetGmLogHandler(ctx, req, rsp); err != nil {
+		log.Errorf("get gm log is err:%v", err)
+		ctx.Err("get gm log is err:%v", err)
 		return
 	}
 	ctx.SuccessOk(rsp)

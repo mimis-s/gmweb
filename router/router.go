@@ -38,6 +38,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.Get("/gm_order_table.html", "gm命令管理表", controllerHandler.GmOrderTable)
 		engine.Get("/gm_user_mangement.html", "用户管理界面", controllerHandler.GmUserMangement)
 		engine.Get("/gm_permission.html", "权限管理界面", controllerHandler.GmPermission)
+		engine.Get("/gm_log.html", "日志管理界面", controllerHandler.GmLog)
 
 		engine.PostWithStructParams("/api/login", "登陆的post", webmodel.GetUserReq{}, controllerHandler.PostApiLogin)
 		engine.PostWithStructParams("/api/gm_order_box", "获取gm指令的post", webmodel.GetGmOrderBoxReq{}, controllerHandler.PostApiGmOrderBox)
@@ -74,6 +75,9 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		// 权限分配
 		engine.PostWithStructParams("/api/gm_permission/assign/add", "权限分配增加", webmodel.AddPowerAssignmentReq{}, controllerHandler.PostApiAddPowerAssignment)
 		engine.PostWithStructParams("/api/gm_permission/assign/del", "权限分配删除", webmodel.DelPowerAssignmentReq{}, controllerHandler.PostApiDelPowerAssignment)
+
+		// 日志查看
+		engine.PostWithStructParams("/api/gm_log", "日志查看", webmodel.GetGmLogReq{}, controllerHandler.PostApiGetGmLog)
 		a.AddServer("gmweb", engine)
 		return nil
 	}))

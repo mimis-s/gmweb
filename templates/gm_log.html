@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/assets/gm_log/log.css">
+</head>
+<body>
+<div class="project-container" id="projectLogContainer">
+    <main>
+        <section class="query-panel">
+            <h2><i class="fas fa-filter"></i> 组合查询</h2>
+            <form id="queryForm" class="query-form">
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user"></i> 用户名</label>
+                    <input type="text" id="username" class="form-control" placeholder="输入用户名...">
+                </div>
+
+                <div class="form-group">
+                    <label for="ip"><i class="fas fa-network-wired"></i> IP地址</label>
+                    <input type="text" id="ip" class="form-control" placeholder="例如: 192.168.1.1">
+                </div>
+
+                <div class="form-group">
+                    <label for="level"><i class="fas fa-exclamation-circle"></i> 日志等级</label>
+                    <select id="level" class="form-control">
+                        <option value=0>所有等级</option>
+                        <option value=1>DEBUG</option>
+                        <option value=3>INFO</option>
+                        <option value=4>WARNING</option>
+                        <option value=2>ERROR</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="startDate"><i class="fas fa-calendar"></i> 开始日期</label>
+                    <input type="date" id="startDate" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="endDate"><i class="fas fa-calendar"></i> 结束日期</label>
+                    <input type="date" id="endDate" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="message"><i class="fas fa-comment-alt"></i> 消息内容</label>
+                    <input type="text" id="message" class="form-control" placeholder="搜索日志消息...">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> 查询日志
+                    </button>
+                    <button type="button" id="resetBtn" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> 重置条件
+                    </button>
+                    <button type="button" id="exportBtn" class="btn btn-export">
+                        <i class="fas fa-file-export"></i> 导出数据
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="toolbar">
+            <div class="view-toggle">
+                <button class="view-btn active" id="tableViewBtn">
+                    <i class="fas fa-table"></i> 表格视图
+                </button>
+                <button class="view-btn" id="cardViewBtn">
+                    <i class="fas fa-th-large"></i> 卡片视图
+                </button>
+            </div>
+
+            <div class="pagination-info">
+                显示 <span id="currentPage">1</span> / <span id="totalPages">1</span> 页,
+                共 <span id="filteredLogs">0</span> 条记录
+            </div>
+        </section>
+
+        <section class="table-container" id="tableView">
+            <table>
+                <thead>
+                <tr>
+                    <th class="sortable" data-sort="username">
+                        用户名 <i class="fas fa-sort"></i>
+                    </th>
+                    <th class="sortable" data-sort="ip">
+                        IP地址 <i class="fas fa-sort"></i>
+                    </th>
+                    <th class="sortable" data-sort="level">
+                        日志等级 <i class="fas fa-sort"></i>
+                    </th>
+                    <th class="sortable" data-sort="time">
+                        日志时间 <i class="fas fa-sort"></i>
+                    </th>
+                    <th>具体信息</th>
+                </tr>
+                </thead>
+                <tbody id="logTableBody">
+                <!-- 日志数据将通过JS动态填充 -->
+                </tbody>
+            </table>
+
+            <div id="noLogsTable" class="empty-state" style="display: none;">
+                <i class="fas fa-clipboard"></i>
+                <h3>未找到日志记录</h3>
+                <p>尝试修改查询条件或重置查询</p>
+            </div>
+        </section>
+
+        <section class="cards-container" id="cardView">
+            <!-- 卡片视图将通过JS动态填充 -->
+        </section>
+
+        <div class="pagination">
+            <button id="prevPage" class="page-btn" disabled>
+                <i class="fas fa-chevron-left"></i> 上一页
+            </button>
+
+            <div class="page-numbers" id="pageNumbers">
+                <!-- 页码将通过JS动态生成 -->
+            </div>
+
+            <button id="nextPage" class="page-btn">
+                下一页 <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

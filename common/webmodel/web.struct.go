@@ -299,3 +299,26 @@ type AddPowerAssignmentReq struct {
 type AddPowerAssignmentRsp struct {
 	Data *PermissionGroupUserAssignmentInfo `json:"data"`
 }
+
+// 获取日志
+type GetGmLogReq struct {
+	UserName  string `json:"username"`  // 用户名过滤(为空就是所有用户)
+	Ip        string `json:"ip"`        // IP地址过滤(模糊匹配)
+	Level     int    `json:"level"`     // 日志等级过滤(为0是所有等级)
+	StartTime int64  `json:"starttime"` // 日期范围过滤
+	EndTime   int64  `json:"endtime"`   // 日期范围过滤
+	Msg       string `json:"msg"`       // 消息内容过滤(模糊匹配)
+}
+
+type GmLogInfo struct {
+	UserId   int64  `json:"userid"`
+	UserName int64  `json:"username"`
+	Ip       string `json:"ip"`
+	Level    int    `json:"level"`
+	LogTime  int64  `json:"logtime"`
+	Msg      string `json:"msg"`
+}
+
+type GetGmLogRsp struct {
+	Datas []*GmLogInfo `json:"datas"`
+}

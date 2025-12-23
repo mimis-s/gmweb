@@ -98,7 +98,12 @@ function initializeNav() {
     navLinkPermission.addEventListener('click', function() {
         loadPermissionModule();
     });
-    window.showToast("登录成功")
+    // 日志管理
+    const navLinkLog = document.getElementById('navLinkLog');
+    navLinkLog.addEventListener('click', function() {
+        loadGmLogModule();
+    });
+    window.showToast("在线")
 }
 
 // 点击gm操作页面

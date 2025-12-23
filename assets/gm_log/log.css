@@ -1,0 +1,426 @@
+:root {
+    --primary-color: #4361ee;
+    --success-color: #4cc9f0;
+    --warning-color: #f8961e;
+    --error-color: #f72585;
+    --info-color: #7209b7;
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --border-color: #e0e0e0;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --radius: 8px;
+}
+
+/* 查询面板 */
+.query-panel {
+    width: 100%;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.query-panel h2 {
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.query-form {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-control {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #3a56d4;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: #f1f3f9;
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background-color: #e2e6f0;
+}
+
+.btn-export {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.btn-export:hover {
+    background-color: #3db8d8;
+}
+
+/* 工具栏 */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.view-toggle {
+    display: flex;
+    gap: 5px;
+}
+
+.view-btn {
+    padding: 8px 15px;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.view-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.pagination-info {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* 日志表格视图 */
+.table-container {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 30px;
+    display: block;
+}
+
+.table-container.hidden {
+    display: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: #f8f9fe;
+}
+
+th {
+    padding: 18px 15px;
+    text-align: left;
+    font-weight: 700;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    user-select: none;
+}
+
+th.sortable {
+    cursor: pointer;
+    position: relative;
+}
+
+th.sortable:hover {
+    background-color: #f0f2fc;
+}
+
+th.sortable i {
+    margin-left: 5px;
+    font-size: 0.8rem;
+    opacity: 0.5;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: top;
+}
+
+tbody tr:hover {
+    background-color: #f9fafd;
+}
+
+/* 日志卡片视图 */
+.cards-container {
+    display: none;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.cards-container.active {
+    display: flex;
+}
+
+.log-card {
+    flex: 1 1 300px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    border-left: 4px solid var(--info-color);
+    transition: transform 0.3s;
+}
+
+.log-card:hover {
+    transform: translateY(-5px);
+}
+
+.log-card.error {
+    border-left-color: var(--error-color);
+}
+
+.log-card.warning {
+    border-left-color: var(--warning-color);
+}
+
+.log-card.success {
+    border-left-color: var(--success-color);
+}
+
+.log-card.info {
+    border-left-color: var(--info-color);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.log-level {
+    background: #00aeef;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+}
+
+.level-error {
+    background-color: var(--error-color);
+}
+
+.level-warning {
+    background-color: var(--warning-color);
+}
+
+.level-success {
+    background-color: var(--success-color);
+}
+
+.level-info {
+    background-color: var(--info-color);
+}
+
+.log-time {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.card-content {
+    margin-bottom: 15px;
+}
+
+.card-field {
+    margin-bottom: 10px;
+    display: flex;
+}
+
+.field-label {
+    font-weight: 600;
+    min-width: 80px;
+    color: var(--text-secondary);
+}
+
+.field-value {
+    flex: 1;
+    word-break: break-word;
+}
+
+.log-message {
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 3px solid #ddd;
+    margin-top: 10px;
+    font-size: 0.95rem;
+}
+
+/* 分页控件 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.page-btn {
+    padding: 8px 15px;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 5px;
+}
+
+.page-number {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    min-width: 40px;
+    text-align: center;
+}
+
+.page-number.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+/* 响应式调整 */
+@media (max-width: 992px) {
+    .query-form {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .stats {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .query-form {
+        grid-template-columns: 1fr;
+    }
+
+    .toolbar {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .logo {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .log-card {
+        flex: 1 1 100%;
+    }
+}
