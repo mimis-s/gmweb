@@ -32,11 +32,12 @@ func GetGmLogHandler(ctx *web.WebContext, req *webmodel.GetGmLogReq, rsp *webmod
 	rsp.Datas = make([]*webmodel.GmLogInfo, 0)
 	for _, gmLog := range gmLogs {
 		rsp.Datas = append(rsp.Datas, &webmodel.GmLogInfo{
-			Ip:      gmLog.Ip,
-			Level:   gmLog.LogLevel,
-			LogTime: gmLog.UpdateDate * 1000,
-			Msg:     gmLog.LogStr,
-			UserId:  gmLog.UserId,
+			UserName: gmLog.UserName,
+			Ip:       gmLog.Ip,
+			Level:    gmLog.LogLevel,
+			LogTime:  gmLog.UpdateDate * 1000,
+			Msg:      gmLog.LogStr,
+			UserId:   gmLog.UserId,
 		})
 	}
 	return nil

@@ -312,7 +312,7 @@ type GetGmLogReq struct {
 
 type GmLogInfo struct {
 	UserId   int64  `json:"userid"`
-	UserName int64  `json:"username"`
+	UserName string `json:"username"`
 	Ip       string `json:"ip"`
 	Level    int    `json:"level"`
 	LogTime  int64  `json:"logtime"`

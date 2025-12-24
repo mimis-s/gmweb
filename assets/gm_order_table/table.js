@@ -168,7 +168,7 @@ function saveEditItemModal() {
     const outputArea = projectTableEditModal.querySelector('#editDescription')
     const editPath = projectTableEditModal.querySelector('#editPath');
     const editMethod = projectTableEditModal.querySelector('#editSelectMethod');
-    const projectId = projectTableEditModal.querySelector('#projectTableEditModal').value;
+    const projectId = projectTableEditModal.querySelector('#projectTableEditModalTitle').value;
 
     var modifyGmOrderReq = {
         ProjectId: Number(projectId), // 项目id
