@@ -19,10 +19,7 @@ type gmExecReq struct {
 }
 
 type ApiResponse struct {
-	Code      int         `json:"code"`
-	Message   string      `json:"message"`
-	Data      interface{} `json:"data"`
-	Timestamp int64       `json:"timestamp"`
+	Data interface{} `json:"data"`
 }
 
 // 发送POST JSON请求（增强版）
@@ -80,18 +77,11 @@ func SendPostGmOrder(ctx *web.WebContext, ip string, jsonData string, token stri
 
 	// 尝试解析为JSON
 	var result ApiResponse
-	if err := json.Unmarshal(body, &result); err != nil {
+	if err := json.Unmarshal(body, &result.Data); err != nil {
 		// 如果不是JSON格式，返回原始响应
 		result = ApiResponse{
-			Code:      resp.StatusCode,
-			Data:      string(body),
-			Timestamp: time.Now().Unix(),
+			Data: string(body),
 		}
-	}
-
-	// 添加HTTP状态码
-	if result.Code == 0 {
-		result.Code = resp.StatusCode
 	}
 
 	return &result, nil

@@ -134,7 +134,7 @@ func GetGmOrderBoxReq(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq, rsp *
 
 	for _, orderData := range orderDatas {
 		lastRunArgs := orderData.Data.OrderStruct
-		if userDBData.OrderStatus != nil && userDBData.OrderStatus.LastRunArgsMap != nil && userDBData.OrderStatus.LastRunArgsMap[orderData.ProjectId] != nil {
+		if userDBData.OrderStatus != nil && userDBData.OrderStatus.LastRunArgsMap != nil && userDBData.OrderStatus.LastRunArgsMap[orderData.ProjectId] != nil && userDBData.OrderStatus.LastRunArgsMap[orderData.ProjectId][orderData.Id] != "" {
 			lastRunArgs = userDBData.OrderStatus.LastRunArgsMap[orderData.ProjectId][orderData.Id]
 		}
 
@@ -293,6 +293,16 @@ func SendGmOrderHandler(ctx *web.WebContext, req *webmodel.SendGmOrderReq, rsp *
 	if user == nil {
 		return nil
 	}
+	userData, find, err := dao.GetUserData(user.Rid)
+	if err != nil {
+		dao.Error(ctx, "send order:%v get user db is err:%v", req.OrderId, err)
+		return err
+	}
+	if !find {
+		// 不存在
+		dao.Error(ctx, "send order:%v user db is not found", req.OrderId, err)
+		return err
+	}
 
 	orderData, find, err := dao.GetOrderData(req.OrderId)
 	if err != nil {
@@ -357,9 +367,22 @@ func SendGmOrderHandler(ctx *web.WebContext, req *webmodel.SendGmOrderReq, rsp *
 		return err
 	}
 	if gmRsp != nil {
-		rsp.Code = gmRsp.Code
 		rsp.Data = gmRsp.Data
-		rsp.Message = gmRsp.Message
+	}
+
+	// 记录用户使用命令情况
+	if userData.OrderStatus == nil {
+		userData.OrderStatus = &db_extra.RoleGmOrderStatus{
+			LastRunArgsMap: make(map[int64]map[int64]string),
+		}
+	}
+	if userData.OrderStatus.LastRunArgsMap[orderData.ProjectId] == nil {
+		userData.OrderStatus.LastRunArgsMap[orderData.ProjectId] = make(map[int64]string)
+	}
+	userData.OrderStatus.LastRunArgsMap[orderData.ProjectId][orderData.Id] = req.Msg
+	err = dao.UpdateUserData(userData.Rid, userData)
+	if err != nil {
+		dao.Error(ctx, err.Error())
 	}
 
 	dao.Info(ctx, "send order:%v Method[%v] name:%v project:%v ip:%v path:%v msg:%v", orderData.Data.Method, orderData.Id,

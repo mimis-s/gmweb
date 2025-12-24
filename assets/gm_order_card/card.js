@@ -121,7 +121,7 @@ function sendGmOrder(orderid, sendData, modalOverlayTip){
           retTitle.textContent = "操作失败🤡 💩"
       }
       const retMsg = modalOverlayTip.querySelector('#modalOverlayTipShow');
-      retMsg.textContent = JSON.stringify(data);
+      retMsg.textContent = JSON.stringify(data, null, 2);
     })
     .catch((error) => {
         console.debug("发送gm结果err:",error)
