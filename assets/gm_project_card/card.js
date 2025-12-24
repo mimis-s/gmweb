@@ -68,7 +68,7 @@ function gmProjectCardEvent(gridWrapper, gmOrderData, newBox){
   });
   // 保存数据
   projectEditModalSaveBtn.addEventListener('click', () => {
-    saveEditProjectModal(gmOrderData)
+    saveEditProjectModal(gmOrderData, projectEditModal)
   });
   // 关闭模态框
   projectEditModalCloseBtn.addEventListener('click', () => {
@@ -91,8 +91,7 @@ function gmProjectCardEvent(gridWrapper, gmOrderData, newBox){
   });
 }
 
-function saveEditProjectModal(gmOrderData){
-  const projectEditModal = document.getElementById('projectEditModal');
+function saveEditProjectModal(gmOrderData, projectEditModal){
   const editProjectDataReq = {
       ProjectId: Number(gmOrderData.projectid),
       Name: projectEditModal.querySelector('#editName').value,

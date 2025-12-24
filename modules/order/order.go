@@ -199,19 +199,6 @@ func AddGmOrderHandler(ctx *web.WebContext, req *webmodel.AddGmOrderReq, rsp *we
 		return err
 	}
 
-	// 检查命令是否重名
-	_, find, err = dao.GetOrderDataByName(req.OrderName)
-	if err != nil {
-		dao.Error(ctx, "add project:%v order:%v is err:%v", req.ProjectId, req.OrderName, err)
-		return err
-	}
-
-	if find {
-		err := fmt.Errorf("add project:%v order:%v is exist", req.ProjectId, req.OrderName)
-		dao.Error(ctx, err.Error())
-		return err
-	}
-
 	inserData := &dbmodel.GmOrder{
 		ProjectId: req.ProjectId,
 		Name:      req.OrderName,
