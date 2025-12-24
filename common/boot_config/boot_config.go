@@ -8,9 +8,9 @@ import "github.com/mimis-s/zpudding/pkg/app"
 
 type BootFlags struct {
 	IP     string `flag:"ip" default:"192.168.1.1" desc:"服务器地址"`
-	Port   string `flag:"port" default:"8888" desc:"服务器http端口"`
+	Port   string `flag:"web_port" default:"8888" desc:"服务器http端口"`
 	User   string `flag:"user" default:"admin" desc:"管理员用户名"`
-	Passwd string `flag:"passwd" default:"admin123" desc:"管理员密码"`
+	Passwd string `flag:"password" default:"admin123" desc:"管理员密码"`
 }
 
 type DBConfig struct {

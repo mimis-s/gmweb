@@ -110,9 +110,10 @@ function sendGmOrder(orderid, sendData, modalOverlayTip){
       });
     })
     .then((data) => {
-      if (data.success == true)
+        console.debug("发送gm结果:",data)
+        modalOverlayTip.classList.add('active');
+        if (data.success)
       {
-          modalOverlayTip.classList.add('active');
           const retTitle = modalOverlayTip.querySelector('#modalOverlayTipTitle');
           retTitle.textContent = "发送成功💯 🥳"
       }else{
@@ -123,7 +124,9 @@ function sendGmOrder(orderid, sendData, modalOverlayTip){
       retMsg.textContent = JSON.stringify(data);
     })
     .catch((error) => {
-      const retTitle = modalOverlayTip.querySelector('#modalOverlayTipTitle');
+        console.debug("发送gm结果err:",error)
+        modalOverlayTip.classList.add('active');
+        const retTitle = modalOverlayTip.querySelector('#modalOverlayTipTitle');
       retTitle.textContent = "操作失败🤡 💩"
       const retMsg = modalOverlayTip.querySelector('#modalOverlayTipShow');
       retMsg.textContent = error;

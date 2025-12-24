@@ -278,7 +278,7 @@ func ModifyGmProjectHandler(ctx *web.WebContext, req *webmodel.ModifyGmProjectRe
 	}
 	projectData.Name = req.Name
 	projectData.Data.Desc = req.Desc
-	projectData.Data.GmAddr = req.Desc
+	projectData.Data.GmAddr = req.GmAddr
 	err = dao.UpdateProjectData(projectData.Id, projectData)
 	if err != nil {
 		dao.Error(ctx, "modify project:%v is err:%v", req.ProjectId, err)
@@ -286,7 +286,7 @@ func ModifyGmProjectHandler(ctx *web.WebContext, req *webmodel.ModifyGmProjectRe
 	}
 	rsp.Desc = req.Desc
 	rsp.GmAddr = req.GmAddr
-	rsp.Name = req.GmAddr
+	rsp.Name = req.Name
 	rsp.ProjectId = req.ProjectId
 
 	strProject, _ := json.Marshal(rsp)

@@ -79,10 +79,12 @@ func SetSeesion(ctx *web.WebContext, userData *dbmodel.User) *sessions.Session {
 		session.Values["tab_home"] = "/gm_tab_home_user"
 	}
 
+	maxAge := 24 * 7 * 60 * 60 // 7天
+
 	// 记住我 - 设置30天过期
 	session.Options = &sessions.Options{
 		Path:   "/",
-		MaxAge: 60, // 10s
+		MaxAge: maxAge, // 10s
 	}
 
 	session.Save(ctx.GetGinContext().Request, ctx.GetGinContext().Writer)

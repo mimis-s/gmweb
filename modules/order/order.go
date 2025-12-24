@@ -1,6 +1,7 @@
 package order
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 
@@ -340,14 +341,19 @@ func SendGmOrderHandler(ctx *web.WebContext, req *webmodel.SendGmOrderReq, rsp *
 		return fmt.Errorf("send order:%v name:%v project:%v power is not enough", orderData.Id,
 			orderData.Name, projectData.Name)
 	}
+
+	gmExec := &gmExecReq{
+		GMArgs: orderData.Name + " " + req.Msg,
+	}
+	gmExecJson, _ := json.Marshal(gmExec)
+
 	var gmRsp *ApiResponse
 	if orderData.Data.Method == "GET" {
-		gmRsp, err = SendGetGmOrder(projectData.Data.GmAddr, req.Msg)
+		gmRsp, err = SendGetGmOrder(ctx, projectData.Data.GmAddr, string(gmExecJson))
 	} else if orderData.Data.Method == "POST" {
-		gmRsp, err = SendPostGmOrder(projectData.Data.GmAddr, req.Msg, "")
+		gmRsp, err = SendPostGmOrder(ctx, projectData.Data.GmAddr+orderData.Data.Path, string(gmExecJson), "")
 	}
 	if err != nil {
-		dao.Error(ctx, err.Error())
 		return err
 	}
 	if gmRsp != nil {
@@ -357,6 +363,6 @@ func SendGmOrderHandler(ctx *web.WebContext, req *webmodel.SendGmOrderReq, rsp *
 	}
 
 	dao.Info(ctx, "send order:%v Method[%v] name:%v project:%v ip:%v path:%v msg:%v", orderData.Data.Method, orderData.Id,
-		orderData.Name, projectData.Name, projectData.Data.GmAddr, orderData.Data.Path, req.Msg)
+		orderData.Name, projectData.Name, projectData.Data.GmAddr, orderData.Data.Path, string(gmExecJson))
 	return nil
 }

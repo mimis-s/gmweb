@@ -17,6 +17,9 @@ function loadGmOrderProjectBriefModule(tabProject){
       });
     })
     .then((data) => {
+      while (tabProject.firstChild) {
+          tabProject.removeChild(tabProject.firstChild);
+      }
       console.log('成功获取所有项目:', data);
       data.message.datas.forEach(briefData => {
         const projectBriefBox = document.createElement("li");
