@@ -53,17 +53,25 @@ function renderArray(jsonOutput, arr, parentKey) {
 function renderArrayField(arr, container, key) {
     const arrayContainer = document.createElement('div');
     arrayContainer.className = 'json-array struct_box';
-    
-    arr.forEach((item, index) => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'json-array-item';
-        
-        const input = createInputForValue(item, `${key}[${index}]`);
-        itemElement.appendChild(input);
-        
-        arrayContainer.appendChild(itemElement);
-    });
-    
+
+    // 数组不解析, 直接输出
+    // arr.forEach((item, index) => {
+    //     const itemElement = document.createElement('div');
+    //     itemElement.className = 'json-array-item';
+    //
+    //     const input = createInputForValue(item, `${key}[${index}]`);
+    //     itemElement.appendChild(input);
+    //
+    //     arrayContainer.appendChild(itemElement);
+    // });
+    const itemElement = document.createElement('div');
+    itemElement.className = 'json-array-item';
+
+    const input = createInputForValue(arr, `${key}`);
+    itemElement.appendChild(input);
+
+    arrayContainer.appendChild(itemElement);
+
     container.appendChild(arrayContainer);
 }
 
@@ -109,6 +117,50 @@ function renderPrimitiveField(value, container, key) {
     container.appendChild(input);
 }
 
+function objectToString(obj, indent = '  ', depth = 0) {
+    if (obj === null) return 'null';
+    if (obj === undefined) return 'undefined';
+
+    const type = typeof obj;
+
+    // 基本类型直接返回
+    if (type !== 'object' && type !== 'function') {
+        if (type === 'string') return `"${obj}"`;
+        return String(obj);
+    }
+
+    // 如果是数组
+    if (Array.isArray(obj)) {
+        if (obj.length === 0) return '[]';
+
+        let result = '[\n';
+        for (let i = 0; i < obj.length; i++) {
+            const prefix = indent.repeat(depth + 1);
+            result += prefix + objectToString(obj[i], indent, depth + 1);
+            if (i < obj.length - 1) result += ',';
+            result += '\n';
+        }
+        result += indent.repeat(depth) + ']';
+        return result;
+    }
+
+    // 如果是普通对象
+    const keys = Object.keys(obj);
+    if (keys.length === 0) return '{}';
+
+    let result = '{\n';
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const prefix = indent.repeat(depth + 1);
+        result += prefix + key + ': ';
+        result += objectToString(obj[key], indent, depth + 1);
+        if (i < keys.length - 1) result += ',';
+        result += '\n';
+    }
+    result += indent.repeat(depth) + '}';
+    return result;
+}
+
 // 创建对应类型的输入框
 function createInputForValue(value, key) {
     let input;
@@ -123,11 +175,12 @@ function createInputForValue(value, key) {
             input.type = 'text';
             input.value = value;
             input.placeholder = '请输入文本...';
+            input.placeholder = '请输入文本...';
         }
         input.className = 'json-string card_form_input';
     } else if (typeof value === 'number') {
         input = document.createElement('input');
-        // input.type = 'number';
+        input.type = 'number';
         input.value = value;
         input.className = 'json-number card_form_input';
     } else if (typeof value === 'boolean') {
@@ -145,6 +198,13 @@ function createInputForValue(value, key) {
         input.appendChild(trueOption);
         input.appendChild(falseOption);
         input.value = value.toString();
+    } else if (typeof value == "object"){
+        var val = JSON.stringify(value);
+        input = document.createElement('input');
+        input.id = "json_input";
+        input.value = val;
+        input.type = 'text';
+        input.className = 'json-string card_form_input';
     } else if (value === null) {
         input = document.createElement('input');
         input.type = 'text';
@@ -257,7 +317,11 @@ function getFormData(jsonOutput) {
 
 // 获取输入值
 function getInputValue(input) {
-    if (input.tagName === 'SELECT') {
+    console.debug("输入类型:",input.type)
+    if (input.id === "json_input") {
+        var val = JSON.parse(input.value);
+        return val;
+    } else if (input.tagName === 'SELECT') {
         return input.value === 'true';
     } else if (input.type === 'number') {
         return parseFloat(input.value);
