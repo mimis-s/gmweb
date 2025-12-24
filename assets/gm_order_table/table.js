@@ -60,7 +60,7 @@ function initGmRederTableDatagmOrderData(newBox, gmOrderData){
 function createTableItem(newBox, projectId, gmorderdata){
     const listContainer = newBox.querySelector('#projectTableDataList');
     const index = listContainer.querySelectorAll("#projectTableListItem").length;
-    gmOrderTableMap.set(gmorderdata.ordername, gmorderdata);
+    gmOrderTableMap.set(gmorderdata.orderid, gmorderdata);
 
     const listItem = document.createElement('div');
     listItem.className = 'project-table-list-item';
@@ -80,11 +80,11 @@ function createTableItem(newBox, projectId, gmorderdata){
     // 修改事件
     const editButton = listItem.querySelector('#projectTableBtnEdit-'+String(index))
     editButton.addEventListener('click', () => {
-        const data = gmOrderTableMap.get(gmorderdata.ordername)
+        const data = gmOrderTableMap.get(gmorderdata.orderid)
         const projectTableEditModal =  document.getElementById('projectTableEditModal');
         projectTableEditModal.style.display = 'flex';
-        console.debug('点击按钮:',data.ordername);
-        projectTableEditModal.querySelector('#projectTableEditModalTitle').value = data.projectId;
+        projectTableEditModal.value = gmorderdata.orderid;
+        projectTableEditModal.querySelector('#projectTableEditModalTitle').value = projectId;
         projectTableEditModal.querySelector('#editName').value = data.ordername;
         projectTableEditModal.querySelector('#editLevel').value = data.level;
         projectTableEditModal.querySelector('#editDesc').value = data.orderdesc;
@@ -109,7 +109,7 @@ function createTableItem(newBox, projectId, gmorderdata){
     const delButton = listItem.querySelector('#projectTableBtnDelete-'+String(index))
     delButton.addEventListener('click', function(e) {
         console.log(`按钮在第 ${index + 1} 行`);
-        const data = gmOrderTableMap.get(gmorderdata.ordername)
+        const data = gmOrderTableMap.get(gmorderdata.orderid)
         listItem.remove();
         postDelGmOrder(data.projectid, data.orderid);
     });
@@ -173,6 +173,7 @@ function saveEditItemModal() {
     var modifyGmOrderReq = {
         ProjectId: Number(projectId), // 项目id
         "data":{
+            OrderId: projectTableEditModal.value,
 	        OrderName: editName.value, // 命令名字(不允许重名)
 	        Level: Number(editLevel.value),
 	        OrderDesc: editDesc.value,
@@ -234,7 +235,7 @@ function modifyGmOrderData(modifyGmOrderReq) {
             {
                 child.querySelector('#orderLevel').textContent = data.message.data.level;
                 child.querySelector('#orderDesc').textContent = data.message.data.orderdesc;
-                gmOrderTableMap.set(editName.value, data.message.data);
+                gmOrderTableMap.set(data.message.data.orderid, data.message.data);
             }
         });
         window.showToast("修改成功");
