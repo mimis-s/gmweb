@@ -1,0 +1,374 @@
+/**
+ * 表格样式
+ */
+
+/* 表格容器 */
+.table-container {
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.table-container.hidden {
+    display: none;
+}
+
+/* 表格基础样式 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: var(--gray-100);
+}
+
+th {
+    padding: 18px 15px;
+    text-align: center;
+    font-weight: 700;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    user-select: none;
+}
+
+th.sortable {
+    cursor: pointer;
+    position: relative;
+}
+
+th.sortable:hover {
+    background-color: var(--gray-200);
+}
+
+th.sortable i {
+    margin-left: 5px;
+    font-size: 0.8rem;
+    opacity: 0.5;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: top;
+}
+
+tbody tr:hover {
+    background-color: var(--gray-50);
+}
+
+/* 项目表格样式 */
+.project-table-data-list {
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.project-table-list-header {
+    display: grid;
+    grid-template-columns: 1fr 150px;
+    padding: 15px 20px;
+    background-color: var(--gray-100);
+    font-weight: bold;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.project-table-list-item {
+    display: grid;
+    grid-template-columns: 1fr 150px;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.project-table-list-item:hover {
+    background-color: var(--gray-50);
+}
+
+.project-table-item-content {
+    display: flex;
+    align-items: center;
+}
+
+.project-table-item-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* 表格按钮 */
+.project-table-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.project-table-btn-edit {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.project-table-btn-edit:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.project-table-btn-delete {
+    background-color: var(--error-color);
+    color: white;
+}
+
+.project-table-btn-delete:hover {
+    background-color: #dc2626;
+    transform: translateY(-2px);
+}
+
+.project-table-btn-cancel {
+    background-color: var(--gray-400);
+    color: white;
+}
+
+.project-table-btn-cancel:hover {
+    background-color: var(--gray-500);
+}
+
+.project-table-btn-save {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.project-table-btn-save:hover {
+    background-color: #059669;
+}
+
+.project-table-btn-add {
+    background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+    color: white;
+    padding: 12px 25px;
+    font-size: 1rem;
+    margin-top: 20px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+.project-table-btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+/* 表格模态框 */
+.project-table-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: var(--z-modal);
+    justify-content: center;
+    align-items: center;
+}
+
+.project-table-modal.active {
+    display: flex;
+}
+
+.project-table-modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    width: 90%;
+    max-width: 700px;
+    animation: modalAppear 0.3s ease;
+}
+
+.project-table-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.project-table-modal-title {
+    font-size: var(--font-size-2xl);
+    color: var(--text-primary);
+}
+
+.project-table-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray-500);
+}
+
+.project-table-form-group {
+    margin-bottom: 20px;
+}
+
+.project-table-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.project-table-json-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    font-family: 'Consolas', monospace;
+    resize: vertical;
+}
+
+/* 用户表格样式 */
+.users-table-container {
+    overflow-x: auto;
+    margin-bottom: 40px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+    background: white;
+}
+
+.users-table th {
+    background: var(--primary-color);
+    color: white;
+    padding: 18px 15px;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+}
+
+.users-table th:first-child {
+    border-radius: var(--radius) 0 0 0;
+}
+
+.users-table th:last-child {
+    border-radius: 0 var(--radius) 0 0;
+}
+
+.users-table td {
+    padding: 16px 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.users-table tr:hover {
+    background-color: var(--gray-50);
+}
+
+.users-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* 用户头像 */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.user-password {
+    font-family: 'Consolas', monospace;
+    color: var(--gray-500);
+    letter-spacing: 1px;
+}
+
+.password-mask {
+    background: var(--gray-100);
+    padding: 2px 8px;
+    border-radius: var(--radius);
+    font-family: 'Consolas', monospace;
+}
+
+/* 操作按钮 */
+.action-cell {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-btn-edit {
+    background: var(--primary-color);
+    color: white;
+}
+
+.action-btn-delete {
+    background: var(--error-color);
+    color: white;
+}
+
+.action-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+/* 空状态 */
+.no-users,
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--gray-500);
+    font-size: 1.1rem;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: var(--gray-300);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .project-table-list-header,
+    .project-table-list-item {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .project-table-item-actions {
+        justify-content: flex-start;
+    }
+}

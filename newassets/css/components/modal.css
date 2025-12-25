@@ -1,0 +1,263 @@
+/**
+ * 模态框样式
+ */
+
+/* 遮罩层 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal-backdrop);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 提示型遮罩层 */
+.modal-overlay-tip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: calc(var(--z-modal) + 1);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay-tip.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 模态框内容 */
+.modal {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 500px;
+    padding: 24px;
+    box-shadow: var(--shadow-xl);
+    transform: translateY(30px);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal {
+    transform: translateY(0);
+}
+
+/* 大尺寸模态框 */
+.modal-lg {
+    max-width: 750px;
+}
+
+/* 小尺寸模态框 */
+.modal-sm {
+    max-width: 400px;
+}
+
+/* 模态框头部 */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* 关闭按钮 */
+.modal-close,
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--gray-500);
+    transition: color 0.3s ease;
+    line-height: 1;
+}
+
+.modal-close:hover,
+.close-btn:hover {
+    color: var(--gray-700);
+}
+
+/* 模态框主体 */
+.modal-body {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* 模态框底部 */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* 项目管理模态框（复用） */
+.project-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: var(--z-modal);
+    justify-content: center;
+    align-items: center;
+}
+
+.project-modal.active {
+    display: flex;
+}
+
+.project-modal-content {
+    background-color: var(--white);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    width: 90%;
+    max-width: 700px;
+    animation: modalAppear 0.3s ease;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.project-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.project-modal-title {
+    font-size: var(--font-size-2xl);
+    color: var(--text-primary);
+}
+
+.project-close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--gray-500);
+    transition: color 0.3s ease;
+}
+
+.project-close-btn:hover {
+    color: var(--gray-700);
+}
+
+.project-form-group {
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+}
+
+.project-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+/* 项目表单输入框 */
+.projet-input {
+    border: 2px solid transparent;
+    width: 15em;
+    height: 2.5em;
+    padding-left: 0.8em;
+    outline: none;
+    overflow: hidden;
+    background-color: var(--gray-100);
+    border-radius: var(--radius);
+    transition: all 0.5s;
+}
+
+.projet-input:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 7px rgba(74, 157, 236, 0.2);
+    background-color: var(--white);
+}
+
+.projet-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 7px rgba(120, 80, 190, 0.2);
+    background-color: var(--white);
+}
+
+/* 项目按钮 */
+.project-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.project-btn-cancel {
+    background-color: var(--gray-400);
+    color: var(--white);
+}
+
+.project-btn-cancel:hover {
+    background-color: var(--gray-500);
+}
+
+.project-btn-save {
+    background-color: var(--success-color);
+    color: var(--white);
+}
+
+.project-btn-save:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+}
+
+/* 通用容器 */
+.project-container,
+.premission-container {
+    width: 90%;
+    margin: 0 auto;
+    padding: 20px;
+    margin-top: 40px;
+}

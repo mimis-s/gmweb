@@ -20,7 +20,27 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		templ := template.Must(template.New("").ParseFS(htmlEmbed, "templates/*.html"))
 		engine.SetHTMLTemplate(templ)
 		// 加载静态资源(比如图片,文件等)
-		engine.StaticFS("/assets", http.FS(assetsEmbed))
+		//engine.StaticFS("/assets", http.FS(assetsEmbed))
+		// 加载新的静态资源 - 使用 SubFS 映射 newassets 目录
+		engine.StaticFS("/newassets", http.FS(assetsEmbed))
+
+		//// 添加模板文件路由，用于动态加载 HTML
+		//engine.Get("/templates/*.html", "模板文件", func(ctx web.Context) error {
+		//	ginCtx := ctx.GetGinContext()
+		//	pattern := ginCtx.Param("*")
+		//	data, err := htmlEmbed.ReadFile("templates/" + pattern)
+		//	if err != nil {
+		//		ginCtx.JSON(http.StatusNotFound, gin.H{
+		//			"success": false,
+		//			"message": "模板不存在",
+		//		})
+		//		return nil
+		//	}
+		//	ginCtx.Header("Content-Type", "text/html; charset=utf-8")
+		//	ginCtx.String(http.StatusOK, string(data))
+		//	return nil
+		//})
+
 		controllerHandler, err := controller.Init()
 		if err != nil {
 			return err

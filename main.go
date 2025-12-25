@@ -18,7 +18,7 @@ import (
 //go:embed templates
 var htmlEmbed embed.FS
 
-//go:embed assets
+//go:embed newassets
 var assetsEmbed embed.FS
 
 func newDefRegistry() *app.Registry {
