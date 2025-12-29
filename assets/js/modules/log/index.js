@@ -2,8 +2,6 @@
  * 日志管理模块
  */
 import { apiClient } from '../../api/client.js';
-import { store } from '../../core/store.js';
-// import { eventBus, Events } from '../../core/eventBus.js';
 import { showToast } from '../../components/toast.js';
 
 /**
@@ -29,188 +27,202 @@ export const LogLevelMap = {
  * 日志 Store
  */
 export function createLogStore() {
-    const logStore = {
-        state: {
-            logs: [],
-            filter: {
-                username: '',
-                ip: '',
-                level: 0,
-                startTime: null,
-                endTime: null,
-                message: '',
-            },
-            pagination: {
-                currentPage: 1,
-                pageSize: 25,
-                total: 0,
-            },
-            sort: {
-                field: 'logtime',
-                direction: 'desc',
-            },
-            loading: false,
-            error: null,
+    // 应用状态
+    const state = {
+        currentView: 'table',
+        currentPage: 1,
+        pageSize: 25,
+        sortField: 'logtime',
+        sortDirection: 'desc',
+        filter: {
+            username: '',
+            ip: '',
+            level: 0,
+            startDate: '',
+            endDate: '',
+            message: ''
         },
-        
+        filteredLogs: [],
+        loading: false,
+        error: null,
+    };
+
+    const logStore = {
+        state,
+
         /**
          * 获取日志
-         * @param {Object} options 选项
          */
-        async fetchLogs(options = {}) {
-            const { page = 1, pageSize = 25 } = options;
-            
-            this.state.loading = true;
-            this.state.error = null;
-            
-            const { filter, sort } = this.state;
-            
-            const params = {
-                username: filter.username,
-                ip: filter.ip,
-                level: Number(filter.level),
-                starttime: filter.startTime ? new Date(filter.startTime).getTime() : 0,
-                endtime: filter.endTime ? new Date(filter.endTime).getTime() : 0,
-                msg: filter.message,
-            };
-            
+        async fetchLogs() {
+            // 确保 filteredLogs 存在
+            if (!state.filteredLogs) {
+                state.filteredLogs = [];
+            }
+
+            state.loading = true;
+            state.error = null;
+
             try {
+                let startTimestamp = new Date(state.filter.startDate).getTime();
+                let endTimestamp = new Date(state.filter.endDate).getTime();
+
+                // 参数名与旧版一致
+                const params = {
+                    UserName: state.filter.username,
+                    Ip: state.filter.ip,
+                    Level: Number(state.filter.level),
+                    StartTime: Number(startTimestamp),
+                    EndTime: Number(endTimestamp),
+                    Msg: state.filter.message,
+                };
+
                 const response = await apiClient.getLogs(params);
                 const data = response.message;
-                
+
+                console.debug('API 返回数据:', data);
+
                 if (!data || !data.datas) {
-                    this.state.logs = [];
-                    this.state.pagination.total = 0;
+                    state.filteredLogs = [];
                     return [];
                 }
-                
+
+                console.debug('日志数据条数:', data.datas.length);
+
                 // 格式化日志数据
-                this.state.logs = data.datas.map(log => ({
+                state.filteredLogs = data.datas.map(log => ({
                     id: log.userid,
-                    userId: log.userid,
-                    userName: log.username,
+                    username: log.username,
                     ip: log.ip,
                     level: log.level,
-                    levelLabel: LogLevelMap[log.level] || 'UNDEFINE',
-                    time: new Date(log.logtime),
-                    logTime: log.logtime,
+                    time: log.logtime,
                     message: log.msg,
                 }));
-                
-                // 排序
-                this.sortLogs(sort.field, sort.direction, false);
-                
-                this.state.pagination.total = this.state.logs.length;
-                store.set('log.logs', this.state.logs);
-                store.set('log.filter', this.state.filter);
-                
-                // eventBus.emit(Events.DATA_LOADED, { type: 'log', data: this.state.logs });
-                
-                return this.state.logs;
+
+                // 应用排序
+                this.sortLogs(state.sortField, false);
+
+                return state.filteredLogs;
             } catch (error) {
-                this.state.error = error.message;
+                state.error = error.message;
                 showToast(error.message || '获取日志失败', 'error');
                 throw error;
             } finally {
-                this.state.loading = false;
+                state.loading = false;
             }
         },
-        
+
         /**
          * 设置筛选条件
-         * @param {Object} filter 
          */
         setFilter(filter) {
-            this.state.filter = { ...this.state.filter, ...filter };
-            store.set('log.filter', this.state.filter);
+            state.filter = { ...state.filter, ...filter };
         },
-        
+
         /**
          * 重置筛选条件
          */
         resetFilter() {
-            this.state.filter = {
+            // 设置默认日期范围（当天到前一天）
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+            state.filter = {
                 username: '',
                 ip: '',
                 level: 0,
-                startTime: null,
-                endTime: null,
-                message: '',
+                startDate: yesterdayStr,
+                endDate: today,
+                message: ''
             };
-            store.set('log.filter', this.state.filter);
+            state.currentPage = 1;
         },
-        
+
         /**
-         * 排序
-         * @param {string} field 排序字段
-         * @param {string} direction 排序方向
-         * @param {boolean} updateUI 是否更新 UI
+         * 排序日志
          */
-        sortLogs(field, direction = 'desc', updateUI = true) {
-            this.state.sort = { field, direction };
-            
-            this.state.logs.sort((a, b) => {
+        sortLogs(field, updateUI = true) {
+            if (field === state.sortField) {
+                state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                state.sortField = field;
+                state.sortDirection = 'desc';
+            }
+
+            state.filteredLogs.sort((a, b) => {
                 let aVal = a[field];
                 let bVal = b[field];
-                
-                // 时间字段特殊处理
+
                 if (field === 'time') {
-                    aVal = aVal.getTime();
-                    bVal = bVal.getTime();
+                    aVal = new Date(aVal).getTime();
+                    bVal = new Date(bVal).getTime();
                 }
-                
-                if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-                if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+
+                if (aVal < bVal) return state.sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return state.sortDirection === 'asc' ? 1 : -1;
                 return 0;
             });
-            
-            store.set('log.logs', this.state.logs);
-            store.set('log.sort', this.state.sort);
         },
-        
+
         /**
          * 获取分页日志
          */
         getPageLogs() {
-            const { currentPage, pageSize } = this.state.pagination;
-            const start = (currentPage - 1) * pageSize;
-            return this.state.logs.slice(start, start + pageSize);
+            if (!state.filteredLogs) {
+                state.filteredLogs = [];
+            }
+            const start = (state.currentPage - 1) * state.pageSize;
+            return state.filteredLogs.slice(start, start + state.pageSize);
         },
-        
+
         /**
          * 设置页码
-         * @param {number} page 
          */
         setPage(page) {
-            this.state.pagination.currentPage = page;
-            store.set('log.pagination', this.state.pagination);
+            state.currentPage = page;
         },
-        
+
+        /**
+         * 切换视图
+         */
+        switchView(view) {
+            state.currentView = view;
+        },
+
         /**
          * 获取状态
          */
         getState() {
-            return this.state;
+            // 确保 filteredLogs 始终存在
+            if (!state.filteredLogs) {
+                state.filteredLogs = [];
+            }
+            return state;
         },
-        
+
         /**
          * 清空状态
          */
         clear() {
-            this.state.logs = [];
-            this.state.filter = {
+            state.filteredLogs = [];
+            state.filter = {
                 username: '',
                 ip: '',
                 level: 0,
-                startTime: null,
-                endTime: null,
-                message: '',
+                startDate: '',
+                endDate: '',
+                message: ''
             };
-            this.state.pagination.currentPage = 1;
-            store.set('log', {});
+            state.currentPage = 1;
         },
     };
-    
+
     return logStore;
 }
 

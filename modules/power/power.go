@@ -103,7 +103,7 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 		rsp.PermissionDatas = append(rsp.PermissionDatas, &webmodel.PermissionInfo{
 			Id:             powerData.PowerId,
 			Name:           powerData.Name,
-			Enable:         powerData.Enable,
+			Enable:         *powerData.Enable,
 			ProjectId:      powerData.ProjectId,
 			ProjectName:    tmpProjectName,
 			Level:          powerData.Data.Level,
@@ -179,7 +179,7 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 		rsp.PermissionGroupDatas = append(rsp.PermissionGroupDatas, &webmodel.PermissionGroupInfo{
 			Id:       powerGroup.GroupId,
 			Name:     powerGroup.Name,
-			Enable:   powerGroup.Enable,
+			Enable:   *powerGroup.Enable,
 			PowerIds: powerGroup.ExtraData.PowerIds,
 		})
 
@@ -232,7 +232,7 @@ func AddPermissionHandler(ctx *web.WebContext, req *webmodel.AddPermissionReq, r
 	insertData := &dbmodel.Power{
 		Name:      req.Name,
 		ProjectId: req.ProjectId,
-		Enable:    req.Enable,
+		Enable:    &req.Enable,
 		Data: &db_extra.PowerExtra{
 			Level:          req.Level,
 			OrderNameMatch: req.OrderNameMatch,
@@ -247,7 +247,7 @@ func AddPermissionHandler(ctx *web.WebContext, req *webmodel.AddPermissionReq, r
 	rsp.Data = &webmodel.PermissionInfo{
 		Id:             insertData.PowerId,
 		Name:           insertData.Name,
-		Enable:         insertData.Enable,
+		Enable:         *insertData.Enable,
 		ProjectId:      insertData.ProjectId,
 		ProjectName:    projectName,
 		Level:          insertData.Data.Level,
@@ -282,7 +282,7 @@ func ModifyPermissionHandler(ctx *web.WebContext, req *webmodel.ModifyPermission
 	}
 
 	powerData.Name = req.Data.Name
-	powerData.Enable = req.Data.Enable
+	powerData.Enable = &req.Data.Enable
 	powerData.Data.Level = req.Data.Level
 	powerData.Data.OrderNameMatch = req.Data.OrderNameMatch
 	powerData.ProjectId = req.Data.ProjectId

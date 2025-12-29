@@ -34,19 +34,19 @@ export function createPermissionStore() {
                 const data = response.message;
                 console.debug('权限数据:', data);
 
-                this.state.permissions = data.permissiondatas || [];
-                this.state.permissionGroups = data.permissiongroupdatas || [];
+                // 规范化 enable 值为布尔值
+                this.state.permissions = (data.permissiondatas || []).map(p => ({
+                    ...p,
+                    enable: p.enable === 1 || p.enable === true || p.enable === 'true',
+                }));
+                this.state.permissionGroups = (data.permissiongroupdatas || []).map(g => ({
+                    ...g,
+                    enable: g.enable === 1 || g.enable === true || g.enable === 'true',
+                }));
                 this.state.allUsers = data.allusers || [];
                 this.state.allProjects = data.allprojects || [];
                 this.state.allLevels = data.alllevels || [];
                 this.state.assignments = data.assignment || [];
-
-                console.debug('解析后的数据:');
-                console.debug('  permissions:', this.state.permissions);
-                console.debug('  permissionGroups:', this.state.permissionGroups);
-                console.debug('  allUsers:', this.state.allUsers);
-                console.debug('  allProjects:', this.state.allProjects);
-                console.debug('  assignments:', this.state.assignments);
 
                 return this.state;
             } catch (error) {
@@ -68,6 +68,9 @@ export function createPermissionStore() {
             try {
                 const response = await apiClient.addPermission(permissionData);
                 const newPermission = response.message.data;
+
+                // 规范化 enable 值为布尔值
+                newPermission.enable = newPermission.enable === 1 || newPermission.enable === true || newPermission.enable === 'true';
 
                 this.state.permissions.push(newPermission);
 
@@ -103,6 +106,51 @@ export function createPermissionStore() {
                 return updatedPermission;
             } catch (error) {
                 showToast(error.message || '修改失败', 'error');
+                throw error;
+            } finally {
+                this.state.loading = false;
+            }
+        },
+
+        /**
+         * 切换权限启用状态
+         * @param {number} id
+         * @param {boolean} enable
+         */
+        async togglePermission(id, enable) {
+            const permission = this.state.permissions.find(p => p.id === id);
+            if (!permission) {
+                showToast('权限不存在', 'error');
+                throw new Error('权限不存在');
+            }
+
+            // 切换本地状态
+            permission.enable = !permission.enable;
+
+            this.state.loading = true;
+
+            try {
+                // 传递整个 permission 对象
+                const response = await apiClient.modifyPermission({
+                    data: permission,
+                });
+                const updatedPermission = response.message.data;
+
+                // 规范化 enable 值为布尔值
+                updatedPermission.enable = updatedPermission.enable === 1 || updatedPermission.enable === true;
+
+                const index = this.state.permissions.findIndex(p => p.id === updatedPermission.id);
+                if (index !== -1) {
+                    this.state.permissions[index] = updatedPermission;
+                }
+
+                showToast('成功修改权限', 'success');
+
+                return updatedPermission;
+            } catch (error) {
+                // 恢复本地状态
+                permission.enable = !permission.enable;
+                showToast(error.message || '操作失败', 'error');
                 throw error;
             } finally {
                 this.state.loading = false;
@@ -149,6 +197,9 @@ export function createPermissionStore() {
                 const response = await apiClient.addPermissionGroup(groupData);
                 const newGroup = response.message.data;
 
+                // 规范化 enable 值为布尔值
+                newGroup.enable = newGroup.enable === 1 || newGroup.enable === true || newGroup.enable === 'true';
+
                 this.state.permissionGroups.push(newGroup);
 
                 showToast('添加成功', 'success');
@@ -192,11 +243,76 @@ export function createPermissionStore() {
         },
 
         /**
+         * 切换权限组启用状态
+         * @param {number} id
+         * @param {boolean} enable
+         */
+        async togglePermissionGroup(id, enable) {
+            const group = this.state.permissionGroups.find(g => g.id === id);
+            if (!group) {
+                showToast('权限组不存在', 'error');
+                throw new Error('权限组不存在');
+            }
+
+            // 切换本地状态
+            group.enable = !group.enable;
+
+            this.state.loading = true;
+
+            try {
+                // 传递整个 group 对象
+                const response = await apiClient.modifyPermissionGroup({
+                    data: group,
+                });
+                const updatedGroup = response.message.data;
+
+                // 规范化 enable 值为布尔值
+                updatedGroup.enable = updatedGroup.enable === 1 || updatedGroup.enable === true;
+
+                const index = this.state.permissionGroups.findIndex(g => g.id === updatedGroup.id);
+                if (index !== -1) {
+                    this.state.permissionGroups[index] = updatedGroup;
+                }
+
+                showToast('成功修改权限组', 'success');
+
+                return updatedGroup;
+            } catch (error) {
+                // 恢复本地状态
+                group.enable = !group.enable;
+                showToast(error.message || '操作失败', 'error');
+                throw error;
+            } finally {
+                this.state.loading = false;
+            }
+        },
+
+        /**
          * 分配权限组给用户
          * @param {number} userId
          * @param {number} groupId
          */
         async assignPermission(userId, groupId) {
+            // 检查权限组是否存在且已启用
+            const group = this.state.permissionGroups.find(g => g.id === groupId);
+            if (!group) {
+                showToast('选择的权限组不存在', 'error');
+                throw new Error('权限组不存在');
+            }
+            if (group.enable !== true) {
+                showToast('选择的权限组已禁用', 'error');
+                throw new Error('权限组已禁用');
+            }
+
+            // 检查是否已经分配过
+            const existingAssignment = this.state.assignments.find(
+                a => a.userid === userId && a.groupid === groupId
+            );
+            if (existingAssignment) {
+                showToast('该玩家已经分配了这个权限组', 'warning');
+                throw new Error('已分配');
+            }
+
             this.state.loading = true;
 
             try {
@@ -209,7 +325,9 @@ export function createPermissionStore() {
 
                 return newAssignment;
             } catch (error) {
-                showToast(error.message || '分配失败', 'error');
+                if (error.message !== '已分配' && error.message !== '权限组不存在' && error.message !== '权限组已禁用') {
+                    showToast(error.message || '分配失败', 'error');
+                }
                 throw error;
             } finally {
                 this.state.loading = false;
@@ -235,9 +353,7 @@ export function createPermissionStore() {
                 await apiClient.delPermissionAssignment(assignmentId);
 
                 this.state.assignments = this.state.assignments.filter(a => a.id !== assignmentId);
-                store.set('permission.assignments', this.state.assignments);
 
-                // eventBus.emit(Events.DATA_DELETED, { type: 'assignment', id: assignmentId });
                 showToast('已取消分配', 'success');
             } catch (error) {
                 showToast(error.message || '取消失败', 'error');
@@ -268,7 +384,6 @@ export function createPermissionStore() {
                 loading: false,
                 error: null,
             };
-            store.set('permission', {});
         },
     };
     

@@ -76,6 +76,9 @@ export const PageLoader = {
     async loadGmOrderModule(container, projectId) {
         try {
             // 加载 GM 命令数据
+            const html = await loadHtml.gmOrderCard();
+            container.innerHTML = html
+
             await gmOrderStore.fetchOrders(projectId);
             
             // 渲染 GM 命令列表
@@ -105,6 +108,8 @@ export const PageLoader = {
      */
     async loadProjectModule(container) {
         try {
+            const html = await loadHtml.gmProjectBox();
+            container.innerHTML = html
             await projectStore.fetchProjects();
             // eventBus.emit(Events.NAVIGATE, { page: 'project' });
         } catch (error) {
@@ -437,28 +442,887 @@ export const PageLoader = {
      * @param {HTMLElement} container 容器
      */
     async loadPermissionModule(container) {
-        try {
-            const html = await loadHtml.gmPermission();
-            container.innerHTML = html;
-            await permissionStore.fetchPermissions();
-            // eventBus.emit(Events.NAVIGATE, { page: 'permission' });
-        } catch (error) {
-            showToast(error.message || '加载失败', 'error');
-            throw error;
+        const html = await loadHtml.gmPermission();
+        container.innerHTML = html;
+
+        // 保存容器引用
+        this._permissionContainer = container;
+
+        // 监听数据加载事件，确保数据返回后立即渲染
+        const dataLoadedHandler = () => {
+            this.renderPermissions(this._permissionContainer);
+            this.renderPermissionGroups(this._permissionContainer);
+            this.renderAssignments(this._permissionContainer);
+            // 更新下拉框和复选框
+            this.updatePermissionDropdowns(this._permissionContainer);
+            this.updatePermissionCheckboxes(this._permissionContainer);
+        };
+
+        // 绑定一次性事件监听器
+        eventBus.once(Events.GetPermissionsRsp, dataLoadedHandler);
+
+        // 获取权限数据
+        await permissionStore.fetchPermissions();
+
+        // 如果事件已经触发，手动渲染
+        if (permissionStore.getState().permissions.length > 0) {
+            dataLoadedHandler();
+        }
+
+        // 绑定页面事件
+        this.bindPermissionEvents(container);
+    },
+
+    /**
+     * 更新权限相关下拉框
+     */
+    updatePermissionDropdowns(container) {
+        const state = permissionStore.getState();
+
+        // 更新项目下拉框
+        const projectSelect = container.querySelector('#permissionProjectSelect');
+        if (projectSelect) {
+            projectSelect.innerHTML = '<option value="">所有项目</option>';
+            state.allProjects.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.projectid;
+                option.textContent = `${p.projectid}-${p.name}`;
+                projectSelect.appendChild(option);
+            });
+        }
+
+        // 更新等级下拉框
+        const levelSelect = container.querySelector('#permissionLevelSelect');
+        if (levelSelect) {
+            levelSelect.innerHTML = '<option value="">所有等级</option>';
+            state.allLevels.forEach(level => {
+                const option = document.createElement('option');
+                option.value = level;
+                option.textContent = `等级 (${level})`;
+                levelSelect.appendChild(option);
+            });
+        }
+
+        // 更新权限组下拉框(用于分配)
+        const groupSelect = container.querySelector('#groupSelect');
+        if (groupSelect) {
+            groupSelect.innerHTML = '<option value="">选择权限组</option>';
+            state.permissionGroups
+                .filter(g => g.enable === true)
+                .forEach(g => {
+                    const option = document.createElement('option');
+                    option.value = g.id;
+                    option.textContent = `${g.id} (${g.name})`;
+                    groupSelect.appendChild(option);
+                });
+        }
+
+        // 更新用户下拉框(用于分配)
+        const userSelect = container.querySelector('#playerIdSelect');
+        if (userSelect) {
+            userSelect.innerHTML = '<option value="">选择用户</option>';
+            state.allUsers.forEach(u => {
+                const option = document.createElement('option');
+                option.value = u.userid;
+                option.textContent = `${u.userid} (${u.username || u.name})`;
+                userSelect.appendChild(option);
+            });
         }
     },
-    
+
+    /**
+     * 更新权限复选框(用于创建权限组)
+     */
+    updatePermissionCheckboxes(container) {
+        const state = permissionStore.getState();
+        const checkboxContainer = container.querySelector('#permissionCheckboxes');
+
+        if (!checkboxContainer) return;
+
+        const activePermissions = state.permissions.filter(p => p.enable === true);
+
+        if (activePermissions.length === 0) {
+            checkboxContainer.innerHTML = '<p style="color:#777;font-style:italic;">暂无可用权限，请先在权限模块创建权限</p>';
+            return;
+        }
+
+        checkboxContainer.innerHTML = activePermissions.map(p => `
+            <div class="checkbox-item">
+                <input type="checkbox" id="perm_${p.id}" value="${p.id}">
+                <label for="perm_${p.id}">${p.name}</label>
+            </div>
+        `).join('');
+    },
+
+    /**
+     * 渲染权限列表
+     */
+    renderPermissions(container) {
+        const permissions = permissionStore.getState().permissions;
+        const tableBody = container.querySelector('#permissionsTableBody');
+        const emptyMsg = container.querySelector('#emptyPermissions');
+
+        if (!tableBody) return;
+
+        if (permissions.length === 0) {
+            tableBody.innerHTML = '';
+            if (emptyMsg) emptyMsg.style.display = 'block';
+            return;
+        }
+
+        if (emptyMsg) emptyMsg.style.display = 'none';
+
+        tableBody.innerHTML = permissions.map(p => {
+            const isEnabled = p.enable === true || p.enable === 1 || p.enable === 'true';
+            return `
+            <tr>
+                <td>${p.id || '-'}</td>
+                <td>${p.name || '-'}</td>
+                <td>${p.project_name || (p.projectid === 0 ? '所有项目' : p.projectid)}</td>
+                <td>${p.level === 0 ? '所有等级' : p.level}</td>
+                <td>${p.ordername_match || '-'}</td>
+                <td class="${isEnabled ? 'status-active' : 'status-inactive'}">
+                    ${isEnabled ? '启用' : '禁用'}
+                </td>
+                <td>
+                    <button class="action-btn action-btn-toggle" data-action="toggle-permission" data-id="${p.id}" data-enabled="${isEnabled}">
+                        ${isEnabled ? '禁用' : '启用'}
+                    </button>
+                    <button class="action-btn action-btn-delete" data-action="delete-permission" data-id="${p.id}">删除</button>
+                </td>
+            </tr>
+        `}).join('');
+    },
+
+    /**
+     * 渲染权限组列表
+     */
+    renderPermissionGroups(container) {
+        const groups = permissionStore.getState().permissionGroups;
+        const tableBody = container.querySelector('#groupsTableBody');
+        const emptyMsg = container.querySelector('#emptyGroups');
+
+        if (!tableBody) return;
+
+        if (groups.length === 0) {
+            tableBody.innerHTML = '';
+            if (emptyMsg) emptyMsg.style.display = 'block';
+            return;
+        }
+
+        if (emptyMsg) emptyMsg.style.display = 'none';
+
+        tableBody.innerHTML = groups.map(g => {
+            const isEnabled = g.enable === true || g.enable === 1 || g.enable === 'true';
+            return `
+            <tr>
+                <td>${g.id || '-'}</td>
+                <td>${g.name || '-'}</td>
+                <td>${g.powerids?.length || 0}</td>
+                <td class="${isEnabled ? 'status-active' : 'status-inactive'}">
+                    ${isEnabled ? '启用' : '禁用'}
+                </td>
+                <td>
+                    <button class="action-btn action-btn-toggle" data-action="toggle-group" data-id="${g.id}" data-enabled="${isEnabled}">
+                        ${isEnabled ? '禁用' : '启用'}
+                    </button>
+                    <button class="action-btn action-btn-delete" data-action="delete-group" data-id="${g.id}">删除</button>
+                </td>
+            </tr>
+        `}).join('');
+    },
+
+    /**
+     * 渲染权限分配列表
+     */
+    renderAssignments(container) {
+        const assignments = permissionStore.getState().assignments;
+        const tableBody = container.querySelector('#assignmentsTableBody');
+        const emptyMsg = container.querySelector('#emptyAssignments');
+
+        if (!tableBody) return;
+
+        if (assignments.length === 0) {
+            tableBody.innerHTML = '';
+            if (emptyMsg) emptyMsg.style.display = 'block';
+            return;
+        }
+
+        if (emptyMsg) emptyMsg.style.display = 'none';
+
+        tableBody.innerHTML = assignments.map(a => `
+            <tr>
+                <td>${a.userid || '-'}</td>
+                <td>${a.username || '-'}</td>
+                <td>${a.groupid || '-'}</td>
+                <td>${a.groupname || '-'}</td>
+                <td>
+                    <button class="action-btn action-btn-delete" data-action="delete-assignment" data-id="${a.id}">删除</button>
+                </td>
+            </tr>
+        `).join('');
+    },
+
+    /**
+     * 绑定权限管理页面事件
+     */
+    bindPermissionEvents(container) {
+        // 使用事件委托绑定表格操作按钮
+        const tables = container.querySelectorAll('table');
+        tables.forEach(table => {
+            table.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action]');
+                if (!btn) return;
+
+                const action = btn.dataset.action;
+                const id = parseInt(btn.dataset.id);
+
+                switch (action) {
+                    case 'toggle-permission':
+                        this.handleTogglePermission(id, btn.dataset.enabled === 'true');
+                        break;
+                    case 'delete-permission':
+                        this.handleDeletePermission(id);
+                        break;
+                    case 'toggle-group':
+                        this.handleTogglePermissionGroup(id, btn.dataset.enabled === 'true');
+                        break;
+                    case 'delete-group':
+                        this.handleDeletePermissionGroup(id);
+                        break;
+                    case 'delete-assignment':
+                        this.handleRemoveAssignment(id);
+                        break;
+                }
+            });
+        });
+
+        // 添加权限按钮
+        const addPermissionBtn = container.querySelector('#addPermissionBtn');
+        if (addPermissionBtn) {
+            addPermissionBtn.onclick = () => this.handleAddPermission();
+        }
+
+        // 添加权限组按钮
+        const addGroupBtn = container.querySelector('#addGroupBtn');
+        if (addGroupBtn) {
+            addGroupBtn.onclick = () => this.handleAddPermissionGroup();
+        }
+
+        // 分配权限按钮
+        const assignBtn = container.querySelector('#assignPermissionBtn');
+        if (assignBtn) {
+            assignBtn.onclick = () => this.handleAssignPermission();
+        }
+    },
+
+    /**
+     * 处理添加权限
+     */
+    async handleAddPermission() {
+        const nameInput = document.getElementById('permissionName');
+        const projectSelect = document.getElementById('permissionProjectSelect');
+        const levelSelect = document.getElementById('permissionLevelSelect');
+        const orderMatchInput = document.getElementById('permissionOrderNameMatch');
+
+        const name = nameInput?.value.trim();
+        const projectId = projectSelect?.value;
+        const levelId = levelSelect?.value;
+        const orderMatch = orderMatchInput?.value.trim();
+
+        if (!name) {
+            showToast('请输入权限名称', 'warning');
+            return;
+        }
+
+        // 获取项目名称
+        let projectname = '';
+        if (projectSelect && projectSelect.selectedIndex >= 0) {
+            const text = projectSelect.options[projectSelect.selectedIndex].text;
+            const parts = text.split('-');
+            if (parts.length >= 2) {
+                projectname = parts[1].trim();
+            }
+        }
+
+        try {
+            // 传递参数与旧版一致
+            const addPermissionReq = {
+                name: name,
+                enable: true,
+                projectid: Number(projectId),
+                projectname: projectname,
+                level: Number(levelId),
+                ordernamematch: orderMatch,
+            };
+
+            await permissionStore.addPermission(addPermissionReq);
+
+            // 清空表单
+            if (nameInput) nameInput.value = '';
+            if (levelSelect) levelSelect.value = '';
+            if (projectSelect) projectSelect.selectedIndex = 0;
+            if (orderMatchInput) orderMatchInput.value = '';
+
+            // 重新渲染并刷新关联数据
+            if (this._permissionContainer) {
+                this.renderPermissions(this._permissionContainer);
+                // 刷新权限组相关的下拉框和复选框
+                this.updatePermissionDropdowns(this._permissionContainer);
+                this.updatePermissionCheckboxes(this._permissionContainer);
+            }
+        } catch (error) {
+            // 错误已在 store 中处理
+        }
+    },
+
+    /**
+     * 处理删除权限
+     */
+    async handleDeletePermission(id) {
+        try {
+            await permissionStore.deletePermission(id);
+
+            // 重新渲染并刷新关联数据
+            if (this._permissionContainer) {
+                this.renderPermissions(this._permissionContainer);
+                // 刷新权限组相关的复选框
+                this.updatePermissionCheckboxes(this._permissionContainer);
+            }
+        } catch (error) {
+            // 错误已在 store 中处理
+        }
+    },
+
+    /**
+     * 处理添加权限组
+     */
+    async handleAddPermissionGroup() {
+        const groupNameInput = document.getElementById('groupName');
+        const permissionCheckboxes = document.getElementById('permissionCheckboxes');
+        
+        const name = groupNameInput?.value.trim();
+
+        if (!name) {
+            showToast('请输入权限组名称', 'warning');
+            return;
+        }
+
+        // 获取选中的权限
+        const selectedPermissionIds = [];
+        const selectedCheckboxes = permissionCheckboxes?.querySelectorAll('input[type="checkbox"]:checked');
+        
+        if (selectedCheckboxes && selectedCheckboxes.length > 0) {
+            selectedCheckboxes.forEach(checkbox => {
+                selectedPermissionIds.push(parseInt(checkbox.value));
+            });
+        }
+
+        try {
+            await permissionStore.addPermissionGroup({
+                name,
+                enable: true,
+                powerids: selectedPermissionIds,
+            });
+
+            // 清空表单
+            if (groupNameInput) groupNameInput.value = '';
+            if (permissionCheckboxes) {
+                permissionCheckboxes.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            }
+
+            // 重新渲染并刷新关联数据
+            if (this._permissionContainer) {
+                this.renderPermissionGroups(this._permissionContainer);
+                // 刷新分配下拉框
+                this.updatePermissionDropdowns(this._permissionContainer);
+            }
+        } catch (error) {
+            // 错误已在 store 中处理
+        }
+    },
+
+    /**
+     * 处理删除权限组
+     */
+    async handleDeletePermissionGroup(id) {
+        try {
+            await permissionStore.deletePermissionGroup(id);
+
+            // 重新渲染并刷新关联数据
+            if (this._permissionContainer) {
+                this.renderPermissionGroups(this._permissionContainer);
+                // 刷新分配下拉框
+                this.updatePermissionDropdowns(this._permissionContainer);
+            }
+        } catch (error) {
+            // 错误已在 store 中处理
+        }
+    },
+
+    /**
+     * 处理分配权限
+     */
+    async handleAssignPermission() {
+        const playerIdSelect = document.getElementById('playerIdSelect');
+        const groupSelect = document.getElementById('groupSelect');
+        
+        const userId = playerIdSelect?.value;
+        const groupId = groupSelect?.value;
+
+        if (!userId) {
+            showToast('请选择一个有效用户', 'warning');
+            return;
+        }
+
+        if (!groupId) {
+            showToast('请选择权限组', 'warning');
+            return;
+        }
+
+        // 检查是否已经分配过
+        const state = permissionStore.getState();
+        const existingAssignment = state.assignments.find(
+            a => a.userid === parseInt(userId) && a.groupid === parseInt(groupId)
+        );
+        if (existingAssignment) {
+            showToast('该玩家已经分配了这个权限组', 'warning');
+            return;
+        }
+
+        try {
+            await permissionStore.assignPermission(
+                parseInt(userId),
+                parseInt(groupId)
+            );
+
+            // 清空表单
+            if (playerIdSelect) playerIdSelect.value = '';
+            if (groupSelect) groupSelect.value = '';
+
+            // 重新渲染
+            if (this._permissionContainer) {
+                this.renderAssignments(this._permissionContainer);
+            }
+        } catch (error) {
+            // 错误已在 store 中处理
+        }
+    },
+
+    /**
+     * 处理取消权限分配
+     */
+    async handleRemoveAssignment(id) {
+        try {
+            await permissionStore.removeAssignment(id);
+
+            // 重新渲染
+            if (this._permissionContainer) {
+                this.renderAssignments(this._permissionContainer);
+            }
+        } catch (error) {
+            // 错误已在 store 中处理
+        }
+    },
+
+    /**
+     * 处理切换权限状态
+     */
+    async handleTogglePermission(id, currentEnabled) {
+        try {
+            await permissionStore.togglePermission(id, !currentEnabled);
+
+            // 重新渲染并刷新关联数据
+            if (this._permissionContainer) {
+                this.renderPermissions(this._permissionContainer);
+                // 刷新权限组相关的复选框（禁用的权限不应该出现在创建组的选项中）
+                this.updatePermissionCheckboxes(this._permissionContainer);
+            }
+        } catch (error) {
+            // 错误已在 store 中处理
+        }
+    },
+
+    /**
+     * 处理切换权限组状态
+     */
+    async handleTogglePermissionGroup(id, currentEnabled) {
+        try {
+            await permissionStore.togglePermissionGroup(id, !currentEnabled);
+
+            // 重新渲染并刷新关联数据
+            if (this._permissionContainer) {
+                this.renderPermissionGroups(this._permissionContainer);
+                // 刷新分配下拉框（禁用的权限组不应该出现在分配选项中）
+                this.updatePermissionDropdowns(this._permissionContainer);
+            }
+        } catch (error) {
+            // 错误已在 store 中处理
+        }
+    },
+
     /**
      * 加载日志模块
      * @param {HTMLElement} container 容器
      */
     async loadLogModule(container) {
         try {
+            const html = await loadHtml.gmLog();
+            container.innerHTML = html;
+
+            // 保存容器引用
+            this._logContainer = container;
+
+            // 初始化日期范围
+            this.initLogDates(container);
+
+            // 绑定事件
+            this.bindLogEvents(container);
+
+            // 获取日志
             await logStore.fetchLogs();
-            // eventBus.emit(Events.NAVIGATE, { page: 'log' });
+
+            // 渲染日志
+            this.renderLogs(container);
+            this.updateLogPagination(container);
         } catch (error) {
             showToast(error.message || '加载失败', 'error');
             throw error;
+        }
+    },
+
+    /**
+     * 初始化日志日期
+     */
+    initLogDates(container) {
+        const today = new Date().toISOString().split('T')[0];
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+        const startDateInput = container.querySelector('#startDate');
+        const endDateInput = container.querySelector('#endDate');
+
+        if (startDateInput) startDateInput.value = yesterdayStr;
+        if (endDateInput) endDateInput.value = today;
+
+        // 设置 store 中的日期
+        logStore.setFilter({ startDate: yesterdayStr, endDate: today });
+    },
+
+    /**
+     * 绑定日志页面事件
+     */
+    bindLogEvents(container) {
+        // 查询表单
+        const queryForm = container.querySelector('#queryForm');
+        if (queryForm) {
+            queryForm.addEventListener('submit', (e) => this.handleLogQuery(e, container));
+        }
+
+        // 重置按钮
+        const resetBtn = container.querySelector('#resetBtn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => this.resetLogQuery(container));
+        }
+
+        // 表格视图按钮
+        const tableViewBtn = container.querySelector('#tableViewBtn');
+        if (tableViewBtn) {
+            tableViewBtn.addEventListener('click', () => this.switchLogView('table', container));
+        }
+
+        // 上一页
+        const prevPageBtn = container.querySelector('#prevPage');
+        if (prevPageBtn) {
+            prevPageBtn.addEventListener('click', () => this.logPrevPage(container));
+        }
+
+        // 下一页
+        const nextPageBtn = container.querySelector('#nextPage');
+        if (nextPageBtn) {
+            nextPageBtn.addEventListener('click', () => this.logNextPage(container));
+        }
+
+        // 排序事件
+        container.querySelectorAll('.sortable').forEach(th => {
+            th.addEventListener('click', () => {
+                const field = th.getAttribute('data-sort');
+                this.sortLogs(field, container);
+            });
+        });
+
+        // 切换视图按钮状态
+        const tableView = container.querySelector('#tableViewBtn');
+        if (tableView) {
+            tableView.classList.add('active');
+        }
+    },
+
+    /**
+     * 处理日志查询
+     */
+    handleLogQuery(e, container) {
+        e.preventDefault();
+
+        const username = container.querySelector('#username')?.value.trim() || '';
+        const ip = container.querySelector('#ip')?.value.trim() || '';
+        const level = container.querySelector('#level')?.value || 0;
+        const startDate = container.querySelector('#startDate')?.value || '';
+        const endDate = container.querySelector('#endDate')?.value || '';
+        const message = container.querySelector('#message')?.value.trim() || '';
+
+        logStore.setFilter({
+            username,
+            ip,
+            level: Number(level),
+            startDate,
+            endDate,
+            message
+        });
+
+        logStore.setPage(1);
+
+        this.loadLogsAndRender(container);
+    },
+
+    /**
+     * 重置日志查询
+     */
+    resetLogQuery(container) {
+        // 清空表单
+        const usernameInput = container.querySelector('#username');
+        const ipInput = container.querySelector('#ip');
+        const levelSelect = container.querySelector('#level');
+        const messageInput = container.querySelector('#message');
+
+        if (usernameInput) usernameInput.value = '';
+        if (ipInput) ipInput.value = '';
+        if (levelSelect) levelSelect.value = 0;
+        if (messageInput) messageInput.value = '';
+
+        // 重置日期
+        this.initLogDates(container);
+
+        // 重置 store
+        logStore.resetFilter();
+
+        // 重新加载
+        this.loadLogsAndRender(container);
+    },
+
+    /**
+     * 加载日志并渲染
+     */
+    async loadLogsAndRender(container) {
+        console.debug('loadLogsAndRender 被调用');
+        try {
+            const logs = await logStore.fetchLogs();
+            console.debug('fetchLogs 返回:', logs.length, '条日志');
+            this.renderLogs(container);
+            this.updateLogPagination(container);
+        } catch (error) {
+            console.error('loadLogsAndRender 错误:', error);
+            // 错误已在 store 中处理
+        }
+    },
+
+    /**
+     * 切换日志视图
+     */
+    switchLogView(view, container) {
+        logStore.switchView(view);
+
+        const tableViewBtn = container.querySelector('#tableViewBtn');
+        const tableView = container.querySelector('#tableView');
+
+        if (tableViewBtn) {
+            tableViewBtn.classList.toggle('active', view === 'table');
+        }
+        if (tableView) {
+            tableView.classList.toggle('hidden', view !== 'table');
+        }
+
+        this.renderLogs(container);
+    },
+
+    /**
+     * 排序日志
+     */
+    sortLogs(field, container) {
+        logStore.sortLogs(field);
+
+        // 更新排序指示器
+        this.updateSortIndicators(container);
+
+        this.renderLogs(container);
+    },
+
+    /**
+     * 更新排序指示器
+     */
+    updateSortIndicators(container) {
+        const state = logStore.getState();
+
+        container.querySelectorAll('.sortable i').forEach(icon => {
+            icon.className = 'fas fa-sort';
+        });
+
+        const currentTh = container.querySelector(`th[data-sort="${state.sortField}"] i`);
+        if (currentTh) {
+            currentTh.className = state.sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+        }
+    },
+
+    /**
+     * 渲染日志
+     */
+    renderLogs(container) {
+        const pageLogs = logStore.getPageLogs();
+        const state = logStore.getState();
+
+        // 确保 filteredLogs 存在
+        if (!state.filteredLogs) {
+            state.filteredLogs = [];
+        }
+
+        console.debug('renderLogs: pageLogs.length =', pageLogs.length, ', filteredLogs.length =', state.filteredLogs.length);
+
+        // 更新统计信息
+        const filteredLogsSpan = container.querySelector('#filteredLogs');
+        if (filteredLogsSpan) {
+            filteredLogsSpan.textContent = state.filteredLogs.length;
+        }
+
+        // 清空现有内容
+        const tableBody = container.querySelector('#logTableBody');
+        const cardView = container.querySelector('#cardView');
+        const noLogsTable = container.querySelector('#noLogsTable');
+
+        console.debug('DOM 元素: tableBody =', !!tableBody, ', noLogsTable =', !!noLogsTable);
+
+        if (tableBody) tableBody.innerHTML = '';
+        if (cardView) cardView.innerHTML = '';
+
+        if (pageLogs.length === 0) {
+            console.debug('没有日志数据，显示空状态');
+            if (noLogsTable) noLogsTable.style.display = 'block';
+            return;
+        }
+
+        if (noLogsTable) noLogsTable.style.display = 'none';
+
+        // 渲染表格视图
+        pageLogs.forEach(log => {
+            if (!tableBody) return;
+
+            const row = document.createElement('tr');
+            const levelMap = { 0: 'UNDEFINE', 1: 'DEBUG', 2: 'ERROR', 3: 'INFO', 4: 'WARNING' };
+            const levelLabel = levelMap[log.level] || 'UNDEFINE';
+
+            if (levelLabel === 'ERROR') row.classList.add('error-row');
+            if (levelLabel === 'WARNING') row.classList.add('warning-row');
+
+            const timeStr = new Date(log.time).toLocaleString('zh-CN');
+            const levelClassName = levelLabel.toLowerCase();
+
+            row.innerHTML = `
+                <td><strong>${log.username}</strong></td>
+                <td>${log.ip}</td>
+                <td><span class="log-level level-${levelClassName}">${levelLabel}</span></td>
+                <td>${timeStr}</td>
+                <td>${log.message}</td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    },
+
+    /**
+     * 更新日志分页
+     */
+    updateLogPagination(container) {
+        const state = logStore.getState();
+
+        // 确保 filteredLogs 存在
+        if (!state.filteredLogs) {
+            state.filteredLogs = [];
+        }
+
+        const totalPages = Math.ceil(state.filteredLogs.length / state.pageSize);
+
+        // 更新页面信息
+        const currentPageSpan = container.querySelector('#currentPage');
+        const totalPagesSpan = container.querySelector('#totalPages');
+
+        if (currentPageSpan) currentPageSpan.textContent = state.currentPage;
+        if (totalPagesSpan) totalPagesSpan.textContent = totalPages;
+
+        // 更新按钮状态
+        const prevPageBtn = container.querySelector('#prevPage');
+        const nextPageBtn = container.querySelector('#nextPage');
+
+        if (prevPageBtn) prevPageBtn.disabled = state.currentPage === 1;
+        if (nextPageBtn) nextPageBtn.disabled = state.currentPage === totalPages || totalPages === 0;
+
+        // 生成页码按钮
+        const pageNumbersContainer = container.querySelector('#pageNumbers');
+        if (!pageNumbersContainer) return;
+
+        pageNumbersContainer.innerHTML = '';
+
+        let startPage = Math.max(1, state.currentPage - 2);
+        let endPage = Math.min(totalPages, state.currentPage + 2);
+
+        if (endPage - startPage < 4) {
+            if (startPage === 1) {
+                endPage = Math.min(totalPages, startPage + 4);
+            } else if (endPage === totalPages) {
+                startPage = Math.max(1, endPage - 4);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = `page-number ${i === state.currentPage ? 'active' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.addEventListener('click', () => {
+                logStore.setPage(i);
+                this.renderLogs(container);
+                this.updateLogPagination(container);
+            });
+            pageNumbersContainer.appendChild(pageBtn);
+        }
+    },
+
+    /**
+     * 日志上一页
+     */
+    logPrevPage(container) {
+        const state = logStore.getState();
+        if (state.currentPage > 1) {
+            logStore.setPage(state.currentPage - 1);
+            this.renderLogs(container);
+            this.updateLogPagination(container);
+        }
+    },
+
+    /**
+     * 日志下一页
+     */
+    logNextPage(container) {
+        const state = logStore.getState();
+
+        // 确保 filteredLogs 存在
+        if (!state.filteredLogs) {
+            state.filteredLogs = [];
+        }
+
+        const totalPages = Math.ceil(state.filteredLogs.length / state.pageSize);
+        if (state.currentPage < totalPages) {
+            logStore.setPage(state.currentPage + 1);
+            this.renderLogs(container);
+            this.updateLogPagination(container);
         }
     },
     
@@ -468,6 +1332,8 @@ export const PageLoader = {
      */
     async loadUserProjects(container) {
         try {
+            const html = await loadHtml.gmProjectBox();
+            container.innerHTML = html;
             await projectStore.fetchUserProjects();
             // eventBus.emit(Events.DATA_LOADED, { type: 'userProjects', data: projectStore.getProjects() });
         } catch (error) {

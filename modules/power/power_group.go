@@ -39,7 +39,7 @@ func AddPermissionGroupHandler(ctx *web.WebContext, req *webmodel.AddPermissionG
 	}
 	insertData := &dbmodel.PowerGroup{
 		Name:   req.Name,
-		Enable: req.Enable,
+		Enable: &req.Enable,
 		ExtraData: &db_extra.PowerGroupExtra{
 			PowerIds: req.PowerIds,
 		},
@@ -96,7 +96,7 @@ func ModifyPermissionGroupHandler(ctx *web.WebContext, req *webmodel.ModifyPermi
 	}
 
 	powerGroupData.Name = req.Data.Name
-	powerGroupData.Enable = req.Data.Enable
+	powerGroupData.Enable = &req.Data.Enable
 	powerGroupData.ExtraData.PowerIds = req.Data.PowerIds
 	err = dao.UpdatePowerGroupData(powerGroupData.GroupId, powerGroupData)
 	if err != nil {
