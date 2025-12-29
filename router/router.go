@@ -19,8 +19,8 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine := web.NewEngine(addr, func() web.Context { return &web.WebContext{} })
 		templ := template.Must(template.New("").ParseFS(htmlEmbed, "templates/*.html"))
 		engine.SetHTMLTemplate(templ)
-		// 加载静态资源(比如图片,文件等)
-		engine.StaticFS("/assets", http.FS(assetsEmbed))
+		// 加载静态资源(比如图片,文件等) - 使用本地文件系统而不是 embed
+		engine.StaticFS("/assets", http.Dir("assets"))
 
 		controllerHandler, err := controller.Init()
 		if err != nil {

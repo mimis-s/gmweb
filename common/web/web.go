@@ -226,11 +226,25 @@ type Engine struct {
 func NewEngine(addr string, newContextFun func() Context) *Engine {
 	engine := &Engine{
 		addr:          addr,
-		ginEngine:     gin.Default(),
+		ginEngine:     gin.New(),
 		newContextFun: newContextFun,
 		GroupRoutes:   make(map[string]*RouterGroup),
 		Routes:        make(map[string]*RouteInfo),
 	}
+	// 添加中间件强制设置静态文件的 MIME 类型
+	engine.ginEngine.Use(func(c *gin.Context) {
+		path := c.Request.URL.Path
+		if strings.HasSuffix(path, ".js") {
+			c.Header("Content-Type", "application/javascript; charset=utf-8")
+		} else if strings.HasSuffix(path, ".css") {
+			c.Header("Content-Type", "text/css; charset=utf-8")
+		} else if strings.HasSuffix(path, ".json") {
+			c.Header("Content-Type", "application/json; charset=utf-8")
+		}
+		c.Next()
+	})
+	engine.ginEngine.Use(gin.Logger())
+	engine.ginEngine.Use(gin.Recovery())
 	return engine
 }
 func (e *Engine) SetHTMLTemplate(templ *template.Template) {
