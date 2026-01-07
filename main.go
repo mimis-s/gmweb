@@ -18,6 +18,9 @@ import (
 //go:embed templates
 var htmlEmbed embed.FS
 
+//go:embed assets
+var assetsEmbed embed.FS
+
 func newDefRegistry() *app.Registry {
 	s := app.NewRegistry(
 		app.AddRegistryBootConfigFile(boot_config.BootConfigData),
@@ -41,7 +44,7 @@ func newDefRegistry() *app.Registry {
 
 func main() {
 	s := newDefRegistry()
-	router.Init(s, htmlEmbed)
+	router.Init(s, htmlEmbed, assetsEmbed)
 	s.Run()
 }
 

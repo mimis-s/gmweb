@@ -13,14 +13,14 @@ import (
 	"github.com/mimis-s/zpudding/pkg/app"
 )
 
-func Init(s *app.Registry, htmlEmbed embed.FS) {
+func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 	s.AddAppOutSide(app.NewAppOutSide("all_in_one", func(a *app.App) error {
 		addr := boot_config.CustomBootFlagsData.IP + ":" + boot_config.CustomBootFlagsData.Port
 		engine := web.NewEngine(addr, func() web.Context { return &web.WebContext{} })
 		templ := template.Must(template.New("").ParseFS(htmlEmbed, "templates/*.html"))
 		engine.SetHTMLTemplate(templ)
 		// 加载静态资源(比如图片,文件等) - 使用本地文件系统而不是 embed
-		engine.StaticFS("/assets", http.Dir("assets"))
+		engine.StaticFS("/assets", http.FS(assetsEmbed))
 
 		controllerHandler, err := controller.Init()
 		if err != nil {
