@@ -13,7 +13,7 @@ import (
 	"github.com/mimis-s/zpudding/pkg/app"
 )
 
-func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
+func Init(s *app.Registry, htmlEmbed embed.FS) {
 	s.AddAppOutSide(app.NewAppOutSide("all_in_one", func(a *app.App) error {
 		addr := boot_config.CustomBootFlagsData.IP + ":" + boot_config.CustomBootFlagsData.Port
 		engine := web.NewEngine(addr, func() web.Context { return &web.WebContext{} })

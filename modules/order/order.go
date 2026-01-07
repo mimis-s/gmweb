@@ -270,6 +270,8 @@ func ModifyGmOrderHandler(ctx *web.WebContext, req *webmodel.ModifyGmOrderReq, r
 		Level:       orderData.Level,
 		OrderDesc:   orderData.Data.Desc,
 		OrderStruct: orderData.Data.OrderStruct,
+		Method:      orderData.Data.Method,
+		Path:        orderData.Data.Path,
 	}
 	dao.Info(ctx, "modify project:%v order:%v-%v Path:%v Method:%v is ok", req.ProjectId, orderData.Id, req.Data.OrderName, req.Data.Path, req.Data.Method)
 	return nil

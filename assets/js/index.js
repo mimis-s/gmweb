@@ -1,190 +1,233 @@
-import { api, apiClient, Endpoints } from './api/index.js';
+import {tabHomeSelectClass} from './modules/gm_tab_home/select.js';
 
-// 导入组件
-import { showToast, Toast, modal, confirm } from './components/index.js';
+// DOM元素
 
-// 导入工具函数
-import * as utils from './utils/index.js';
+const leftNav = document.getElementById('leftNav');
+const collapseBtn = document.getElementById('collapseBtn');
+const navMenu = document.querySelector('.nav-menu');
+const contentDisplay = document.getElementById('contentDisplay');
+const dynamicContent = document.getElementById('dynamicContent');
+const defaultContent = document.querySelector('.default-content');
+const addTabBtn = document.getElementById('addTabBtn');
+const removeTabBtn = document.getElementById('removeTabBtn');
+const resetTabsBtn = document.getElementById('resetTabsBtn');
 
-// 导入业务模块
-import { 
-    authStore, 
-    gmOrderStore, 
-    projectStore, 
-    userStore, 
-    permissionStore, 
-    logStore,
-    PageLoader,
-    NavigationManager,
-    initApp 
-} from './modules/index.js';
+// 跟踪动态添加的标签
+let dynamicTabs = [];
+let dynamicTabCounter = 0;
 
-/**
- * 应用配置
- */
-export const AppConfig = {
-    name: 'GMWeb',
-    version: '2.0.0',
-    apiBaseUrl: '',
-};
+// 最小化实现 - 只有核心功能
+(function() {
+    'use strict';
 
-/**
- * 全局状态
- */
-export const AppState = {
-    ready: false,
-    currentUser: null,
-    currentProject: null,
-};
+    const container = document.createElement('div');
+    container.className = 'toast-container-mini';
+    container.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 300px;
+    `;
+    document.body.appendChild(container);
 
-/**
- * 应用初始化
- */
-async function bootstrap() {
-    if (AppState.ready) return;
-    
-    try {
-        // 初始化认证状态
-        authStore.init();
-        
-        // 初始化应用状态
-        AppState.ready = true;
-        
-        console.log(`${AppConfig.name} v${AppConfig.version} 已启动`);
-        
-        // // 触发就绪事件
-        // eventBus.emit(Events.APP_READY);
-        
-    } catch (error) {
-        console.error('应用初始化失败:', error);
-        showToast('应用初始化失败', 'error');
-    }
-}
+    window.showToast = function(message, type = 'info', duration = 2000) {
+        const toast = document.createElement('div');
+        toast.className = `toast-mini ${type}`;
+        toast.style.cssText = `
+            background: white;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            border-left: 4px solid ${type === 'success' ? '#52c41a' :
+            type === 'error' ? '#ff4d4f' :
+                type === 'warning' ? '#faad14' : '#1890ff'};
+        `;
+        toast.textContent = message;
+        container.insertBefore(toast, container.firstChild);
 
-/**
- * 页面初始化
- */
-function initPage() {
-    console.log('initPage 被调用, pathname:', window.location.pathname);
-    
-    // 根据页面类型初始化
-    const path = window.location.pathname;
-    console.log('路径检测:', path);
-    
-    if (path.includes('gm_tab_home')) {
-        console.log('检测到 gm_tab_home 页面，调用 initApp...');
-        initApp();
-    } else if (path.includes('login')) {
-        console.log('检测到 login 页面，调用 initLoginPage...');
-        initLoginPage();
-    } else if (path.includes('register')) {
-        console.log('检测到 register 页面，调用 initRegisterPage...');
-        initRegisterPage();
-    } else {
-        console.log('未知页面类型');
-    }
-}
+        // 显示
+        setTimeout(() => {
+            toast.style.transform = 'translateX(0)';
+            toast.style.opacity = '1';
+        }, 10);
 
-/**
- * 登录页面初始化
- */
-function initLoginPage() {
-    const loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', handleLogin);
-    }
-}
+        // 移动其他提示框
+        Array.from(container.children).forEach((child, i) => {
+            child.style.top = `${i * 58}px`;
+        });
 
-/**
- * 处理登录
- */
-async function handleLogin() {
-    const username = document.getElementById('input-username')?.value;
-    const password = document.getElementById('input-password')?.value;
-    
-    if (!username || !password) {
-        showToast('请输入用户名和密码', 'warning');
-        return;
-    }
-    
-    try {
-        await authStore.login(username, password);
-    } catch (error) {
-        // 错误已在 authStore 中处理
-    }
-}
+        // 自动移除
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }, duration);
+    };
+})();
 
-/**
- * 注册页面初始化
- */
-function initRegisterPage() {
-    const registerBtn = document.getElementById('registerBtn');
-    if (registerBtn) {
-        registerBtn.addEventListener('click', handleRegister);
-    }
-}
-
-/**
- * 处理注册
- */
-async function handleRegister() {
-    const username = document.getElementById('register_lineedit_username')?.value;
-    const password = document.getElementById('register_lineedit_password')?.value;
-    const passwordAgain = document.getElementById('register_lineedit_passwordagain')?.value;
-    
-    if (!username || !password) {
-        showToast('请填写完整信息', 'warning');
-        return;
-    }
-    
-    if (password !== passwordAgain) {
-        showToast('两次密码不一致', 'error');
-        return;
-    }
-    
-    showToast('注册功能开发中', 'info');
-}
-
-// 导出所有公共 API
-export {
-    // 核心
-    // store,
-    // eventBus,
-    // Events,
-    
-    // API
-    api,
-    apiClient,
-    Endpoints,
-    
-    // 组件
-    showToast,
-    Toast,
-    modal,
-    confirm,
-    
-    // 工具
-    utils,
-    
-    // 模块
-    authStore,
-    gmOrderStore,
-    projectStore,
-    userStore,
-    permissionStore,
-    logStore,
-    PageLoader,
-    NavigationManager,
-    initApp,
-};
-
-// 自动初始化
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        bootstrap();
-        initPage();
+// 初始化导航菜单
+function initializeNav() {
+    // 导航项的点击事件
+    // gm操作点击事件
+    const navLinkGmOperation = document.getElementById('navLinkGmOperation');
+    navLinkGmOperation.addEventListener('click', function() {
+        onGmOperationclick(navLinkGmOperation);
     });
-} else {
-    bootstrap();
-    initPage();
+
+    // 项目管理
+    const navLinkGmProject = document.getElementById('navLinkGmProject');
+    navLinkGmProject.addEventListener('click', function() {
+        tabHomeSelectClass.loadGmProjectModule();
+    });
+
+    // 用户管理
+    const navLinkUsers = document.getElementById('navLinkUsers');
+    navLinkUsers.addEventListener('click', function() {
+        tabHomeSelectClass.loadUserMangementModule();
+    });
+
+    // 权限管理
+    const navLinkPermission = document.getElementById('navLinkPermission');
+    navLinkPermission.addEventListener('click', function() {
+        tabHomeSelectClass.loadPermissionModule();
+    });
+    // 日志管理
+    const navLinkLog = document.getElementById('navLinkLog');
+    navLinkLog.addEventListener('click', function() {
+        tabHomeSelectClass.loadGmLogModule();
+    });
+    window.showToast("在线")
 }
+
+// 点击gm操作页面
+function onGmOperationclick(navLinkGmOperation) {
+    const navLinks = document.querySelectorAll('.nav-link');
+    // e.preventDefault();
+    // 处理子菜单展开/折叠
+    const parentItem = navLinkGmOperation.closest('.has-submenu');
+    if (parentItem) {
+        // 如果点击的是有子菜单的项
+        if (!navLinkGmOperation.getAttribute('data-content')) {
+            parentItem.classList.toggle('open');
+            const submenu = parentItem.querySelector('.submenu');
+            tabHomeSelectClass.loadGmOrderProjectBriefModule(submenu);
+            return;
+        }
+    }
+    // 设置活动状态
+    navLinks.forEach(l => l.classList.remove('active'));
+    navLinkGmOperation.classList.add('active');
+
+    // 显示对应内容
+    const contentId = navLinkGmOperation.getAttribute('data-content');
+    if (contentId) {
+        showDynamicContent(contentId);
+    }
+}
+
+// 显示动态内容
+function showDynamicContent(contentId) {
+    // 隐藏默认内容，显示动态内容
+    defaultContent.style.display = 'none';
+    dynamicContent.style.display = 'block';
+
+    // 更新内容
+    dynamicContent.innerHTML = `
+        <div class="content-header">
+            <h1 class="content-title">${data.title}</h1>
+            <p class="content-subtitle">${data.subtitle}</p>
+        </div>
+        <div class="content-body">
+            ${data.content}
+        </div>
+        ${data.features ? `
+        <div class="features">
+            ${data.features.map(feature => `
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas ${feature.icon}"></i>
+                    </div>
+                    <h3 class="feature-title">${feature.title}</h3>
+                    <p>${feature.desc}</p>
+                </div>
+            `).join('')}
+        </div>
+        ` : ''}
+    `;
+
+    // 更新样式
+    contentDisplay.style.backgroundColor = data.bgColor;
+    contentDisplay.style.borderColor = data.borderColor;
+    contentDisplay.style.borderStyle = 'solid';
+    contentDisplay.classList.add('active');
+
+    // 添加进入动画
+    dynamicContent.style.animation = 'fadeInUp 0.5s ease';
+}
+
+// 显示默认内容
+function showDefaultContent() {
+    defaultContent.style.display = 'block';
+    dynamicContent.style.display = 'none';
+
+    // 重置样式
+    contentDisplay.style.backgroundColor = 'var(--white)';
+    contentDisplay.style.borderColor = 'var(--border-color)';
+    contentDisplay.style.borderStyle = 'dashed';
+    contentDisplay.classList.remove('active');
+}
+
+// 切换导航栏折叠状态
+collapseBtn.addEventListener('click', function() {
+    leftNav.classList.toggle('nav-collapsed');
+
+    // 在移动设备上使用不同的切换逻辑
+    if (window.innerWidth <= 1024) {
+        leftNav.classList.toggle('nav-expanded');
+    }
+
+    // 更新折叠按钮图标
+    const icon = this.querySelector('i');
+    if (leftNav.classList.contains('nav-collapsed')) {
+        icon.className = 'fas fa-chevron-right';
+        // 添加旋转动画
+        this.style.transform = 'rotate(180deg)';
+        setTimeout(() => {
+            this.style.transform = 'rotate(0deg)';
+        }, 300);
+    } else {
+        icon.className = 'fas fa-chevron-left';
+        // 添加旋转动画
+        this.style.transform = 'rotate(-180deg)';
+        setTimeout(() => {
+            this.style.transform = 'rotate(0deg)';
+        }, 300);
+    }
+});
+
+// 初始化
+initializeNav();
+
+// 添加导航栏悬停效果
+leftNav.addEventListener('mouseenter', function() {
+    if (window.innerWidth > 1024 && this.classList.contains('nav-collapsed')) {
+        this.style.boxShadow = 'var(--shadow-lg)';
+        this.style.transform = 'translateX(0) scale(1.02)';
+    }
+});
+
+leftNav.addEventListener('mouseleave', function() {
+    if (window.innerWidth > 1024 && this.classList.contains('nav-collapsed')) {
+        this.style.boxShadow = 'var(--shadow-md)';
+        this.style.transform = 'translateX(0) scale(1)';
+    }
+});

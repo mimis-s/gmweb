@@ -5,9 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GM命令大布局页面</title>
-    <link rel="stylesheet" href="assets/css/common.css">
-    <link rel="stylesheet" href="assets/gm_project_box/box.css">
-    <link rel="stylesheet" href="assets/gm_order_card/card.css">
+    <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -21,12 +19,15 @@
       <span>新增项目</span>
     </button>
 
+    <!-- 项目卡片容器 -->
+    <div id="gmProjectCardContainer" class="gm-project-card-container"></div>
+
     <!-- 添加项目模态框 -->
     <div class="project-modal" id="projectAddModal">
         <div class="project-modal-content">
             <div class="project-modal-header">
                 <h2 class="project-modal-title">新增项目</h2>
-                <button class="project-close-btn" onclick="closeAddProjectModal()">&times;</button>
+                <button class="project-close-btn" id="projectAddModalCloseBtn">&times;</button>
             </div>
             <form id="addForm">
                 <div class="project-form-group">
@@ -42,8 +43,8 @@
                     <input type="text" class="projet-input" id="editIPPath" required>
                 </div>
                 <div class="project-form-actions">
-                    <button type="button" class="project-btn project-btn-cancel" onclick="closeAddProjectModal()">取消</button>
-                    <button type="button" class="project-btn project-btn-save" onclick="saveAddProjectModal()">保存</button>
+                    <button type="button" class="project-btn project-btn-cancel" id="projectAddModalCloseBtn2">取消</button>
+                    <button type="button" class="project-btn project-btn-save" id="projectAddModalSaveBtn">保存</button>
                 </div>
             </form>
         </div>
