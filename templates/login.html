@@ -1,30 +1,454 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录</title>
+    <title>简约磨砂玻璃登录页面</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
 
-    <!-- <script type="text/javascript" src="assets/assets/js/websocket.js"></script> -->
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: whitesmoke;
+            overflow: hidden;
+            position: relative;
+        }
 
+        /* 背景容器 */
+        .background-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
 
-    <link rel="stylesheet" href="assets/css/login.css">
-    <script type="text/javascript" src="assets/js/login.js"></script>
+        /* 背景图片 */
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
 
+        .background-image.active {
+            opacity: 1;
+        }
+
+        /* 背景1 - 数字魅影 */
+        .bg1 {
+            background-image: url('assets/image/shuzimeiying.jpg');
+        }
+        /* 背景2 - 数字魅影2 */
+        .bg2 {
+            background-image: url('assets/image/shuzimeiying-2.jpg');
+        }
+
+        /* 磨砂玻璃效果遮罩层 */
+        .glass-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(8px);
+            z-index: 1;
+        }
+
+        /* 登录表单容器 */
+        .login-container {
+            position: relative;
+            width: 400px;
+            max-width: 90%;
+            padding: 40px 35px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 2;
+            transition: transform 0.3s ease;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+        }
+
+        /* 标题样式 */
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #fff;
+        }
+
+        .login-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .login-header p {
+            font-size: 1rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        /* 表单元素样式 */
+        .input-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-group input:focus + i {
+            color: #4dabf7;
+        }
+
+        /* 记住我和忘记密码 */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .remember-me input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            color: #4dabf7;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .forgot-password:hover {
+            color: #339af0;
+            text-decoration: underline;
+        }
+
+        /* 登录按钮 */
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #339af0, #228be6);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 25px;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #228be6, #1c7ed6);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 139, 230, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 注册链接 */
+        .register-link {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
+
+        .register-link a {
+            color: #4dabf7;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+            transition: color 0.3s;
+        }
+
+        .register-link a:hover {
+            color: #339af0;
+            text-decoration: underline;
+        }
+
+        /* 背景切换按钮 */
+        .bg-switcher {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 3;
+            display: flex;
+            gap: 10px;
+        }
+
+        .bg-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .bg-btn:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .bg-btn.active {
+            border-color: #4dabf7;
+            box-shadow: 0 0 10px rgba(77, 171, 247, 0.7);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 25px;
+            }
+
+            .login-header h1 {
+                font-size: 2rem;
+            }
+
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .bg-switcher {
+                bottom: 15px;
+                right: 15px;
+            }
+
+            .bg-btn {
+                width: 35px;
+                height: 35px;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <div id="login_window">
-        <div id="login_left">
-            {{template "login_lineedit" .}}
-            {{template "login_button" .}}
-        </div>
-        <div id="login_right">
-        </div>
+<!-- 背景容器 -->
+<div class="background-container">
+    <div class="background-image bg1 active"></div>
+    <div class="background-image bg2"></div>
+    <div class="glass-overlay"></div>
+</div>
+
+<!-- 登录表单 -->
+<div class="login-container">
+    <div class="login-header">
+        <h1>欢迎登录</h1>
+        <p>请输入您的账户信息</p>
     </div>
 
-</body>
+    <form id="loginForm">
+        <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" id="username" placeholder="用户名" required>
+        </div>
 
+        <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="密码" required>
+        </div>
+
+        <div class="form-options">
+            <label class="remember-me">
+                <input type="checkbox" id="remember">
+                <span>记住我(暂时不支持)</span>
+            </label>
+            <a href="#" class="forgot-password">忘记密码?</a>
+        </div>
+
+        <button type="submit" class="login-btn">登录</button>
+    </form>
+</div>
+
+<!-- 背景切换按钮 -->
+<div class="bg-switcher">
+    <div class="bg-btn active" style="background-image: url('assets/image/shuzimeiying.jpg');" data-bg="0"></div>
+    <div class="bg-btn" style="background-image: url('assets/image/shuzimeiying-2.jpg');" data-bg="0"></div>
+</div>
+
+<script>
+    // 表单提交处理
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        // const remember = document.getElementById('remember').checked;
+
+        // 简单验证
+        if (!username || !password) {
+            alert('请输入用户名和密码');
+            return;
+        }
+
+        // 模拟登录过程
+        const loginBtn = document.querySelector('.login-btn');
+        const originalText = loginBtn.textContent;
+
+        loginBtn.textContent = '登录中...';
+        loginBtn.disabled = true;
+        const loginReq = {
+            Username: username,
+            Password: password,
+        }
+        console.debug("登录", loginReq)
+
+        fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loginReq)
+        })
+        .then(response => {
+            const nextPage = response.headers.get('next-page');
+            console.log('返回:', response);
+            return response.json().then(data => {
+                return { data, nextPage, response };
+            });
+        })
+        .then(({ data, nextPage, response }) => {
+            console.log('成功:', data, nextPage);
+            window.location.href = nextPage;
+        })
+        .catch((error) => {
+            console.error('错误:', error);
+        });
+    });
+
+    // 背景切换功能
+    const bgButtons = document.querySelectorAll('.bg-btn');
+    const bgImages = document.querySelectorAll('.background-image');
+
+    bgButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const bgIndex = this.getAttribute('data-bg');
+
+            // 更新按钮状态
+            bgButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            // 切换背景图片
+            bgImages.forEach(img => img.classList.remove('active'));
+            bgImages[bgIndex].classList.add('active');
+        });
+    });
+
+    // 自动切换背景（每10秒）
+    let currentBgIndex = 0;
+
+    function autoSwitchBackground() {
+        currentBgIndex = (currentBgIndex + 1) % bgImages.length;
+
+        // 更新按钮状态
+        bgButtons.forEach(btn => btn.classList.remove('active'));
+        bgButtons[currentBgIndex].classList.add('active');
+
+        // 切换背景图片
+        bgImages.forEach(img => img.classList.remove('active'));
+        bgImages[currentBgIndex].classList.add('active');
+    }
+
+    // 开始自动切换（如需禁用，可注释掉下面这行）
+    setInterval(autoSwitchBackground, 10000);
+
+    // 添加一些交互效果
+    const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+
+    inputs.forEach(input => {
+        // 输入时添加焦点效果
+        input.addEventListener('focus', function() {
+            this.parentElement.querySelector('i').style.color = '#4dabf7';
+        });
+
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.querySelector('i').style.color = 'rgba(255, 255, 255, 0.7)';
+            }
+        });
+    });
+
+    // 忘记密码链接点击事件
+    document.querySelector('.forgot-password').addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('密码重置链接已发送到您的注册邮箱（模拟功能）');
+    });
+
+    // 注册链接点击事件
+    document.querySelector('.register-link a').addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('跳转到注册页面（模拟功能）');
+    });
+</script>
+</body>
 </html>

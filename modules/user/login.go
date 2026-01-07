@@ -19,10 +19,6 @@ func LoginHandler(ctx *web.WebContext, req *webmodel.GetUserReq, rsp *webmodel.G
 	// 在Header中返回下一个页面路径
 	var err error
 	var find bool
-	user := dao.GetSession(ctx)
-	if user != nil {
-		return nil
-	}
 	userDBData, find, err := dao.GetUserDataByName(req.Username)
 	if err != nil {
 		return err

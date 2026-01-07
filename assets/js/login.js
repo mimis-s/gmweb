@@ -1,10 +1,3 @@
-var worker;
-
-// 跳转到注册界面
-function TrunRegister() {
-    window.parent.frames[0].location = "register";
-}
-
 function Login() {
     var userID = document.getElementById("input-username")
     var password = document.getElementById("input-password")

@@ -38,17 +38,6 @@ func GetSession(ctx *web.WebContext) *CacheUser {
 	return nil
 }
 
-// // 如果用户缓存已经过期, 则强行改变用户界面到登陆界面
-// func GetSessionAndRedirectInit(ctx *web.WebContext) *sessions.Session {
-// 	session, _ := sessionStore.Get(ctx.GetGinContext().Request, "session1")
-// 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-// 		ctx.GetGinContext().Redirect(http.StatusFound, "/login")
-// 		return nil
-// 	}
-
-// 	return session
-// }
-
 func RedirectSession(ctx *web.WebContext) error {
 	session, _ := sessionStore.Get(ctx.GetGinContext().Request, "session1")
 	if auth, ok := session.Values["authenticated"].(bool); ok && auth {
@@ -79,7 +68,7 @@ func SetSeesion(ctx *web.WebContext, userData *dbmodel.User) *sessions.Session {
 		session.Values["tab_home"] = "/gm_tab_home_user"
 	}
 
-	maxAge := 24 * 7 * 60 * 60 // 7天
+	maxAge := 1 * 60 * 60 // 1个小时
 
 	// 记住我 - 设置30天过期
 	session.Options = &sessions.Options{
