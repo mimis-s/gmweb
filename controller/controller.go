@@ -56,8 +56,9 @@ func (c *ControllerHandler) PostApiLogin(ctx *web.WebContext, req *webmodel.GetU
 	rsp := &webmodel.GetUserRsp{}
 	err := user.LoginHandler(ctx, req, rsp)
 	if err != nil {
-		log.Errorf("login is err:%v", err)
-		ctx.Err("login is err:%v", err)
+		//log.Errorf("login is err:%v", err)
+		//ctx.Err("login is err:%v", err)
+		ctx.NextPage("/login")
 		return
 	}
 	log.Infof("user:%v login is ok", req.Username)
