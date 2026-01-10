@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>步骤审批流程界面</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!--    <style>-->
+<!--        * {-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            box-sizing: border-box;-->
+<!--            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;-->
+<!--        }-->
+
+<!--        body {-->
+<!--            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);-->
+<!--            min-height: 100vh;-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            align-items: center;-->
+<!--            padding: 30px 20px;-->
+<!--            color: #333;-->
+<!--        }-->
+
+<!--        .header {-->
+<!--            text-align: center;-->
+<!--            margin-bottom: 30px;-->
+<!--            width: 100%;-->
+<!--            max-width: 1000px;-->
+<!--        }-->
+
+<!--        h1 {-->
+<!--            color: #2c3e50;-->
+<!--            margin-bottom: 10px;-->
+<!--            font-size: 2.5rem;-->
+<!--        }-->
+
+<!--        .subtitle {-->
+<!--            color: #7f8c8d;-->
+<!--            font-size: 1.1rem;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        .container {-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            width: 100%;-->
+<!--            max-width: 1000px;-->
+<!--            gap: 20px;-->
+<!--        }-->
+
+<!--        .controls {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            align-items: center;-->
+<!--            background: white;-->
+<!--            padding: 20px;-->
+<!--            border-radius: 12px;-->
+<!--            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);-->
+<!--        }-->
+
+<!--        .stats {-->
+<!--            display: flex;-->
+<!--            gap: 20px;-->
+<!--        }-->
+
+<!--        .stat-item {-->
+<!--            text-align: center;-->
+<!--        }-->
+
+<!--        .stat-value {-->
+<!--            font-size: 1.8rem;-->
+<!--            font-weight: bold;-->
+<!--            color: #3498db;-->
+<!--        }-->
+
+<!--        .stat-label {-->
+<!--            font-size: 0.9rem;-->
+<!--            color: #7f8c8d;-->
+<!--            margin-top: 5px;-->
+<!--        }-->
+
+<!--        .add-message-btn {-->
+<!--            background: #3498db;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 12px 24px;-->
+<!--            border-radius: 8px;-->
+<!--            cursor: pointer;-->
+<!--            font-size: 1rem;-->
+<!--            font-weight: 600;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 10px;-->
+<!--            transition: all 0.3s ease;-->
+<!--            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);-->
+<!--        }-->
+
+<!--        .add-message-btn:hover {-->
+<!--            background: #2980b9;-->
+<!--            transform: translateY(-2px);-->
+<!--            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.4);-->
+<!--        }-->
+
+<!--        .messages-container {-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            gap: 30px;-->
+<!--            transition: all 0.4s ease;-->
+<!--        }-->
+
+<!--        .message {-->
+<!--            background: white;-->
+<!--            border-radius: 12px;-->
+<!--            padding: 25px;-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);-->
+<!--            transition: all 0.4s ease;-->
+<!--            position: relative;-->
+<!--            overflow: hidden;-->
+<!--            border-left: 4px solid #3498db;-->
+<!--            transform: translateY(0);-->
+<!--        }-->
+
+<!--        /* 增大悬浮幅度到15px */-->
+<!--        .message:hover {-->
+<!--            transform: translateY(-15px);-->
+<!--            box-shadow: 0 18px 25px rgba(0, 0, 0, 0.15);-->
+<!--        }-->
+
+<!--        .message-header {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            align-items: flex-start;-->
+<!--            margin-bottom: 25px;-->
+<!--        }-->
+
+<!--        .message-content {-->
+<!--            flex: 1;-->
+<!--        }-->
+
+<!--        .message-text {-->
+<!--            font-size: 1.2rem;-->
+<!--            margin-bottom: 8px;-->
+<!--            color: #2c3e50;-->
+<!--            font-weight: 600;-->
+<!--        }-->
+
+<!--        .message-time {-->
+<!--            font-size: 0.9rem;-->
+<!--            color: #95a5a6;-->
+<!--        }-->
+
+<!--        .message-actions {-->
+<!--            display: flex;-->
+<!--            gap: 12px;-->
+<!--        }-->
+
+<!--        .btn {-->
+<!--            padding: 10px 20px;-->
+<!--            border: none;-->
+<!--            border-radius: 8px;-->
+<!--            cursor: pointer;-->
+<!--            font-weight: 600;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 8px;-->
+<!--            transition: all 0.3s ease;-->
+<!--        }-->
+
+<!--        .btn-approve {-->
+<!--            background: #2ecc71;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .btn-approve:hover {-->
+<!--            background: #27ae60;-->
+<!--            transform: scale(1.05);-->
+<!--        }-->
+
+<!--        .btn-reject {-->
+<!--            background: #e74c3c;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .btn-reject:hover {-->
+<!--            background: #c0392b;-->
+<!--            transform: scale(1.05);-->
+<!--        }-->
+
+<!--        /* 步骤审批流程样式 */-->
+<!--        .approval-process {-->
+<!--            margin-top: 15px;-->
+<!--            position: relative;-->
+<!--            padding: 20px 0;-->
+<!--        }-->
+
+<!--        .process-title {-->
+<!--            font-size: 1rem;-->
+<!--            color: #7f8c8d;-->
+<!--            margin-bottom: 20px;-->
+<!--            font-weight: 600;-->
+<!--        }-->
+
+<!--        .steps-container {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            position: relative;-->
+<!--            margin-top: 10px;-->
+<!--        }-->
+
+<!--        .step {-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            align-items: center;-->
+<!--            position: relative;-->
+<!--            z-index: 2;-->
+<!--            flex: 1;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+
+<!--        .step:not(:last-child)::after {-->
+<!--            content: '';-->
+<!--            position: absolute;-->
+<!--            top: 15px;-->
+<!--            left: 60%;-->
+<!--            width: 80%;-->
+<!--            height: 3px;-->
+<!--            background-color: #e0e0e0;-->
+<!--            z-index: 1;-->
+<!--            transition: all 0.5s ease;-->
+<!--        }-->
+
+<!--        .step.completed:not(:last-child)::after {-->
+<!--            background-color: #2ecc71;-->
+<!--        }-->
+
+<!--        .step.rejected:not(:last-child)::after {-->
+<!--            background-color: #e74c3c;-->
+<!--        }-->
+
+<!--        .step-dot {-->
+<!--            width: 30px;-->
+<!--            height: 30px;-->
+<!--            border-radius: 50%;-->
+<!--            background-color: #e0e0e0;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            color: white;-->
+<!--            font-size: 0.9rem;-->
+<!--            font-weight: 600;-->
+<!--            margin-bottom: 10px;-->
+<!--            position: relative;-->
+<!--            z-index: 3;-->
+<!--            transition: all 0.5s ease;-->
+<!--            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);-->
+<!--        }-->
+
+<!--        .step.current .step-dot {-->
+<!--            background-color: #3498db;-->
+<!--            transform: scale(1.2);-->
+<!--        }-->
+
+<!--        .step.completed .step-dot {-->
+<!--            background-color: #2ecc71;-->
+<!--        }-->
+
+<!--        .step.rejected .step-dot {-->
+<!--            background-color: #e74c3c;-->
+<!--        }-->
+
+<!--        /* 圆点悬停效果 */-->
+<!--        .step-dot:hover {-->
+<!--            transform: scale(1.3);-->
+<!--            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);-->
+<!--        }-->
+
+<!--        .step.current .step-dot:hover {-->
+<!--            transform: scale(1.4);-->
+<!--        }-->
+
+<!--        .step-content {-->
+<!--            text-align: center;-->
+<!--            font-size: 0.9rem;-->
+<!--            color: #7f8c8d;-->
+<!--            padding: 0 5px;-->
+<!--            max-width: 120px;-->
+<!--            min-height: 40px;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--        }-->
+
+<!--        .step-number {-->
+<!--            font-size: 0.8rem;-->
+<!--            margin-bottom: 3px;-->
+<!--            color: #95a5a6;-->
+<!--        }-->
+
+<!--        /* 气泡框样式 */-->
+<!--        .bubble-tooltip {-->
+<!--            position: absolute;-->
+<!--            top: -90px;-->
+<!--            left: 50%;-->
+<!--            transform: translateX(-50%);-->
+<!--            background-color: #2c3e50;-->
+<!--            color: white;-->
+<!--            padding: 12px 16px;-->
+<!--            border-radius: 8px;-->
+<!--            font-size: 0.85rem;-->
+<!--            min-width: 180px;-->
+<!--            max-width: 220px;-->
+<!--            z-index: 100;-->
+<!--            opacity: 0;-->
+<!--            visibility: hidden;-->
+<!--            transition: all 0.3s ease;-->
+<!--            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);-->
+<!--            pointer-events: none;-->
+<!--        }-->
+
+<!--        .bubble-tooltip::after {-->
+<!--            content: '';-->
+<!--            position: absolute;-->
+<!--            top: 100%;-->
+<!--            left: 50%;-->
+<!--            transform: translateX(-50%);-->
+<!--            border-width: 8px;-->
+<!--            border-style: solid;-->
+<!--            border-color: #2c3e50 transparent transparent transparent;-->
+<!--        }-->
+
+<!--        .bubble-tooltip.show {-->
+<!--            opacity: 1;-->
+<!--            visibility: visible;-->
+<!--            top: -100px;-->
+<!--        }-->
+
+<!--        .bubble-title {-->
+<!--            font-weight: 600;-->
+<!--            margin-bottom: 5px;-->
+<!--            font-size: 0.95rem;-->
+<!--            color: #ecf0f1;-->
+<!--        }-->
+
+<!--        .bubble-desc {-->
+<!--            margin-bottom: 8px;-->
+<!--            line-height: 1.4;-->
+<!--            color: #bdc3c7;-->
+<!--        }-->
+
+<!--        .bubble-status {-->
+<!--            display: inline-block;-->
+<!--            padding: 3px 8px;-->
+<!--            border-radius: 4px;-->
+<!--            font-size: 0.75rem;-->
+<!--            font-weight: 600;-->
+<!--            margin-top: 5px;-->
+<!--        }-->
+
+<!--        .bubble-status.pending {-->
+<!--            background-color: #7f8c8d;-->
+<!--        }-->
+
+<!--        .bubble-status.current {-->
+<!--            background-color: #3498db;-->
+<!--        }-->
+
+<!--        .bubble-status.completed {-->
+<!--            background-color: #2ecc71;-->
+<!--        }-->
+
+<!--        .bubble-status.rejected {-->
+<!--            background-color: #e74c3c;-->
+<!--        }-->
+
+<!--        /* 状态标签样式 */-->
+<!--        .status-label {-->
+<!--            padding: 8px 16px;-->
+<!--            border-radius: 8px;-->
+<!--            font-weight: 600;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 8px;-->
+<!--            font-size: 0.95rem;-->
+<!--            transition: all 0.3s ease;-->
+<!--        }-->
+
+<!--        .status-label.approved {-->
+<!--            background-color: #f1f8f4;-->
+<!--            color: #2ecc71;-->
+<!--            border: 1px solid #d5e8dd;-->
+<!--        }-->
+
+<!--        .status-label.rejected {-->
+<!--            background-color: #fdf2f1;-->
+<!--            color: #e74c3c;-->
+<!--            border: 1px solid #f4d5d2;-->
+<!--        }-->
+
+<!--        .status-label.in-progress {-->
+<!--            background-color: #ebf5fb;-->
+<!--            color: #3498db;-->
+<!--            border: 1px solid #d6eaf8;-->
+<!--        }-->
+
+<!--        /* 已处理消息样式 */-->
+<!--        .message.processed {-->
+<!--            border-left-color: #95a5a6;-->
+<!--            opacity: 0.9;-->
+<!--        }-->
+
+<!--        .message.processed:hover {-->
+<!--            transform: translateY(-8px);-->
+<!--            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);-->
+<!--        }-->
+
+<!--        .message.processed .message-text {-->
+<!--            color: #7f8c8d;-->
+<!--        }-->
+
+<!--        .empty-state {-->
+<!--            text-align: center;-->
+<!--            padding: 60px 20px;-->
+<!--            background: white;-->
+<!--            border-radius: 12px;-->
+<!--            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);-->
+<!--        }-->
+
+<!--        .empty-icon {-->
+<!--            font-size: 4rem;-->
+<!--            color: #bdc3c7;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+
+<!--        .empty-text {-->
+<!--            color: #7f8c8d;-->
+<!--            font-size: 1.2rem;-->
+<!--        }-->
+
+<!--        .instructions {-->
+<!--            background: white;-->
+<!--            padding: 20px;-->
+<!--            border-radius: 12px;-->
+<!--            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);-->
+<!--            margin-top: 20px;-->
+<!--            width: 100%;-->
+<!--            max-width: 1000px;-->
+<!--        }-->
+
+<!--        .instructions h3 {-->
+<!--            color: #2c3e50;-->
+<!--            margin-bottom: 10px;-->
+<!--        }-->
+
+<!--        .instructions ul {-->
+<!--            padding-left: 20px;-->
+<!--            color: #7f8c8d;-->
+<!--        }-->
+
+<!--        .instructions li {-->
+<!--            margin-bottom: 8px;-->
+<!--        }-->
+
+<!--        @media (max-width: 900px) {-->
+<!--            .steps-container {-->
+<!--                flex-wrap: wrap;-->
+<!--                justify-content: flex-start;-->
+<!--                gap: 20px;-->
+<!--            }-->
+
+<!--            .step {-->
+<!--                flex: 0 0 calc(50% - 20px);-->
+<!--            }-->
+
+<!--            .step:not(:last-child)::after {-->
+<!--                display: none;-->
+<!--            }-->
+
+<!--            .bubble-tooltip {-->
+<!--                max-width: 160px;-->
+<!--                min-width: 140px;-->
+<!--                font-size: 0.8rem;-->
+<!--            }-->
+<!--        }-->
+
+<!--        @media (max-width: 600px) {-->
+<!--            .step {-->
+<!--                flex: 0 0 100%;-->
+<!--            }-->
+
+<!--            .message-header {-->
+<!--                flex-direction: column;-->
+<!--                gap: 15px;-->
+<!--            }-->
+
+<!--            .message-actions {-->
+<!--                align-self: flex-start;-->
+<!--            }-->
+
+<!--            .controls {-->
+<!--                flex-direction: column;-->
+<!--                gap: 20px;-->
+<!--            }-->
+
+<!--            .stats {-->
+<!--                order: 2;-->
+<!--            }-->
+<!--        }-->
+<!--    </style>-->
+</head>
+<body>
+<div class="header">
+    <h1>步骤审批流程中心</h1>
+    <p class="subtitle">处理待审批流程，点击同意或拒绝进行步骤审批</p>
+</div>
+
+<div class="container">
+    <div class="messages-container" id="gmReviewMessagesContainer">
+        <!-- 消息将通过JavaScript动态添加 -->
+    </div>
+</div>
+
+</body>
+</html>

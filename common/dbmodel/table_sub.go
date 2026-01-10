@@ -94,3 +94,16 @@ func (tb *PowerAssignMent) SubTable(baseValue int64) string {
 func (tb *PowerAssignMent) BindSubTreasury() ShardGroup {
 	return ShardGroupTag_AllInOne
 }
+
+// 审核表
+func (tb *Review) SubTableNum() int {
+	return 1
+}
+
+func (tb *Review) SubTable(baseValue int64) string {
+	return subName(tb.SubName(), baseValue, tb.SubTableNum())
+}
+
+func (tb *Review) BindSubTreasury() ShardGroup {
+	return ShardGroupTag_AllInOne
+}

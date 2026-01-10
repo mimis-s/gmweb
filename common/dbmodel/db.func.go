@@ -85,3 +85,15 @@ func (tb *PowerAssignMent) String() string {
 	}
 	return string(data)
 }
+
+func (tb *Review) SubName() string {
+	return "review"
+}
+
+func (tb *Review) String() string {
+	data, err := json.Marshal(tb)
+	if err != nil {
+		return err.Error()
+	}
+	return string(data)
+}

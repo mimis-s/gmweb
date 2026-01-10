@@ -41,6 +41,10 @@ func InitSync(orm *xorm.Engine) error {
 	if err != nil {
 		fmt.Print(fmt.Errorf("sync &PowerAssignMent error:%v", err))
 	}
+	err = sync(orm, &Review{})
+	if err != nil {
+		fmt.Print(fmt.Errorf("sync &Review error:%v", err))
+	}
 
 	return nil
 }
@@ -56,6 +60,7 @@ func GetShardInfo() map[string]DbTableInterface {
 	info["gm_order"] = new(GmOrder)
 	info["operation_log"] = new(OperationLog)
 	info["power_assign_ment"] = new(PowerAssignMent)
+	info["review"] = new(Review)
 
 	return info
 }

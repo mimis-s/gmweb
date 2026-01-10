@@ -87,3 +87,16 @@ type OperationLog struct {
 	UpdatedAt  time.Time `xorm:"updated"`
 	DeletedAt  time.Time `xorm:"deleted"`
 }
+
+// 审核表
+type Review struct {
+	Id        int64                     `xorm:"id not null pk autoincr comment('主键') BIGINT"`
+	ProjectId int64                     `xorm:"not null BIGINT"`
+	OrderId   string                    `xorm:"not null BIGINT"`
+	UserId    int64                     `xorm:"not null BIGINT"` // 发送gm命令的人
+	ExtraData *db_extra.ExtraReviewStep `xorm:"comment('#*db_extra.ExtraReviewStep#') JSON" json:"data,omitempty"`
+	StartDate int64                     `xorm:"not null BIGINT"` // 申请审核的时间(作为查询条件)
+	CreatedAt time.Time                 `xorm:"created"`
+	UpdatedAt time.Time                 `xorm:"updated"`
+	DeletedAt time.Time                 `xorm:"deleted"`
+}

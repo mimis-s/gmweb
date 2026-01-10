@@ -320,3 +320,30 @@ type GmLogInfo struct {
 type GetGmLogRsp struct {
 	Datas []*GmLogInfo `json:"datas"`
 }
+
+type ReviewStep struct {
+	UserId     int64  `json:"user_id"`     // 当前步骤的审批人
+	Status     int    `json:"status"`      // 状态(1:成功, 2:等待审批, 3:失败)
+	ReviewTime int64  `json:"review_time"` // 审核时间
+	Desc       string `json:"desc"`        // 步骤具体信息(可以填当前步骤的gm命令,也可以是执行之后的返回值)
+}
+
+type ReviewInfo struct {
+	ProjectId   int64         `json:"project_id"`
+	ProjectName string        `json:"project_name"`
+	OrderId     string        `json:"order_id"`
+	OrderName   string        `json:"order_name"`
+	OrderDesc   string        `json:"order_desc"`
+	UserId      int64         `json:"user_id"`
+	UserName    string        `json:"user_name"`
+	ResultData  []*ReviewStep `json:"result_data"` // 执行步骤
+	StartDate   int64         `json:"start_date"`  // 申请审核的时间(作为查询条件)
+}
+
+// 获取审核信息
+type GetReviewReq struct {
+	StartTime int64 `json:"starttime"` // 日期范围过滤(申请时间为标准)
+	EndTime   int64 `json:"endtime"`   // 日期范围过滤(申请时间为标准)
+}
+type GetReviewRsp struct {
+}
