@@ -23,6 +23,19 @@ func FindUserDatas(userIds []int64) ([]*dbmodel.User, error) {
 	return rets, nil
 }
 
+func FindUserDatasToMap(userIds []int64) (map[int64]*dbmodel.User, error) {
+	rets := make([]*dbmodel.User, 0)
+	err := daoHandler.db.ReadEngine().Table((&dbmodel.User{}).SubTable(0)).In("rid", userIds).Find(&rets)
+	if err != nil {
+		return nil, err
+	}
+	retMap := make(map[int64]*dbmodel.User)
+	for _, ret := range rets {
+		retMap[ret.Rid] = ret
+	}
+	return retMap, nil
+}
+
 func GetUserDataByName(userName string) (*dbmodel.User, bool, error) {
 	ret := &dbmodel.User{}
 	find, err := daoHandler.db.ReadEngine().Table(ret.SubTable(0)).Where("name=?", userName).Get(ret)

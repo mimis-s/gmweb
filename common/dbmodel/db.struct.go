@@ -68,6 +68,7 @@ type GmOrder struct {
 	Level     int                    `xorm:"not null INT"`
 	ProjectId int64                  `xorm:"project_id not null BIGINT"`
 	Name      string                 `xorm:"not null VARCHAR(255)"`
+	Desc      string                 `xorm:"not null VARCHAR(255)"`
 	Data      *db_extra.GmOrderExtra `xorm:"comment('#*db_extra.GmOrderExtra#') JSON" json:"data,omitempty"`
 	CreatedAt time.Time              `xorm:"created"`
 	UpdatedAt time.Time              `xorm:"updated"`
@@ -92,7 +93,7 @@ type OperationLog struct {
 type Review struct {
 	Id        int64                     `xorm:"id not null pk autoincr comment('主键') BIGINT"`
 	ProjectId int64                     `xorm:"not null BIGINT"`
-	OrderId   string                    `xorm:"not null BIGINT"`
+	OrderId   int64                     `xorm:"not null BIGINT"`
 	UserId    int64                     `xorm:"not null BIGINT"` // 发送gm命令的人
 	ExtraData *db_extra.ExtraReviewStep `xorm:"comment('#*db_extra.ExtraReviewStep#') JSON" json:"data,omitempty"`
 	StartDate int64                     `xorm:"not null BIGINT"` // 申请审核的时间(作为查询条件)

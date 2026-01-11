@@ -1,5 +1,7 @@
 package webmodel
 
+import "github.com/mimis-s/gmweb/common/define"
+
 type GetUserReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -322,16 +324,17 @@ type GetGmLogRsp struct {
 }
 
 type ReviewStep struct {
-	UserId     int64  `json:"user_id"`     // 当前步骤的审批人
-	Status     int    `json:"status"`      // 状态(1:成功, 2:等待审批, 3:失败)
-	ReviewTime int64  `json:"review_time"` // 审核时间
-	Desc       string `json:"desc"`        // 步骤具体信息(可以填当前步骤的gm命令,也可以是执行之后的返回值)
+	UserId     int64                       `json:"user_id"` // 当前步骤的审批人
+	UserName   string                      `json:"user_name"`
+	Status     define.EnumReviewStepStatus `json:"status"`      // 状态(1:成功, 2:等待审批, 3:失败)
+	ReviewTime int64                       `json:"review_time"` // 审核时间
+	Desc       string                      `json:"desc"`        // 步骤具体信息(可以填当前步骤的gm命令,也可以是执行之后的返回值)
 }
 
 type ReviewInfo struct {
 	ProjectId   int64         `json:"project_id"`
 	ProjectName string        `json:"project_name"`
-	OrderId     string        `json:"order_id"`
+	OrderId     int64         `json:"order_id"`
 	OrderName   string        `json:"order_name"`
 	OrderDesc   string        `json:"order_desc"`
 	UserId      int64         `json:"user_id"`
@@ -342,8 +345,28 @@ type ReviewInfo struct {
 
 // 获取审核信息
 type GetReviewReq struct {
+	ProjectId int64 `json:"projectid"` // 按照项目来划分
 	StartTime int64 `json:"starttime"` // 日期范围过滤(申请时间为标准)
 	EndTime   int64 `json:"endtime"`   // 日期范围过滤(申请时间为标准)
 }
 type GetReviewRsp struct {
+	Datas []*ReviewInfo `json:"datas"`
+}
+
+// 获取某个人的一条gm命令的审核信息
+type GetUserOrderReviewReq struct {
+	OrderId int64 `json:"orderid"`
+}
+type GetUserOrderReviewRsp struct {
+	Datas []*ReviewInfo `json:"datas"`
+}
+
+// 审核命令
+type OrderReviewStepReq struct {
+	ReviewId int64 `json:"reviewid"` // 审核id
+	IsAgree  bool  `json:"is_agree"` // 是否同意(true:同意, false:拒绝)
+}
+
+type OrderReviewStepRsp struct {
+	Data *ReviewInfo `json:"data"`
 }

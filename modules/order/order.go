@@ -13,91 +13,6 @@ import (
 	"github.com/mimis-s/gmweb/dao"
 )
 
-// 获取普通用户权限内的命令
-func getRegularUserOrder(ctx *web.WebContext, projectId int64, user *dao.CacheUser) ([]*dbmodel.GmOrder, error) {
-	powerAssignmentDatas, err := dao.GetPowerAssignmentDataByUserId(user.Rid)
-	if err != nil {
-		dao.Error(ctx, err.Error())
-		return nil, err
-	}
-
-	powerGroups := make([]int64, 0)
-	for _, powerAssignmentData := range powerAssignmentDatas {
-		powerGroups = append(powerGroups, powerAssignmentData.GroupId)
-	}
-
-	// 查询权限组数据
-	powerGroupDBDatas, err := dao.FindEnabelPowerGroupDatas(powerGroups)
-	if err != nil {
-		dao.Error(ctx, err.Error())
-		return nil, err
-	}
-
-	// 收集所有权限ID
-	allPowerIds := make([]int64, 0, len(powerGroupDBDatas))
-	for _, data := range powerGroupDBDatas {
-		if data.ExtraData == nil {
-			continue
-		}
-		allPowerIds = append(allPowerIds, data.ExtraData.PowerIds...)
-	}
-
-	// 如果没有权限ID，则直接返回
-	if len(allPowerIds) == 0 {
-		dao.Error(ctx, "get project:%v orders powers:%v is ok", projectId, allPowerIds)
-		return make([]*dbmodel.GmOrder, 0), nil
-	}
-
-	// 查询权限数据
-	powerDBDatas, err := dao.FindEnablePowerDatas(allPowerIds)
-	if err != nil {
-		dao.Error(ctx, err.Error())
-		return nil, err
-	}
-
-	// 提取符合条件的命令
-	orderDatas := make([]*dbmodel.GmOrder, 0)
-	if projectId == 0 {
-		orderDatas, err = dao.GetAllOrderDatas()
-	} else {
-		orderDatas, err = dao.GetOrderDatasByProjectId(projectId)
-	}
-	if err != nil {
-		dao.Error(ctx, err.Error())
-		return nil, err
-	}
-
-	judgePower := func(orderData *dbmodel.GmOrder) bool {
-		if user.Role == define.EnumRole_Administrator {
-			return true
-		}
-		for _, powerData := range powerDBDatas {
-			if powerData.ProjectId == 0 || powerData.ProjectId == projectId {
-				if powerData.Data.Level == 0 || powerData.Data.Level == orderData.Level {
-					re := regexp.MustCompile(powerData.Data.OrderNameMatch)
-					if re.MatchString(orderData.Name) {
-						return true
-					}
-				}
-			}
-		}
-		return false
-	}
-
-	retOrderDatas := make([]*dbmodel.GmOrder, 0)
-
-	for _, orderData := range orderDatas {
-		if judgePower(orderData) {
-			retOrderDatas = append(retOrderDatas, orderData)
-		}
-	}
-	return retOrderDatas, nil
-}
-
-func getAdminUserOrder(ctx *web.WebContext, projectId int64, user *dao.CacheUser) ([]*dbmodel.GmOrder, error) {
-	return dao.GetOrderDatasByProjectId(projectId)
-}
-
 func GetGmOrderBoxReq(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq, rsp *webmodel.GetGmOrderBoxRsp) error {
 	user := dao.GetSession(ctx)
 	if user == nil {
@@ -119,14 +34,9 @@ func GetGmOrderBoxReq(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq, rsp *
 		return err
 	}
 
-	orderDatas := make([]*dbmodel.GmOrder, 0)
-	switch user.Role {
-	case define.EnumRole_Regular:
-		orderDatas, err = getRegularUserOrder(ctx, req.ProjectId, user)
-	case define.EnumRole_Administrator:
-		orderDatas, err = getAdminUserOrder(ctx, req.ProjectId, user)
-	}
+	orderDatas, _, err := dao.GetUserOrderByReview(ctx, req.ProjectId, user, define.EnumPowerReview_run)
 	if err != nil {
+		dao.Error(ctx, err.Error())
 		return err
 	}
 
@@ -315,21 +225,18 @@ func SendGmOrderHandler(ctx *web.WebContext, req *webmodel.SendGmOrderReq, rsp *
 		return err
 	}
 
+	_, orderIds, err := dao.GetUserOrderByReview(ctx, orderData.ProjectId, user, define.EnumPowerReview_run)
+	if err != nil {
+		dao.Error(ctx, err.Error())
+		return err
+	}
 	bSend := false
-	switch user.Role {
-	case define.EnumRole_Regular:
-		orderDatas, err := getRegularUserOrder(ctx, orderData.ProjectId, user)
-		if err != nil {
-			return err
+
+	for _, orderId := range orderIds {
+		if orderId == orderData.Id {
+			bSend = true
+			break
 		}
-		for _, order := range orderDatas {
-			if order.Id == orderData.Id {
-				bSend = true
-				break
-			}
-		}
-	case define.EnumRole_Administrator:
-		bSend = true
 	}
 
 	if !bSend {
