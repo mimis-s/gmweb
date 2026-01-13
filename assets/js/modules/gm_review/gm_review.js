@@ -209,7 +209,7 @@ export function createGmReviewClass() {
             messageElement.innerHTML = `
                 <div class="message-header">
                     <div class="message-content">
-                        <div class="message-text">${message.ordername}(${message.projectname})</div>
+                        <div class="message-text">${message.orderdesc}-${message.ordername}(${message.projectname})</div>
                         <div class="message-time">${startTimeStr}</div>
                     </div>
                     ${actionContent}
@@ -269,7 +269,6 @@ export function createGmReviewClass() {
                 [...pendingMessages, ...processedMessages].forEach(message => {
                     const messageElement = document.createElement('div');
                     this.createMessageElement(message,messageElement);
-                    console.debug("渲染消息:", messageElement)
                     messagesContainer.appendChild(messageElement);
                 });
             } catch (error) {
