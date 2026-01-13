@@ -28,7 +28,7 @@ export function createGmReviewClass() {
         },
 
         // 创建步骤审批流程HTML
-        async createStepsHTML(reviewId) {
+        async createStepsHTML(message) {
             let stepsHTML = '<div class="approval-process">';
             stepsHTML += '<div class="process-title">审批流程</div>';
             stepsHTML += '<div class="steps-container">';
@@ -44,7 +44,7 @@ export function createGmReviewClass() {
             let stepIds = [0, 1, 2];
             let stepIdName = ["GM请求", "审核", "完成"];
             stepIds.forEach((stepId, index) => {
-                const step = this.state.stepDefinitions.find(s => s.id === stepId);
+                const step = message.resultdata.find(s => s.stepid === stepId);
                 let stepClass = "step";
                 if (step) {
                     if (step.status === 0) { // 成功
@@ -57,7 +57,7 @@ export function createGmReviewClass() {
                 }
 
                 stepsHTML += `
-                    <div class="${stepClass}" data-step-index="${stepId}" data-message-id="${reviewId}">
+                    <div class="${stepClass}" data-step-index="${stepId}" data-message-id="${message.id}">
                         <div class="step-dot">
                             ${stepId + 1}
                         </div>
@@ -163,13 +163,11 @@ export function createGmReviewClass() {
 
         // 创建消息元素
         async createMessageElement(message, messageElement) {
-            console.debug("创建消息元素:", message)
             // const messageElement = document.createElement('div');
             messageElement.className = `message ${message.nextstep !== 3 ? 'processed' : ''}`;
             messageElement.dataset.id = message.id;
 
             const messageStatus = message.resultdata.find(item => item.stepid === 1)
-            console.debug("messageStatus:", messageStatus)
 
             // 根据状态创建不同的内容
             let actionContent = `
@@ -203,7 +201,7 @@ export function createGmReviewClass() {
             }
 
             // 创建步骤审批HTML
-            const stepsHTML = await this.createStepsHTML(message.id);
+            const stepsHTML = await this.createStepsHTML(message);
             const startDate = new Date(Number(message.startdate));
             const startTimeStr = new Date(startDate).toLocaleString('zh-CN');
             messageElement.innerHTML = `
