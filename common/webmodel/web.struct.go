@@ -41,7 +41,7 @@ type SendGmOrderReq struct {
 }
 
 type SendGmOrderRsp struct {
-	Data interface{} `json:"data"`
+	Data *ReviewInfo `json:"data"`
 }
 
 type GetGmProjectBoxReq struct {
@@ -178,6 +178,7 @@ type PermissionInfo struct {
 	ProjectName    string `json:"projectname"`    // 项目名字
 	Level          int    `json:"level"`          // 命令的等级(为0匹配所有level)
 	OrderNameMatch string `json:"ordernamematch"` // 命令字符串匹配(在level下面匹配命令)
+	OrderReviews   []int  `json:"orderreviews"`   // 对于这些gm命令的权限(1: 运行, 2: 审核)
 }
 
 type PermissionGroupUserInfo struct {
@@ -324,23 +325,25 @@ type GetGmLogRsp struct {
 }
 
 type ReviewStep struct {
-	UserId     int64                       `json:"user_id"` // 当前步骤的审批人
-	UserName   string                      `json:"user_name"`
-	Status     define.EnumReviewStepStatus `json:"status"`      // 状态(1:成功, 2:等待审批, 3:失败)
-	ReviewTime int64                       `json:"review_time"` // 审核时间
-	Desc       string                      `json:"desc"`        // 步骤具体信息(可以填当前步骤的gm命令,也可以是执行之后的返回值)
+	StepId     int                         `json:"stepid"`
+	UserId     int64                       `json:"userid"` // 当前步骤的审批人
+	UserName   string                      `json:"username"`
+	Status     define.EnumReviewStepStatus `json:"status"`     // 状态(1:成功, 2:等待审批, 3:失败)
+	ReviewTime int64                       `json:"reviewtime"` // 审核时间
+	Desc       string                      `json:"desc"`       // 步骤具体信息(可以填当前步骤的gm命令,也可以是执行之后的返回值)
 }
 
 type ReviewInfo struct {
-	ProjectId   int64         `json:"project_id"`
-	ProjectName string        `json:"project_name"`
-	OrderId     int64         `json:"order_id"`
-	OrderName   string        `json:"order_name"`
-	OrderDesc   string        `json:"order_desc"`
-	UserId      int64         `json:"user_id"`
-	UserName    string        `json:"user_name"`
-	ResultData  []*ReviewStep `json:"result_data"` // 执行步骤
-	StartDate   int64         `json:"start_date"`  // 申请审核的时间(作为查询条件)
+	ProjectId   int64                `json:"projectid"`
+	ProjectName string               `json:"projectname"`
+	OrderId     int64                `json:"orderid"`
+	OrderName   string               `json:"ordername"`
+	OrderDesc   string               `json:"orderdesc"`
+	UserId      int64                `json:"userid"`
+	UserName    string               `json:"username"`
+	NextStep    define.EnumOrderStep `json:"nextstep"`
+	ResultData  []*ReviewStep        `json:"resultdata"` // 执行步骤
+	StartDate   int64                `json:"startdate"`  // 申请审核的时间(作为查询条件)
 }
 
 // 获取审核信息

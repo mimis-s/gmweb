@@ -9,16 +9,22 @@ import (
 )
 
 // 获取用户权限内的命令(review类型 -> 1: 执行权限 2: 审核权限)
-func GetUserOrderByReview(ctx *web.WebContext, projectId int64, user *CacheUser, reviewStatus define.EnumPowerReview) (
+func GetUserOrderByReview(ctx *web.WebContext, projectId int64, user *CacheUser, reviewStatus ...define.EnumPowerReview) (
 	[]*dbmodel.GmOrder, []int64, error) {
+	var orderDatas []*dbmodel.GmOrder
+	var err error
+	if projectId == 0 {
+		orderDatas, err = GetAllOrderDatas()
+	} else {
+		orderDatas, err = GetOrderDatasByProjectId(projectId)
+	}
 	if user.Role == define.EnumRole_Administrator {
-		adminDatas, err := GetOrderDatasByProjectId(projectId)
 		if err != nil {
 			return nil, nil, err
 		}
 		rets := make([]*dbmodel.GmOrder, 0)
 		retIds := make([]int64, 0)
-		for _, data := range adminDatas {
+		for _, data := range orderDatas {
 			retIds = append(retIds, data.Id)
 			rets = append(rets, data)
 		}
@@ -63,12 +69,6 @@ func GetUserOrderByReview(ctx *web.WebContext, projectId int64, user *CacheUser,
 	}
 
 	// 提取符合条件的命令
-	orderDatas := make([]*dbmodel.GmOrder, 0)
-	if projectId == 0 {
-		orderDatas, err = GetAllOrderDatas()
-	} else {
-		orderDatas, err = GetOrderDatasByProjectId(projectId)
-	}
 	if err != nil {
 		return nil, nil, err
 	}
@@ -77,8 +77,13 @@ func GetUserOrderByReview(ctx *web.WebContext, projectId int64, user *CacheUser,
 		for _, powerData := range powerDBDatas {
 			bReview := false
 			for _, review := range powerData.Data.OrderReviews {
-				if review == reviewStatus {
-					bReview = true
+				for _, reviewStatusData := range reviewStatus {
+					if review == reviewStatusData {
+						bReview = true
+						break
+					}
+				}
+				if bReview {
 					break
 				}
 			}

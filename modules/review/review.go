@@ -2,13 +2,12 @@ package review
 
 import (
 	"fmt"
-	"time"
 
-	"github.com/mimis-s/gmweb/common/dbmodel/db_extra"
 	"github.com/mimis-s/gmweb/common/define"
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
 	"github.com/mimis-s/gmweb/dao"
+	"github.com/mimis-s/gmweb/modules/gm_common"
 )
 
 // 按照时间查询审核数据
@@ -34,12 +33,12 @@ func GetReviewHandler(ctx *web.WebContext, req *webmodel.GetReviewReq, rsp *webm
 	for _, data := range datas {
 		reviewModelData := &webmodel.ReviewInfo{
 			ProjectId:   data.ReviewDB.ProjectId,
-			ProjectName: data.ProjectName,
+			ProjectName: data.ProjectDB.Name,
 			OrderId:     data.ReviewDB.OrderId,
-			OrderName:   data.OrderName,
-			OrderDesc:   data.OrderDesc,
+			OrderName:   data.OrderDB.Name,
+			OrderDesc:   data.OrderDB.Desc,
 			UserId:      data.ReviewDB.UserId,
-			UserName:    data.UserName,
+			UserName:    data.UserDB.Name,
 			ResultData:  make([]*webmodel.ReviewStep, 0),
 			StartDate:   data.ReviewDB.StartDate,
 		}
@@ -72,12 +71,12 @@ func GetUserOrderReviewHandler(ctx *web.WebContext, req *webmodel.GetUserOrderRe
 	for _, data := range datas {
 		reviewModelData := &webmodel.ReviewInfo{
 			ProjectId:   data.ReviewDB.ProjectId,
-			ProjectName: data.ProjectName,
+			ProjectName: data.ProjectDB.Name,
 			OrderId:     data.ReviewDB.OrderId,
-			OrderName:   data.OrderName,
-			OrderDesc:   data.OrderDesc,
+			OrderName:   data.OrderDB.Name,
+			OrderDesc:   data.OrderDB.Desc,
 			UserId:      data.ReviewDB.UserId,
-			UserName:    data.UserName,
+			UserName:    data.UserDB.Name,
 			ResultData:  make([]*webmodel.ReviewStep, 0),
 			StartDate:   data.ReviewDB.StartDate,
 		}
@@ -112,52 +111,58 @@ func OrderReviewStepHandler(ctx *web.WebContext, req *webmodel.OrderReviewStepRe
 		dao.Error(ctx, "order review step：%v %v is not found", req.ReviewId, req.IsAgree)
 		return err
 	}
-	if reviewData.ExtraData.NextStepId != define.EnumOrderStep_review {
+	if reviewData.ReviewDB.ExtraData.NextStepId != define.EnumOrderStep_review {
 		err = fmt.Errorf("order review step：%v %v, next step:%v is err",
-			req.ReviewId, req.IsAgree, reviewData.ExtraData.NextStepId)
+			req.ReviewId, req.IsAgree, reviewData.ReviewDB.ExtraData.NextStepId)
 		dao.Error(ctx, "order review step：%v %v, next step:%v is err",
-			req.ReviewId, req.IsAgree, reviewData.ExtraData.NextStepId)
+			req.ReviewId, req.IsAgree, reviewData.ReviewDB.ExtraData.NextStepId)
 		return err
 	}
 
-	// 判断用户是否有审核命令的权限
-	_, orderIds, err := dao.GetUserOrderByReview(ctx, reviewData.ProjectId, user, define.EnumPowerReview_review)
+	stepData, err := gm_common.StepGmOrderReview(ctx, user, reviewData.ReviewDB.ProjectId, reviewData.ReviewDB.OrderId, req.ReviewId, req.IsAgree, false)
+	if err != nil {
+		return err
+	}
+	if stepData == nil {
+		return nil
+	}
+	reviewData.ReviewDB.ExtraData.NextStepId++
+	reviewData.ReviewDB.ExtraData.ResultData = append(reviewData.ReviewDB.ExtraData.ResultData, stepData)
+
+	firstStep := reviewData.ReviewDB.ExtraData.ResultData[0]
+
+	stepData, err = gm_common.StepGmOrderPush(ctx, user, firstStep.UserId, firstStep.UserName, reviewData.OrderDB, reviewData.ProjectDB, firstStep.Desc)
 	if err != nil {
 		dao.Error(ctx, "order review step：%v %v is err:%v", req.ReviewId, req.IsAgree, err)
 		return err
 	}
-	bReview := false
-
-	for _, orderId := range orderIds {
-		if orderId == reviewData.OrderId {
-			bReview = true
-			break
-		}
-	}
-
-	if !bReview {
-		err := fmt.Errorf("order review step：%v %v power is not enough", req.ReviewId, req.IsAgree)
-		dao.Error(ctx, err.Error())
-		// 权限不足
+	reviewData.ReviewDB.ExtraData.NextStepId++
+	reviewData.ReviewDB.ExtraData.ResultData = append(reviewData.ReviewDB.ExtraData.ResultData, stepData)
+	err = dao.UpdateReviewData(reviewData.ReviewDB.Id, reviewData.ReviewDB)
+	if err != nil {
+		dao.Error(ctx, "order review step：%v %v is err:%v", req.ReviewId, req.IsAgree, err)
 		return err
 	}
-
-	desc := "拒绝"
-	if req.IsAgree {
-		desc = "同意"
+	rsp.Data = &webmodel.ReviewInfo{
+		ProjectId:   reviewData.ReviewDB.ProjectId,
+		ProjectName: reviewData.ProjectDB.Name,
+		OrderId:     reviewData.ReviewDB.OrderId,
+		OrderName:   reviewData.OrderDB.Name,
+		OrderDesc:   reviewData.OrderDB.Desc,
+		UserId:      reviewData.ReviewDB.UserId,
+		UserName:    reviewData.UserDB.Name,
+		ResultData:  make([]*webmodel.ReviewStep, 0),
+	}
+	for _, stepData := range reviewData.ReviewDB.ExtraData.ResultData {
+		rsp.Data.ResultData = append(rsp.Data.ResultData, &webmodel.ReviewStep{
+			UserId:     stepData.UserId,
+			UserName:   stepData.UserName,
+			Status:     stepData.Status,
+			ReviewTime: stepData.ReviewTime,
+			Desc:       stepData.Desc,
+		})
 	}
 
-	reviewData.ExtraData.ResultData = append(reviewData.ExtraData.ResultData, &db_extra.ReviewStep{
-		StepId:     define.EnumOrderStep_review,
-		UserId:     reviewData.UserId,
-		UserName:   user.Name,
-		Status:     define.EnumReviewStepStatus_success,
-		ReviewTime: time.Now().Unix(),
-		Desc:       desc,
-	})
-
-	reviewData.ExtraData.NextStepId++
-
-	dao.Info(ctx, "order review step：%v %v, next step:%v is ok", req.ReviewId, req.IsAgree, reviewData.ExtraData.NextStepId)
+	dao.Info(ctx, "order review step：%v %v, next step:%v is ok", req.ReviewId, req.IsAgree, reviewData.ReviewDB.ExtraData.NextStepId)
 	return nil
 }

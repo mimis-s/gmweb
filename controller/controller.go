@@ -7,6 +7,7 @@ import (
 	"github.com/mimis-s/gmweb/modules/order"
 	"github.com/mimis-s/gmweb/modules/power"
 	"github.com/mimis-s/gmweb/modules/project"
+	"github.com/mimis-s/gmweb/modules/review"
 	"github.com/mimis-s/gmweb/modules/user"
 	"github.com/smallnest/rpcx/log"
 )
@@ -49,6 +50,11 @@ func (c *ControllerHandler) Login(ctx *web.WebContext) {
 // 日志管理界面
 func (c *ControllerHandler) GmLog(ctx *web.WebContext) {
 	ctx.GetGinContext().HTML(200, "gm_log.html", nil)
+}
+
+// 审核界面
+func (c *ControllerHandler) GmReview(ctx *web.WebContext) {
+	ctx.GetGinContext().HTML(200, "gm_review.html", nil)
 }
 
 // 登录
@@ -364,6 +370,28 @@ func (c *ControllerHandler) PostApiGetGmLog(ctx *web.WebContext, req *webmodel.G
 	if err := gm_log.GetGmLogHandler(ctx, req, rsp); err != nil {
 		log.Errorf("get gm log is err:%v", err)
 		ctx.Err("get gm log is err:%v", err)
+		return
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 获取需要审核的数据
+func (c *ControllerHandler) PostApiGetReview(ctx *web.WebContext, req *webmodel.GetReviewReq) {
+	rsp := &webmodel.GetReviewRsp{}
+	if err := review.GetReviewHandler(ctx, req, rsp); err != nil {
+		log.Errorf("get review is err:%v", err)
+		ctx.Err("get review is err:%v", err)
+		return
+	}
+	ctx.SuccessOk(rsp)
+}
+
+// 获取单个命令的审核的数据
+func (c *ControllerHandler) PostApiGetUserOrderReview(ctx *web.WebContext, req *webmodel.GetUserOrderReviewReq) {
+	rsp := &webmodel.GetUserOrderReviewRsp{}
+	if err := review.GetUserOrderReviewHandler(ctx, req, rsp); err != nil {
+		log.Errorf("get user order review is err:%v", err)
+		ctx.Err("get user order review is err:%v", err)
 		return
 	}
 	ctx.SuccessOk(rsp)

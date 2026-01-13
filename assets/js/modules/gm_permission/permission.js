@@ -127,6 +127,11 @@ export function createPermissionClass() {
             <td>${permission.name}</td>
             <td>${permission.projectid === 0 ? '所有项目' : `${permission.projectname}`}</td>
             <td>${permission.level === 0 ? '所有等级' : `${permission.level}`}</td>
+            <td>
+            <input type="checkbox" id="permissionRunCheckBox" style="width: 15px">执行
+            <input type="checkbox" id="permissionReviewCheckBox" style="width: 15px">审核
+            </td>
+<!--            permission.orderreviews-->
             <td>${permission.ordernamematch}</td>
             <td class="${permission.enable === true ? 'status-active' : 'status-inactive'}">
                 ${permission.enable === true ? '启用' : '禁用'}
@@ -138,9 +143,48 @@ export function createPermissionClass() {
                 <button class="btn btn-small btn-warning" id="delPermissionBtn">删除</button>
             </td>
         `;
+
+                const permissionRunCheckBox = row.querySelector('#permissionRunCheckBox')
+                if (permission.orderreviews.includes(1)) {
+                    permissionRunCheckBox.checked = true;
+                }
+                permissionRunCheckBox.addEventListener('change', () => {
+                    let orderreviews = permission.orderreviews;
+                    if (permissionRunCheckBox.checked) {
+                        // 添加权限
+                        if (!orderreviews.includes(1)) {
+                            orderreviews.push(1);
+                        }
+                    } else {
+                        // 删除权限
+                        if (orderreviews.includes(1)) {
+                            orderreviews = orderreviews.filter(item => item !== 1);
+                        }
+                    }
+                    this.togglePermissionStatus(permission.id, permission.enable, orderreviews);
+                });
+                const permissionReviewCheckBox = row.querySelector('#permissionReviewCheckBox')
+                if (permission.orderreviews.includes(2)) {
+                    permissionReviewCheckBox.checked = true;
+                }
+                permissionReviewCheckBox.addEventListener('change', () => {
+                    let orderreviews = permission.orderreviews;
+                    if (permissionReviewCheckBox.checked) {
+                        // 添加权限
+                        if (!orderreviews.includes(2)) {
+                            orderreviews.push(2);
+                        }
+                    } else {
+                        // 删除权限
+                        if (orderreviews.includes(2)) {
+                            orderreviews = orderreviews.filter(item => item !== 2);
+                        }
+                    }
+                    this.togglePermissionStatus(permission.id, permission.enable, orderreviews);
+                });
                 const permissionStatusBtn = row.querySelector('#permissionStatusBtn')
                 permissionStatusBtn.addEventListener('click', () => {
-                    this.togglePermissionStatus(permission.id);
+                    this.togglePermissionStatus(permission.id, !permission.enable, permission.orderreviews);
                 });
                 const delPermissionBtn = row.querySelector('#delPermissionBtn')
                 delPermissionBtn.addEventListener('click', () => {
@@ -151,10 +195,11 @@ export function createPermissionClass() {
         },
 
 // 切换权限状态
-        async togglePermissionStatus(id) {
+        async togglePermissionStatus(id,enable, orderreviews) {
             const permission = this.state.permissions.find(p => p.id === id);
             if (permission) {
-                permission.enable = !permission.enable;
+                permission.enable = enable;
+                permission.orderreviews = orderreviews;
                 const modifyPermissionReq = {
                     data: permission,
                 }

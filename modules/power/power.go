@@ -100,6 +100,10 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 			index--
 			continue
 		}
+		orderReviews := make([]int, 0)
+		for _, orderReview := range powerData.Data.OrderReviews {
+			orderReviews = append(orderReviews, int(orderReview))
+		}
 		rsp.PermissionDatas = append(rsp.PermissionDatas, &webmodel.PermissionInfo{
 			Id:             powerData.PowerId,
 			Name:           powerData.Name,
@@ -108,6 +112,7 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 			ProjectName:    tmpProjectName,
 			Level:          powerData.Data.Level,
 			OrderNameMatch: powerData.Data.OrderNameMatch,
+			OrderReviews:   orderReviews,
 		})
 	}
 
@@ -236,6 +241,7 @@ func AddPermissionHandler(ctx *web.WebContext, req *webmodel.AddPermissionReq, r
 		Data: &db_extra.PowerExtra{
 			Level:          req.Level,
 			OrderNameMatch: req.OrderNameMatch,
+			OrderReviews:   []define.EnumPowerReview{define.EnumPowerReview_run}, // 默认赋予执行权限
 		},
 	}
 
@@ -243,6 +249,10 @@ func AddPermissionHandler(ctx *web.WebContext, req *webmodel.AddPermissionReq, r
 	if err != nil {
 		dao.Error(ctx, "add power is err:%v", err)
 		return err
+	}
+	orderReviews := make([]int, 0)
+	for _, orderReview := range insertData.Data.OrderReviews {
+		orderReviews = append(orderReviews, int(orderReview))
 	}
 	rsp.Data = &webmodel.PermissionInfo{
 		Id:             insertData.PowerId,
@@ -252,6 +262,7 @@ func AddPermissionHandler(ctx *web.WebContext, req *webmodel.AddPermissionReq, r
 		ProjectName:    projectName,
 		Level:          insertData.Data.Level,
 		OrderNameMatch: insertData.Data.OrderNameMatch,
+		OrderReviews:   orderReviews,
 	}
 	dao.Info(ctx, "add power:%v is ok", rsp.Data)
 	return nil
@@ -281,10 +292,16 @@ func ModifyPermissionHandler(ctx *web.WebContext, req *webmodel.ModifyPermission
 		return err
 	}
 
+	orderReviews := make([]define.EnumPowerReview, 0)
+	for _, orderReview := range req.Data.OrderReviews {
+		orderReviews = append(orderReviews, define.EnumPowerReview(orderReview))
+	}
+
 	powerData.Name = req.Data.Name
 	powerData.Enable = &req.Data.Enable
 	powerData.Data.Level = req.Data.Level
 	powerData.Data.OrderNameMatch = req.Data.OrderNameMatch
+	powerData.Data.OrderReviews = orderReviews
 	powerData.ProjectId = req.Data.ProjectId
 
 	err = dao.UpdatePowerData(powerData.PowerId, powerData)

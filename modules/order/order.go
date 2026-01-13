@@ -1,9 +1,7 @@
 package order
 
 import (
-	"encoding/json"
 	"fmt"
-	"regexp"
 
 	"github.com/mimis-s/gmweb/common/dbmodel"
 	"github.com/mimis-s/gmweb/common/dbmodel/db_extra"
@@ -11,6 +9,7 @@ import (
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
 	"github.com/mimis-s/gmweb/dao"
+	"github.com/mimis-s/gmweb/modules/gm_common"
 )
 
 func GetGmOrderBoxReq(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq, rsp *webmodel.GetGmOrderBoxRsp) error {
@@ -53,7 +52,7 @@ func GetGmOrderBoxReq(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq, rsp *
 				OrderId:     orderData.Id,
 				OrderName:   orderData.Name,
 				Level:       orderData.Level,
-				OrderDesc:   orderData.Data.Desc,
+				OrderDesc:   orderData.Desc,
 				OrderStruct: orderData.Data.OrderStruct,
 			},
 			LastRunArgs: lastRunArgs,
@@ -113,8 +112,8 @@ func AddGmOrderHandler(ctx *web.WebContext, req *webmodel.AddGmOrderReq, rsp *we
 		ProjectId: req.ProjectId,
 		Name:      req.OrderName,
 		Level:     req.Level,
+		Desc:      req.OrderDesc,
 		Data: &db_extra.GmOrderExtra{
-			Desc:        req.OrderDesc,
 			OrderStruct: req.OrderStruct,
 			Path:        req.Path,
 			Method:      req.Method,
@@ -130,7 +129,7 @@ func AddGmOrderHandler(ctx *web.WebContext, req *webmodel.AddGmOrderReq, rsp *we
 		OrderId:     inserData.Id,
 		OrderName:   inserData.Name,
 		Level:       inserData.Level,
-		OrderDesc:   inserData.Data.Desc,
+		OrderDesc:   inserData.Desc,
 		OrderStruct: inserData.Data.OrderStruct,
 	}
 	rsp.ProjectId = req.ProjectId
@@ -163,7 +162,7 @@ func ModifyGmOrderHandler(ctx *web.WebContext, req *webmodel.ModifyGmOrderReq, r
 	}
 	orderData.Name = req.Data.OrderName
 	orderData.Level = req.Data.Level
-	orderData.Data.Desc = req.Data.OrderDesc
+	orderData.Desc = req.Data.OrderDesc
 	orderData.Data.OrderStruct = req.Data.OrderStruct
 	orderData.Data.Path = req.Data.Path
 	orderData.Data.Method = req.Data.Method
@@ -178,7 +177,7 @@ func ModifyGmOrderHandler(ctx *web.WebContext, req *webmodel.ModifyGmOrderReq, r
 		OrderId:     orderData.Id,
 		OrderName:   orderData.Name,
 		Level:       orderData.Level,
-		OrderDesc:   orderData.Data.Desc,
+		OrderDesc:   orderData.Desc,
 		OrderStruct: orderData.Data.OrderStruct,
 		Method:      orderData.Data.Method,
 		Path:        orderData.Data.Path,
@@ -192,96 +191,84 @@ func SendGmOrderHandler(ctx *web.WebContext, req *webmodel.SendGmOrderReq, rsp *
 	if user == nil {
 		return nil
 	}
-	userData, find, err := dao.GetUserData(user.Rid)
-	if err != nil {
-		dao.Error(ctx, "send order:%v get user db is err:%v", req.OrderId, err)
-		return err
-	}
-	if !find {
-		// 不存在
-		dao.Error(ctx, "send order:%v user db is not found", req.OrderId, err)
-		return err
-	}
-
-	orderData, find, err := dao.GetOrderData(req.OrderId)
-	if err != nil {
-		dao.Error(ctx, err.Error())
-		return err
-	}
-	if !find {
-		err := fmt.Errorf("send order:%v is not found", req.OrderId)
-		dao.Error(ctx, err.Error())
-		return err
-	}
-
-	projectData, find, err := dao.GetProjectData(orderData.ProjectId)
-	if err != nil {
-		dao.Error(ctx, err.Error())
-		return err
-	}
-	if !find {
-		err := fmt.Errorf("send order:%v project:%v is not found", req.OrderId, orderData.ProjectId)
-		dao.Error(ctx, err.Error())
-		return err
-	}
-
-	_, orderIds, err := dao.GetUserOrderByReview(ctx, orderData.ProjectId, user, define.EnumPowerReview_run)
-	if err != nil {
-		dao.Error(ctx, err.Error())
-		return err
-	}
-	bSend := false
-
-	for _, orderId := range orderIds {
-		if orderId == orderData.Id {
-			bSend = true
-			break
-		}
-	}
-
-	if !bSend {
-		err := fmt.Errorf("send order:%v name:%v project:%v ip:%v path:%v msg:%v power is not enough", orderData.Id,
-			orderData.Name, projectData.Name, projectData.Data.GmAddr, orderData.Data.Path, req.Msg)
-		dao.Error(ctx, err.Error())
-		// 权限不足
-		return fmt.Errorf("send order:%v name:%v project:%v power is not enough", orderData.Id,
-			orderData.Name, projectData.Name)
-	}
-
-	gmExec := &gmExecReq{
-		GMArgs: orderData.Name + " " + req.Msg,
-	}
-	gmExecJson, _ := json.Marshal(gmExec)
-
-	var gmRsp *ApiResponse
-	if orderData.Data.Method == "GET" {
-		gmRsp, err = SendGetGmOrder(ctx, projectData.Data.GmAddr, string(gmExecJson))
-	} else if orderData.Data.Method == "POST" {
-		gmRsp, err = SendPostGmOrder(ctx, projectData.Data.GmAddr+orderData.Data.Path, string(gmExecJson), "")
-	}
+	reviewData, err := gm_common.StepGmOrderRun(ctx, user, req.OrderId, req.Msg)
 	if err != nil {
 		return err
 	}
-	if gmRsp != nil {
-		rsp.Data = gmRsp.Data
+	if reviewData == nil {
+		return nil
 	}
 
 	// 记录用户使用命令情况
-	if userData.OrderStatus == nil {
-		userData.OrderStatus = &db_extra.RoleGmOrderStatus{
+	if reviewData.UserDB.OrderStatus == nil {
+		reviewData.UserDB.OrderStatus = &db_extra.RoleGmOrderStatus{
 			LastRunArgsMap: make(map[int64]map[int64]string),
 		}
 	}
-	if userData.OrderStatus.LastRunArgsMap[orderData.ProjectId] == nil {
-		userData.OrderStatus.LastRunArgsMap[orderData.ProjectId] = make(map[int64]string)
+	if reviewData.UserDB.OrderStatus.LastRunArgsMap[reviewData.OrderDB.ProjectId] == nil {
+		reviewData.UserDB.OrderStatus.LastRunArgsMap[reviewData.OrderDB.ProjectId] = make(map[int64]string)
 	}
-	userData.OrderStatus.LastRunArgsMap[orderData.ProjectId][orderData.Id] = req.Msg
-	err = dao.UpdateUserData(userData.Rid, userData)
+	reviewData.UserDB.OrderStatus.LastRunArgsMap[reviewData.OrderDB.ProjectId][reviewData.OrderDB.Id] = req.Msg
+	err = dao.UpdateUserData(reviewData.UserDB.Rid, reviewData.UserDB)
 	if err != nil {
 		dao.Error(ctx, err.Error())
 	}
 
-	dao.Info(ctx, "send order:%v Method[%v] name:%v project:%v ip:%v path:%v msg:%v", orderData.Data.Method, orderData.Id,
-		orderData.Name, projectData.Name, projectData.Data.GmAddr, orderData.Data.Path, string(gmExecJson))
+	err = afterAutoReview(ctx, user, reviewData)
+	rsp.Data = &webmodel.ReviewInfo{
+		ProjectId:   reviewData.ReviewDB.ProjectId,
+		ProjectName: reviewData.ProjectDB.Name,
+		OrderId:     reviewData.ReviewDB.OrderId,
+		OrderName:   reviewData.OrderDB.Name,
+		OrderDesc:   reviewData.OrderDB.Desc,
+		UserId:      reviewData.ReviewDB.UserId,
+		UserName:    reviewData.UserDB.Name,
+		ResultData:  make([]*webmodel.ReviewStep, 0),
+	}
+	for _, stepData := range reviewData.ReviewDB.ExtraData.ResultData {
+		rsp.Data.ResultData = append(rsp.Data.ResultData, &webmodel.ReviewStep{
+			UserId:     stepData.UserId,
+			UserName:   stepData.UserName,
+			Status:     stepData.Status,
+			ReviewTime: stepData.ReviewTime,
+			Desc:       stepData.Desc,
+		})
+	}
+	if err != nil {
+		dao.Error(ctx, "auto review send order:%v Method[%v] name:%v project:%v ip:%v path:%v msg:%v is err:%v", reviewData.OrderDB.Data.Method, reviewData.OrderDB.Id,
+			reviewData.OrderDB.Name, reviewData.ProjectDB.Name, reviewData.ProjectDB.Data.GmAddr, reviewData.OrderDB.Data.Path, req.Msg, err)
+	} else {
+		dao.Info(ctx, "send order:%v Method[%v] name:%v project:%v ip:%v path:%v msg:%v", reviewData.OrderDB.Data.Method, reviewData.OrderDB.Id,
+			reviewData.OrderDB.Name, reviewData.ProjectDB.Name, reviewData.ProjectDB.Data.GmAddr, reviewData.OrderDB.Data.Path, req.Msg)
+	}
+
+	return nil
+}
+
+func afterAutoReview(ctx *web.WebContext, user *dao.CacheUser, reviewData *dao.ReviewDBInfo) error {
+	stepData, err := gm_common.StepGmOrderReview(ctx, user, reviewData.ReviewDB.ProjectId, reviewData.ReviewDB.OrderId, reviewData.ReviewDB.Id, true, true)
+	if err != nil {
+		return err
+	}
+	if stepData == nil {
+		return nil
+	}
+	reviewData.ReviewDB.ExtraData.NextStepId++
+	reviewData.ReviewDB.ExtraData.ResultData = append(reviewData.ReviewDB.ExtraData.ResultData, stepData)
+
+	firstStep := reviewData.ReviewDB.ExtraData.ResultData[0]
+
+	stepData, err = gm_common.StepGmOrderPush(ctx, user, firstStep.UserId, firstStep.UserName, reviewData.OrderDB, reviewData.ProjectDB, firstStep.Desc)
+	if err != nil {
+		dao.Error(ctx, "auto order review step：%v %v is err:%v", reviewData.ReviewDB.Id, true, err)
+		return err
+	}
+	reviewData.ReviewDB.ExtraData.NextStepId++
+	reviewData.ReviewDB.ExtraData.ResultData = append(reviewData.ReviewDB.ExtraData.ResultData, stepData)
+	err = dao.UpdateReviewData(reviewData.ReviewDB.Id, reviewData.ReviewDB)
+	if err != nil {
+		dao.Error(ctx, "auto order review step：%v %v is err:%v", reviewData.ReviewDB.Id, true, err)
+		return err
+	}
 	return nil
 }

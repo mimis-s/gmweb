@@ -507,12 +507,6 @@ th.sortable i {
     opacity: 0.5;
 }
 
-td {
-    padding: 15px;
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: top;
-}
-
 tbody tr:hover {
     background-color: #f9fafd;
 }
@@ -1326,8 +1320,7 @@ table {
 }
 
 th, td {
-    padding: 15px;
-    text-align: left;
+    padding: 5px;
     border-bottom: 1px solid #eee;
 }
 
@@ -1371,7 +1364,7 @@ tr:hover {
 }
 
 .checkbox-item {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     background: #f8f9fa;
     padding: 8px 15px;

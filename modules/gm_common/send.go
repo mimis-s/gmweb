@@ -1,4 +1,4 @@
-package order
+package gm_common
 
 import (
 	"bytes"

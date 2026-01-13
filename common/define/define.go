@@ -31,14 +31,15 @@ type EnumOrderStep int
 var (
 	EnumOrderStep_start  EnumOrderStep = 0 // 发起gm请求
 	EnumOrderStep_review EnumOrderStep = 1 // 审核
-	EnumOrderStep_end    EnumOrderStep = 2 // 完成
+	EnumOrderStep_Push   EnumOrderStep = 2 // 发送gm命令
+	EnumOrderStep_end    EnumOrderStep = 3 // 完成
 )
 
 // 审批状态
 type EnumReviewStepStatus int
 
 var (
-	EnumReviewStepStatus_success EnumReviewStepStatus = 0 // 发起gm请求
-	EnumReviewStepStatus_pending EnumReviewStepStatus = 1 // 审核
-	EnumReviewStepStatus_fail    EnumReviewStepStatus = 2 // 完成
+	EnumReviewStepStatus_success EnumReviewStepStatus = 0 // 成功
+	EnumReviewStepStatus_pending EnumReviewStepStatus = 1 // pending
+	EnumReviewStepStatus_fail    EnumReviewStepStatus = 2 // 失败
 )

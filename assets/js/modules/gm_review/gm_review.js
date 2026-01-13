@@ -1,149 +1,67 @@
 // 读取数据
 
-import {apiClient} from "../../api/client.js";
+// import {apiClient} from "../../api/client.js";
+// import {showToast} from "../../components/toast.js";
+// import {loadHtml} from "../../api/client.js";
+// import {gmOrderCardClass} from "../gm_order_table/table.js";
+// import {createTabHomeSelectClass} from "../gm_tab_home/select";
+
+import {apiClient, loadHtml} from "../../api/client.js";
 import {showToast} from "../../components/toast.js";
-import {loadHtml} from "../../api/client.js";
-import {gmOrderCardClass} from "../gm_order_table/table.js";
+// import {gmLogClass} from "../gm_log/log";
 
 export function createGmReviewClass() {
     return {
         state: {
             stepDefinitions: [],
             approverDefinitions: [],
-            messages: []
+            messages: [],
+            filter: {
+                startDate: '',
+                endDate: ''
+            },
         },
 
-
-        // // 步骤定义
-        // const stepDefinitions = [
-        // { id: 1, name: "提交申请", description: "申请人提交申请材料，填写申请表并上传相关附件" },
-        // { id: 2, name: "部门审批", description: "部门负责人审核申请内容，确认是否符合部门规定" },
-        // { id: 3, name: "财务审核", description: "财务部门审核预算、费用等财务相关事项" },
-        // { id: 4, name: "分管领导", description: "分管领导审批，确认是否符合公司整体规划" },
-        // { id: 5, name: "最终批准", description: "最终审批人批准，完成整个审批流程" }
-        // ];
-
-        // 审批人定义
-        // const approverDefinitions = [
-        // { id: 1, name: "张三", role: "申请人" },
-        // { id: 2, name: "李四", role: "部门经理" },
-        // { id: 3, name: "王五", role: "财务主管" },
-        // { id: 4, name: "赵六", role: "分管副总" },
-        // { id: 5, name: "孙七", role: "总经理" }
-        // ];
-        //
-        // // 初始消息数据
-        // const initialMessages = [
-        // {
-        //     id: 1,
-        //     text: "采购服务器申请",
-        //     time: "2023-10-05 09:30",
-        //     type: "purchase_request",
-        //     status: "in-progress", // pending, in-progress, approved, rejected
-        //     currentStep: 2, // 当前步骤索引（从0开始）
-        //     steps: [
-        // { status: "completed", stepId: 1, approverId: 1, approveTime: "2023-10-05 09:45" },
-        // { status: "completed", stepId: 2, approverId: 2, approveTime: "2023-10-05 10:30" },
-        // { status: "current", stepId: 3, approverId: null, approveTime: null },
-        // { status: "pending", stepId: 4, approverId: null, approveTime: null },
-        // { status: "pending", stepId: 5, approverId: null, approveTime: null }
-        //     ]
-        // }
-        // ];
-
-        // // 存储当前消息
-        // let messages = [...initialMessages];
-        // let messageIdCounter = 6;
-        //
-        // // 处理统计信息
-        // let totalCount = 5;
-        // let processedCount = 1; // 有一个已处理
-        // let pendingCount = 4;   // 有四个待处理
         async getReviewMessagesContainerBody() {
             return document.getElementById('gmReviewMessagesContainer');
         },
 
-        // DOM元素
-        // const messagesContainer = document.getElementById('messages-container');
-
-//     // 生成随机消息
-//     async generateRandomMessage() {
-//     const messageTypes = [
-// {text: "新员工入职申请", type: "onboarding"},
-// {text: "软件采购申请", type: "software_purchase"},
-// {text: "出差申请", type: "business_trip"},
-// {text: "培训申请", type: "training"},
-// {text: "加班申请", type: "overtime"},
-// {text: "报销申请", type: "expense_report"},
-// {text: "权限申请", type: "permission_request"},
-// {text: "项目立项申请", type: "project_initiation"}
-//     ];
-//
-//     const randomType = messageTypes[Math.floor(Math.random() * messageTypes.length)];
-//
-//     // 生成当前时间
-//     const now = new Date();
-//     const timeStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-//
-//     // 随机设置当前步骤
-//     const currentStep = Math.floor(Math.random() * 3);
-//
-//     // 创建步骤状态数组
-//     const steps = [];
-//     for (let i = 0; i < stepDefinitions.length; i++) {
-//     if (i < currentStep) {
-//     // 随机选择一个审批人
-//     const approverId = Math.floor(Math.random() * 5) + 1;
-//     // 生成一个随机的审批时间
-//     const approveTime = new Date(now.getTime() - (currentStep - i) * 3600000);
-//     const approveTimeStr = `${approveTime.getFullYear()}-${(approveTime.getMonth()+1).toString().padStart(2, '0')}-${approveTime.getDate().toString().padStart(2, '0')} ${approveTime.getHours().toString().padStart(2, '0')}:${approveTime.getMinutes().toString().padStart(2, '0')}`;
-//
-//     steps.push({ status: "completed", stepId: i + 1, approverId: approverId, approveTime: approveTimeStr });
-// } else if (i === currentStep) {
-//     steps.push({ status: "current", stepId: i + 1, approverId: null, approveTime: null });
-// } else {
-//     steps.push({ status: "pending", stepId: i + 1, approverId: null, approveTime: null });
-// }
-// }
-//
-//     return {
-//     id: messageIdCounter++,
-//     text: randomType.text,
-//     time: timeStr,
-//     type: randomType.type,
-//     status: "in-progress",
-//     currentStep: currentStep,
-//     steps: steps
-// };
-// }
-
         // 创建步骤审批流程HTML
-        async createStepsHTML(steps, messageId) {
+        async createStepsHTML(reviewId) {
             let stepsHTML = '<div class="approval-process">';
             stepsHTML += '<div class="process-title">审批流程</div>';
             stepsHTML += '<div class="steps-container">';
-
-            steps.forEach((step, index) => {
-                const stepDef = this.state.stepDefinitions.find(s => s.id === step.stepId);
-                let stepClass = "";
-
-                if (step.status === "completed") {
-                    stepClass = "step completed";
-                } else if (step.status === "current") {
-                    stepClass = "step current";
-                } else if (step.status === "rejected") {
-                    stepClass = "step rejected";
-                } else {
-                    stepClass = "step";
+            // type ReviewStep struct {
+            //     StepId     int                         `json:"stepid"`
+            //     UserId     int64                       `json:"userid"` // 当前步骤的审批人
+            //     UserName   string                      `json:"username"`
+            //     Status     define.EnumReviewStepStatus `json:"status"`     // 状态(1:成功, 2:等待审批, 3:失败)
+            //     ReviewTime int64                       `json:"reviewtime"` // 审核时间
+            //     Desc       string                      `json:"desc"`       // 步骤具体信息(可以填当前步骤的gm命令,也可以是执行之后的返回值)
+            // }
+            // 步骤 -> 0: 发起gm命令 1: 审核 2: 完成
+            let stepIds = [0, 1, 2];
+            let stepIdName = ["GM请求", "审核", "完成"];
+            stepIds.forEach((stepId, index) => {
+                const step = this.state.stepDefinitions.find(s => s.id === stepId);
+                let stepClass = "step";
+                if (step) {
+                    if (step.status === 0) { // 成功
+                        stepClass = "step completed";
+                    } else if (step.status === 1) { // pending
+                        stepClass = "step current";
+                    } else if (step.status === 2) { // 失败
+                        stepClass = "step rejected";
+                    }
                 }
 
                 stepsHTML += `
-                    <div class="${stepClass}" data-step-index="${index}" data-message-id="${messageId}">
+                    <div class="${stepClass}" data-step-index="${stepId}" data-message-id="${reviewId}">
                         <div class="step-dot">
-                            ${index + 1}
+                            ${stepId + 1}
                         </div>
-                        <div class="step-number">步骤${index + 1}</div>
-                        <div class="step-content">${stepDef ? stepDef.name : "未知步骤"}</div>
+                        <div class="step-number">步骤${stepId + 1}</div>
+                        <div class="step-content">${stepIdName[index]}</div>
                     </div>
                 `;
             });
@@ -272,7 +190,7 @@ export function createGmReviewClass() {
             }
 
             // 创建步骤审批HTML
-            const stepsHTML = await this.createStepsHTML(message.steps, message.id);
+            const stepsHTML = await this.createStepsHTML(message.id);
 
             messageElement.innerHTML = `
                 <div class="message-header">
@@ -304,9 +222,20 @@ export function createGmReviewClass() {
         async renderMessages() {
             const messagesContainer = await this.getReviewMessagesContainerBody()
             messagesContainer.innerHTML = '';
+            let startTimestamp = new Date(this.state.filter.startDate).getTime();
+            let endTimestamp = new Date(this.state.filter.endDate).getTime();
+            const projectSelect = messagesContainer.querySelector('#projectSelect');
+            try {
+                const response = await apiClient.getReviewAll({
+                    projectid: Number(projectSelect?projectSelect.value:0),
+                    starttime: Number(startTimestamp),
+                    endtime: Number(endTimestamp),
+                });
+                console.debug("审核数据", response)
+                this.state.messages = response.message.datas;
 
-            if (this.state.messages.length === 0) {
-                messagesContainer.innerHTML = `
+                if (this.state.messages.length === 0) {
+                    messagesContainer.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">
                             <i class="fas fa-inbox"></i>
@@ -314,18 +243,23 @@ export function createGmReviewClass() {
                         <div class="empty-text">暂无待处理流程</div>
                     </div>
                 `;
-                return;
+                    return;
+                }
+
+                // 先显示已处理的消息
+                const processedMessages = this.state.messages.filter(msg => msg.status !== 'in-progress');
+                const pendingMessages = this.state.messages.filter(msg => msg.status === 'in-progress');
+
+                // 先渲染待处理消息，再渲染已处理消息
+                [...pendingMessages, ...processedMessages].forEach(message => {
+                    const messageElement = this.createMessageElement(message);
+                    messagesContainer.appendChild(messageElement);
+                });
+            } catch (error) {
+                this.state.error = error.message;
+                showToast(error.message || '获取 GM 命令失败', 'error');
+                throw error;
             }
-
-            // 先显示已处理的消息
-            const processedMessages = this.state.messages.filter(msg => msg.status !== 'in-progress');
-            const pendingMessages = this.state.messages.filter(msg => msg.status === 'in-progress');
-
-            // 先渲染待处理消息，再渲染已处理消息
-            [...pendingMessages, ...processedMessages].forEach(message => {
-                const messageElement = this.createMessageElement(message);
-                messagesContainer.appendChild(messageElement);
-            });
         },
 
         // 处理同意/拒绝操作
@@ -532,6 +466,26 @@ export function createGmReviewClass() {
 
         // 初始化页面
         async loadReviewData() {
+            const html = await loadHtml.gmLReview();
+            const defaultContent = document.querySelector('.default-content');
+            const dynamicContent = document.getElementById('dynamicContent');
+
+            defaultContent.style.display = 'none';
+            dynamicContent.style.display = 'block';
+            dynamicContent.innerHTML = html;
+
+            // 设置日期范围默认值
+            const today = new Date().toISOString().split('T')[0];
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() + 1);
+            const oneWeekAgoStr = oneWeekAgo.toISOString().split('T')[0];
+
+            dynamicContent.querySelector('#startDate').value = oneWeekAgoStr;
+            dynamicContent.querySelector('#endDate').value = today;
+
+            this.state.filter.startDate = oneWeekAgoStr;
+            this.state.filter.endDate = today;
+
             await this.renderMessages();
 
             // 初始添加一些动画效果
@@ -551,6 +505,10 @@ export function createGmReviewClass() {
                     }, 500);
                 }, index * 150);
             });
+            // 添加进入动画
+            dynamicContent.style.animation = 'fadeInUp 0.5s ease';
         },
     };
 }
+
+export const gmReviewClass = createGmReviewClass();

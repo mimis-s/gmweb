@@ -1,4 +1,5 @@
 import {tabHomeSelectClass} from './modules/gm_tab_home/select.js';
+import {gmReviewClass} from "./modules/gm_review/gm_review.js";
 
 // DOM元素
 
@@ -104,6 +105,11 @@ function initializeNav() {
     const navLinkLog = document.getElementById('navLinkLog');
     navLinkLog.addEventListener('click', function() {
         tabHomeSelectClass.loadGmLogModule();
+    });
+    // 命令审核
+    const navLinkReview = document.getElementById('navLinkReview');
+    navLinkReview.addEventListener('click', function() {
+        gmReviewClass.loadReviewData();
     });
     window.showToast("在线")
 }

@@ -39,4 +39,9 @@ export const Endpoints = {
     
     // 日志
     GM_LOG: '/api/gm_log',
+
+    // 审核管理
+    GM_REVIEW_ALL_GET: '/api/review/all/get',
+    GM_REVIEW_ORDER_GET: '/api/review/order/get',
+
 };

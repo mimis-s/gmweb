@@ -341,7 +341,7 @@ func GetGmProjectBoxHandler(ctx *web.WebContext, req *webmodel.GetGmProjectBoxRe
 				OrderName:   orderData.Name,
 				Path:        orderData.Data.Path,
 				Method:      orderData.Data.Method,
-				OrderDesc:   orderData.Data.Desc,
+				OrderDesc:   orderData.Desc,
 				Level:       orderData.Level,
 				OrderStruct: orderData.Data.OrderStruct,
 			}

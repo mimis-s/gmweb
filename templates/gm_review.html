@@ -511,15 +511,34 @@
 <!--    </style>-->
 </head>
 <body>
-<div class="header">
-    <h1>步骤审批流程中心</h1>
-    <p class="subtitle">处理待审批流程，点击同意或拒绝进行步骤审批</p>
-</div>
+<div class="project-container">
+    <main>
+    <section class="query-panel">
+        <h2><i class="fas fa-filter"></i> 项目选择</h2>
+        <form id="queryForm" class="query-form">
+            <div class="form-group">
+                <label>选择项目：</label>
+                <select id="projectSelect">
+                    <option value="">选择项目</option>
+                    <!-- 羡慕选项将通过JS动态生成 -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="startDate"><i class="fas fa-calendar"></i> 开始日期</label>
+                <input type="date" id="startDate" class="form-control">
+            </div>
 
-<div class="container">
-    <div class="messages-container" id="gmReviewMessagesContainer">
+            <div class="form-group">
+                <label for="endDate"><i class="fas fa-calendar"></i> 结束日期</label>
+                <input type="date" id="endDate" class="form-control">
+            </div>
+        </form>
+    </section>
+
+    <section class="messages-container" id="gmReviewMessagesContainer">
         <!-- 消息将通过JavaScript动态添加 -->
-    </div>
+    </section>
+        </main>
 </div>
 
 </body>

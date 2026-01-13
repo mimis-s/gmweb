@@ -2,9 +2,12 @@ package dao
 
 import "github.com/mimis-s/gmweb/common/dbmodel"
 
-func GetReviewData(id int64) (*dbmodel.Review, bool, error) {
-	ret := &dbmodel.Review{}
-	find, err := daoHandler.db.ReadEngine().Table(ret.SubName()).Where("id=?", id).Get(ret)
+func GetReviewData(id int64) (*ReviewDBInfo, bool, error) {
+	ret := &ReviewDBInfo{}
+	find, err := daoHandler.db.ReadEngine().Table(ret.TableName()).
+		Join("INNER", "project", "review.project_id = project.id").
+		Join("INNER", "gm_order", "review.order_id = gm_order.id").
+		Join("INNER", "user", "review.user_id = user.rid").Where("id=?", id).Get(ret)
 	if err != nil {
 		return nil, false, err
 	}
@@ -12,11 +15,10 @@ func GetReviewData(id int64) (*dbmodel.Review, bool, error) {
 }
 
 type ReviewDBInfo struct {
-	ReviewDB    *dbmodel.Review `xorm:"extends"`
-	ProjectName string          `json:"projectname"`
-	OrderName   string          `json:"ordername"`
-	OrderDesc   string          `json:"orderdesc"`
-	UserName    string          `json:"username"`
+	ReviewDB  *dbmodel.Review  `xorm:"extends"`
+	ProjectDB *dbmodel.Project `xorm:"extends"`
+	OrderDB   *dbmodel.GmOrder `xorm:"extends"`
+	UserDB    *dbmodel.User    `xorm:"extends"`
 }
 
 func (ReviewDBInfo) TableName() string {
@@ -25,13 +27,16 @@ func (ReviewDBInfo) TableName() string {
 
 func FindReviewDatas(projectId int64, orderIds []int64, startTime int64, endTime int64) ([]*ReviewDBInfo, error) {
 	rets := make([]*ReviewDBInfo, 0)
-	err := daoHandler.db.ReadEngine().Table((&ReviewDBInfo{}).TableName()).
-		Select("review.*,project.name as projectname,order.name as ordername,order.desc as orderdesc,user.name as username").
+	session := daoHandler.db.ReadEngine().Table((&ReviewDBInfo{}).TableName()).
 		Join("INNER", "project", "review.project_id = project.id").
-		Join("INNER", "order", "review.order_id = order.id").
-		Join("INNER", "user", "review.user_id = user.id").
-		Where("project_id = ? and start_date >= ? and  start_date <= ?", projectId, startTime, endTime).
-		In("order_id", orderIds).Find(&rets)
+		Join("INNER", "gm_order", "review.order_id = gm_order.id").
+		Join("INNER", "user", "review.user_id = user.rid")
+	if projectId == 0 {
+		session = session.Where("start_date >= ? and  start_date <= ?", startTime, endTime)
+	} else {
+		session = session.Where("project_id = ? and start_date >= ? and  start_date <= ?", projectId, startTime, endTime)
+	}
+	err := session.In("order_id", orderIds).Find(&rets)
 	if err != nil {
 		return nil, err
 	}
@@ -42,10 +47,9 @@ func FindReviewDatas(projectId int64, orderIds []int64, startTime int64, endTime
 func FindReviewByUserDatas(userId int64, orderId int64) ([]*ReviewDBInfo, error) {
 	rets := make([]*ReviewDBInfo, 0)
 	err := daoHandler.db.ReadEngine().Table((&ReviewDBInfo{}).TableName()).
-		Select("review.*,project.name as projectname,order.name as ordername,user.name as username").
 		Join("INNER", "project", "review.project_id = project.id").
-		Join("INNER", "order", "review.order_id = order.id").
-		Join("INNER", "user", "review.user_id = user.id").
+		Join("INNER", "gm_order", "review.order_id = gm_order.id").
+		Join("INNER", "user", "review.user_id = user.rid").
 		Where("user_id = ? and order_id = ?", userId, orderId).
 		Desc("start_date").Limit(50).Find(&rets)
 	if err != nil {

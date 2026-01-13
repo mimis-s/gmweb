@@ -40,6 +40,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		engine.Get("/gm_user_mangement.html", "用户管理界面", controllerHandler.GmUserMangement)
 		engine.Get("/gm_permission.html", "权限管理界面", controllerHandler.GmPermission)
 		engine.Get("/gm_log.html", "日志管理界面", controllerHandler.GmLog)
+		engine.Get("/gm_review.html", "审核界面", controllerHandler.GmReview)
 
 		engine.PostWithStructParams("/api/login", "登陆的post", webmodel.GetUserReq{}, controllerHandler.PostApiLogin)
 		engine.PostWithStructParams("/api/gm_order_box", "获取gm指令的post", webmodel.GetGmOrderBoxReq{}, controllerHandler.PostApiGmOrderBox)
@@ -79,6 +80,11 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 
 		// 日志查看
 		engine.PostWithStructParams("/api/gm_log", "日志查看", webmodel.GetGmLogReq{}, controllerHandler.PostApiGetGmLog)
+
+		// 审核
+		engine.PostWithStructParams("/api/review/all/get", "获取所有可以查看的审核信息", webmodel.GetReviewReq{}, controllerHandler.PostApiGetReview)
+		engine.PostWithStructParams("/api/review/order/get", "获取单个命令的审核信息", webmodel.GetUserOrderReviewReq{}, controllerHandler.PostApiGetUserOrderReview)
+
 		a.AddServer("gmweb", engine)
 		return nil
 	}))

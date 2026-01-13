@@ -281,6 +281,11 @@ export const apiClient = {
     
     // 日志
     getLogs: (params) => api.post(Endpoints.GM_LOG, params),
+
+    // 审核管理
+    getReviewAll: (data) => api.post(Endpoints.GM_REVIEW_ALL_GET, { data }),
+    getReviewOrder: (orderid) => api.post(Endpoints.GM_REVIEW_ORDER_GET, { orderid: orderid }),
+
 };
 
 // 导出 HTML 加载器
@@ -307,7 +312,8 @@ export const loadHtml = {
     gmUserManagement: () => HtmlLoader.loadPage('gm_user_mangement'),
     gmPermission: () => HtmlLoader.loadPage('gm_permission'),
     gmLog: () => HtmlLoader.loadPage('gm_log'),
-    
+    gmLReview: () => HtmlLoader.loadPage('gm_review'),
+
     // 模板片段
     loginButton: () => HtmlLoader.loadTemplate('login_button'),
     loginLineedit: () => HtmlLoader.loadTemplate('login_lineedit'),
