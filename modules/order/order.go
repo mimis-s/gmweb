@@ -9,6 +9,7 @@ import (
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
 	"github.com/mimis-s/gmweb/dao"
+	"github.com/mimis-s/gmweb/lib/parse"
 	"github.com/mimis-s/gmweb/modules/gm_common"
 )
 
@@ -33,7 +34,7 @@ func GetGmOrderBoxReq(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq, rsp *
 		return err
 	}
 
-	orderDatas, _, err := dao.GetUserOrderByReview(ctx, req.ProjectId, user, define.EnumPowerReview_run)
+	orderDatas, _, err := dao.GetUserOrderByReview(ctx, int64(req.ProjectId), user, define.EnumPowerReview_run)
 	if err != nil {
 		dao.Error(ctx, err.Error())
 		return err
@@ -49,7 +50,7 @@ func GetGmOrderBoxReq(ctx *web.WebContext, req *webmodel.GetGmOrderBoxReq, rsp *
 
 		rsp.Datas = append(rsp.Datas, &webmodel.RoleGmOrder{
 			GmOrderData: &webmodel.GmOrder{
-				OrderId:     orderData.Id,
+				OrderId:     int(orderData.Id),
 				OrderName:   orderData.Name,
 				Level:       orderData.Level,
 				OrderDesc:   orderData.Desc,
@@ -75,7 +76,7 @@ func DelGmOrderHandler(ctx *web.WebContext, req *webmodel.DelGmOrderReq, rsp *we
 		dao.Error(ctx, err.Error())
 		return err
 	}
-	err := dao.DelOrderData(req.OrderId)
+	err := dao.DelOrderData(int64(req.OrderId))
 	if err != nil {
 		dao.Error(ctx, "del project:%v order:%v is err:%v", req.ProjectId, req.OrderId, err)
 		return err
@@ -96,7 +97,7 @@ func AddGmOrderHandler(ctx *web.WebContext, req *webmodel.AddGmOrderReq, rsp *we
 		dao.Error(ctx, err.Error())
 		return err
 	}
-	projectData, find, err := dao.GetProjectData(req.ProjectId)
+	projectData, find, err := dao.GetProjectData(int64(req.ProjectId))
 	if err != nil {
 		dao.Error(ctx, "add project:%v order:%v is err:%v", req.ProjectId, req.OrderName, err)
 		return err
@@ -109,10 +110,9 @@ func AddGmOrderHandler(ctx *web.WebContext, req *webmodel.AddGmOrderReq, rsp *we
 	}
 
 	inserData := &dbmodel.GmOrder{
-		ProjectId: req.ProjectId,
-		Name:      req.OrderName,
-		Level:     req.Level,
-		Desc:      req.OrderDesc,
+		Name:  req.OrderName,
+		Level: req.Level,
+		Desc:  req.OrderDesc,
 		Data: &db_extra.GmOrderExtra{
 			OrderStruct: req.OrderStruct,
 			Path:        req.Path,
@@ -126,7 +126,7 @@ func AddGmOrderHandler(ctx *web.WebContext, req *webmodel.AddGmOrderReq, rsp *we
 		return err
 	}
 	rsp.Data = &webmodel.GmOrder{
-		OrderId:     inserData.Id,
+		OrderId:     int(inserData.Id),
 		OrderName:   inserData.Name,
 		Level:       inserData.Level,
 		OrderDesc:   inserData.Desc,
@@ -149,7 +149,7 @@ func ModifyGmOrderHandler(ctx *web.WebContext, req *webmodel.ModifyGmOrderReq, r
 		dao.Error(ctx, err.Error())
 		return err
 	}
-	orderData, find, err := dao.GetOrderData(req.Data.OrderId)
+	orderData, find, err := dao.GetOrderData(int64(req.Data.OrderId))
 	if err != nil {
 		dao.Error(ctx, "modify project:%v order:%v is err:%v", req.ProjectId, req.Data.OrderName, err)
 		return err
@@ -174,7 +174,7 @@ func ModifyGmOrderHandler(ctx *web.WebContext, req *webmodel.ModifyGmOrderReq, r
 	}
 
 	rsp.Data = &webmodel.GmOrder{
-		OrderId:     orderData.Id,
+		OrderId:     int(orderData.Id),
 		OrderName:   orderData.Name,
 		Level:       orderData.Level,
 		OrderDesc:   orderData.Desc,
@@ -191,7 +191,7 @@ func SendGmOrderHandler(ctx *web.WebContext, req *webmodel.SendGmOrderReq, rsp *
 	if user == nil {
 		return nil
 	}
-	reviewData, err := gm_common.StepGmOrderRun(ctx, user, req.OrderId, req.Msg)
+	reviewData, err := gm_common.StepGmOrderRun(ctx, user, int64(req.OrderId), req.Msg)
 	if err != nil {
 		return err
 	}
@@ -216,21 +216,22 @@ func SendGmOrderHandler(ctx *web.WebContext, req *webmodel.SendGmOrderReq, rsp *
 
 	err = afterAutoReview(ctx, user, reviewData)
 	rsp.Data = &webmodel.ReviewInfo{
-		ProjectId:   reviewData.ReviewDB.ProjectId,
+		ProjectId:   int(reviewData.ReviewDB.ProjectId),
 		ProjectName: reviewData.ProjectDB.Name,
-		OrderId:     reviewData.ReviewDB.OrderId,
+		OrderId:     int(reviewData.ReviewDB.OrderId),
 		OrderName:   reviewData.OrderDB.Name,
 		OrderDesc:   reviewData.OrderDB.Desc,
-		UserId:      reviewData.ReviewDB.UserId,
+		UserId:      int(reviewData.ReviewDB.UserId),
 		UserName:    reviewData.UserDB.Name,
 		ResultData:  make([]*webmodel.ReviewStep, 0),
 	}
 	for _, stepData := range reviewData.ReviewDB.ExtraData.ResultData {
 		rsp.Data.ResultData = append(rsp.Data.ResultData, &webmodel.ReviewStep{
-			UserId:     stepData.UserId,
+			StepId:     int(stepData.StepId),
+			UserId:     int(stepData.UserId),
 			UserName:   stepData.UserName,
 			Status:     stepData.Status,
-			ReviewTime: stepData.ReviewTime,
+			ReviewTime: parse.Int64ToString(stepData.ReviewTime),
 			Desc:       stepData.Desc,
 		})
 	}

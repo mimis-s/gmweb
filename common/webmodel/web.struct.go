@@ -12,11 +12,11 @@ type GetUserRsp struct {
 }
 
 type GetGmOrderBoxReq struct {
-	ProjectId int64 `json:"projectid"` // 项目id
+	ProjectId int `json:"projectid"` // 项目id
 }
 
 type GetGmOrderBoxRsp struct {
-	ProjectId int64          `json:"projectid"` // 项目id
+	ProjectId int            `json:"projectid"` // 项目id
 	Datas     []*RoleGmOrder `json:"datas"`     // 项目id对应的所有命令数据
 }
 
@@ -26,7 +26,7 @@ type RoleGmOrder struct {
 }
 
 type GmOrder struct {
-	OrderId     int64  `json:"orderid"` // 命令id
+	OrderId     int    `json:"orderid"` // 命令id
 	OrderName   string `json:"ordername"`
 	Path        string `json:"path"`   // 路径(普通用户获取值为空)
 	Method      string `json:"method"` // POST / GET(普通用户获取值为空)
@@ -36,7 +36,7 @@ type GmOrder struct {
 }
 
 type SendGmOrderReq struct {
-	OrderId int64  `json:"orderid"` // 命令id
+	OrderId int    `json:"orderid"` // 命令id
 	Msg     string `json:"msg"`     // gm命令数据
 }
 
@@ -52,7 +52,7 @@ type GetGmProjectBoxRsp struct {
 }
 
 type GmProject struct {
-	ProjectId int64      `json:"projectid"` // 项目id
+	ProjectId int        `json:"projectid"` // 项目id
 	Name      string     `json:"name"`      // 项目名(不可重复)
 	Desc      string     `json:"desc"`      // 项目描述
 	GmAddr    string     `json:"gmaddr"`    // 项目Gm地址(普通用户没有权限查看修改地址)
@@ -60,21 +60,21 @@ type GmProject struct {
 }
 
 type GmProjectBriefInfo struct {
-	ProjectId int64  `json:"projectid"` // 项目id
+	ProjectId int    `json:"projectid"` // 项目id
 	Name      string `json:"name"`      // 项目名(不可重复)
 	Desc      string `json:"desc"`      // 项目描述
 }
 
 type DelGmOrderReq struct {
-	ProjectId int64 `json:"projectid"` // 项目id
-	OrderId   int64 `json:"orderid"`   // 命令id
+	ProjectId int `json:"projectid"` // 项目id
+	OrderId   int `json:"orderid"`   // 命令id
 }
 
 type DelGmOrderRsp struct {
 }
 
 type AddGmOrderReq struct {
-	ProjectId   int64  `json:"projectid"` // 项目id
+	ProjectId   int    `json:"projectid"` // 项目id
 	OrderName   string `json:"ordername"` // 命令名字(不允许重名)
 	Level       int    `json:"level"`
 	Path        string `json:"path"`
@@ -84,17 +84,17 @@ type AddGmOrderReq struct {
 }
 
 type AddGmOrderRsp struct {
-	ProjectId int64    `json:"projectid"` // 项目id
+	ProjectId int      `json:"projectid"` // 项目id
 	Data      *GmOrder `json:"data"`
 }
 
 type ModifyGmOrderReq struct {
-	ProjectId int64    `json:"projectid"` // 项目id
+	ProjectId int      `json:"projectid"` // 项目id
 	Data      *GmOrder `json:"data"`
 }
 
 type ModifyGmOrderRsp struct {
-	ProjectId int64    `json:"projectid"` // 项目id
+	ProjectId int      `json:"projectid"` // 项目id
 	Data      *GmOrder `json:"data"`
 }
 
@@ -109,29 +109,29 @@ type AddGmProjectRsp struct {
 }
 
 type DelGmProjectReq struct {
-	ProjectId int64 `json:"projectid"` // 项目id
+	ProjectId int `json:"projectid"` // 项目id
 }
 
 type DelGmProjectRsp struct {
-	ProjectId int64 `json:"projectid"` // 项目id
+	ProjectId int `json:"projectid"` // 项目id
 }
 
 type ModifyGmProjectReq struct {
-	ProjectId int64  `json:"projectid"` // 项目id
+	ProjectId int    `json:"projectid"` // 项目id
 	Name      string `json:"name"`      // 项目名(不可重复)
 	Desc      string `json:"desc"`      // 项目描述
 	GmAddr    string `json:"gmaddr"`    // 项目Gm地址
 }
 
 type ModifyGmProjectRsp struct {
-	ProjectId int64  `json:"projectid"` // 项目id
+	ProjectId int    `json:"projectid"` // 项目id
 	Name      string `json:"name"`      // 项目名(不可重复)
 	Desc      string `json:"desc"`      // 项目描述
 	GmAddr    string `json:"gmaddr"`    // 项目Gm地址
 }
 
 type User struct {
-	UserId   int64  `json:"userid"`
+	UserId   int    `json:"userid"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
 }
@@ -144,7 +144,7 @@ type GetAllUsersRsp struct {
 }
 
 type ModifyUserReq struct {
-	UserId   int64  `json:"userid"`
+	UserId   int    `json:"userid"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
 }
@@ -163,18 +163,18 @@ type AddUserRsp struct {
 }
 
 type DelUserReq struct {
-	UserId int64 `json:"userid"`
+	UserId int `json:"userid"`
 }
 
 type DelUserRsp struct {
-	UserId int64 `json:"userid"`
+	UserId int `json:"userid"`
 }
 
 type PermissionInfo struct {
-	Id             int64  `json:"id"`
+	Id             int    `json:"id"`
 	Name           string `json:"name"`
 	Enable         bool   `json:"enable"`         // 是否启用
-	ProjectId      int64  `json:"projectid"`      // 项目id(为0匹配所有项目)
+	ProjectId      int    `json:"projectid"`      // 项目id(为0匹配所有项目)
 	ProjectName    string `json:"projectname"`    // 项目名字
 	Level          int    `json:"level"`          // 命令的等级(为0匹配所有level)
 	OrderNameMatch string `json:"ordernamematch"` // 命令字符串匹配(在level下面匹配命令)
@@ -182,27 +182,27 @@ type PermissionInfo struct {
 }
 
 type PermissionGroupUserInfo struct {
-	UserId int64  `json:"userid"`
+	UserId int    `json:"userid"`
 	Name   string `json:"username"`
 }
 
 type PermissionGroupUserAssignmentInfo struct {
-	Id        int64  `json:"id"`
-	UserId    int64  `json:"userid"`
+	Id        int    `json:"id"`
+	UserId    int    `json:"userid"`
 	Name      string `json:"username"`
-	GroupId   int64  `json:"groupid"`
+	GroupId   int    `json:"groupid"`
 	GroupName string `json:"groupname"`
 }
 
 type PermissionGroupInfo struct {
-	Id       int64   `json:"id"`
-	Name     string  `json:"name"`
-	Enable   bool    `json:"enable"` // 是否启用
-	PowerIds []int64 `json:"powerids"`
+	Id       int    `json:"id"`
+	Name     string `json:"name"`
+	Enable   bool   `json:"enable"` // 是否启用
+	PowerIds []int  `json:"powerids"`
 }
 
 type PermissionProject struct {
-	ProjectId int64  `json:"projectid"` // 项目id
+	ProjectId int    `json:"projectid"` // 项目id
 	Name      string `json:"name"`      // 项目名(不可重复)
 }
 
@@ -221,7 +221,7 @@ type GetPermissionRsp struct {
 type AddPermissionReq struct {
 	Name           string `json:"name"`
 	Enable         bool   `json:"enable"`         // 是否启用
-	ProjectId      int64  `json:"projectid"`      // 项目id(为0匹配所有项目)
+	ProjectId      int    `json:"projectid"`      // 项目id(为0匹配所有项目)
 	ProjectName    string `json:"projectname"`    // 项目名称
 	Level          int    `json:"level"`          // 命令的等级(为0匹配所有level)
 	OrderNameMatch string `json:"ordernamematch"` // 命令字符串匹配(在level下面匹配命令)
@@ -232,11 +232,11 @@ type AddPermissionRsp struct {
 }
 
 type DelPermissionReq struct {
-	Id int64 `json:"id"`
+	Id int `json:"id"`
 }
 
 type DelPermissionRsp struct {
-	Id int64 `json:"id"`
+	Id int `json:"id"`
 }
 
 type ModifyPermissionReq struct {
@@ -248,10 +248,10 @@ type ModifyPermissionRsp struct {
 }
 
 type AddPermissionGroupReq struct {
-	Id       int64   `json:"id"`
-	Name     string  `json:"name"`
-	Enable   bool    `json:"enable"` // 是否启用
-	PowerIds []int64 `json:"powerids"`
+	Id       int    `json:"id"`
+	Name     string `json:"name"`
+	Enable   bool   `json:"enable"` // 是否启用
+	PowerIds []int  `json:"powerids"`
 }
 
 type AddPermissionGroupRsp struct {
@@ -259,11 +259,11 @@ type AddPermissionGroupRsp struct {
 }
 
 type DelPermissionGroupReq struct {
-	Id int64 `json:"id"`
+	Id int `json:"id"`
 }
 
 type DelPermissionGroupRsp struct {
-	Id int64 `json:"id"`
+	Id int `json:"id"`
 }
 
 type ModifyPermissionGroupReq struct {
@@ -284,17 +284,17 @@ type GetGmProjectBriefInfoRsp struct {
 
 // 删除权限分配数据
 type DelPowerAssignmentReq struct {
-	Id int64 `json:"id"`
+	Id int `json:"id"`
 }
 
 type DelPowerAssignmentRsp struct {
-	Id int64 `json:"id"`
+	Id int `json:"id"`
 }
 
 // 添加权限分配数据
 type AddPowerAssignmentReq struct {
-	UserId  int64 `json:"userid"`
-	GroupId int64 `json:"groupid"`
+	UserId  int `json:"userid"`
+	GroupId int `json:"groupid"`
 }
 
 type AddPowerAssignmentRsp struct {
@@ -306,17 +306,17 @@ type GetGmLogReq struct {
 	UserName  string `json:"username"`  // 用户名过滤(为空就是所有用户)
 	Ip        string `json:"ip"`        // IP地址过滤(模糊匹配)
 	Level     int    `json:"level"`     // 日志等级过滤(为0是所有等级)
-	StartTime int64  `json:"starttime"` // 日期范围过滤
-	EndTime   int64  `json:"endtime"`   // 日期范围过滤
+	StartTime string `json:"starttime"` // 日期范围过滤
+	EndTime   string `json:"endtime"`   // 日期范围过滤
 	Msg       string `json:"msg"`       // 消息内容过滤(模糊匹配)
 }
 
 type GmLogInfo struct {
-	UserId   int64  `json:"userid"`
+	UserId   int    `json:"userid"`
 	UserName string `json:"username"`
 	Ip       string `json:"ip"`
 	Level    int    `json:"level"`
-	LogTime  int64  `json:"logtime"`
+	LogTime  string `json:"logtime"`
 	Msg      string `json:"msg"`
 }
 
@@ -326,31 +326,32 @@ type GetGmLogRsp struct {
 
 type ReviewStep struct {
 	StepId     int                         `json:"stepid"`
-	UserId     int64                       `json:"userid"` // 当前步骤的审批人
+	UserId     int                         `json:"userid"` // 当前步骤的审批人
 	UserName   string                      `json:"username"`
 	Status     define.EnumReviewStepStatus `json:"status"`     // 状态(1:成功, 2:等待审批, 3:失败)
-	ReviewTime int64                       `json:"reviewtime"` // 审核时间
+	ReviewTime string                      `json:"reviewtime"` // 审核时间
 	Desc       string                      `json:"desc"`       // 步骤具体信息(可以填当前步骤的gm命令,也可以是执行之后的返回值)
 }
 
 type ReviewInfo struct {
-	ProjectId   int64                `json:"projectid"`
+	Id          int                  `json:"id"`
+	ProjectId   int                  `json:"projectid"`
 	ProjectName string               `json:"projectname"`
-	OrderId     int64                `json:"orderid"`
+	OrderId     int                  `json:"orderid"`
 	OrderName   string               `json:"ordername"`
 	OrderDesc   string               `json:"orderdesc"`
-	UserId      int64                `json:"userid"`
+	UserId      int                  `json:"userid"`
 	UserName    string               `json:"username"`
 	NextStep    define.EnumOrderStep `json:"nextstep"`
 	ResultData  []*ReviewStep        `json:"resultdata"` // 执行步骤
-	StartDate   int64                `json:"startdate"`  // 申请审核的时间(作为查询条件)
+	StartDate   string               `json:"startdate"`  // 申请审核的时间(作为查询条件)
 }
 
 // 获取审核信息
 type GetReviewReq struct {
-	ProjectId int64 `json:"projectid"` // 按照项目来划分
-	StartTime int64 `json:"starttime"` // 日期范围过滤(申请时间为标准)
-	EndTime   int64 `json:"endtime"`   // 日期范围过滤(申请时间为标准)
+	StartTime string `json:"starttime"` // 日期范围过滤(申请时间为标准)
+	EndTime   string `json:"endtime"`   // 日期范围过滤(申请时间为标准)
+	ProjectId int    `json:"projectid"` // 按照项目来划分
 }
 type GetReviewRsp struct {
 	Datas []*ReviewInfo `json:"datas"`
@@ -358,7 +359,7 @@ type GetReviewRsp struct {
 
 // 获取某个人的一条gm命令的审核信息
 type GetUserOrderReviewReq struct {
-	OrderId int64 `json:"orderid"`
+	OrderId int `json:"orderid"`
 }
 type GetUserOrderReviewRsp struct {
 	Datas []*ReviewInfo `json:"datas"`
@@ -366,8 +367,8 @@ type GetUserOrderReviewRsp struct {
 
 // 审核命令
 type OrderReviewStepReq struct {
-	ReviewId int64 `json:"reviewid"` // 审核id
-	IsAgree  bool  `json:"is_agree"` // 是否同意(true:同意, false:拒绝)
+	ReviewId int  `json:"reviewid"` // 审核id
+	IsAgree  bool `json:"is_agree"` // 是否同意(true:同意, false:拒绝)
 }
 
 type OrderReviewStepRsp struct {

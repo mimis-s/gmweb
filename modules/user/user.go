@@ -34,7 +34,7 @@ func GetAllUsersHandler(ctx *web.WebContext, req *webmodel.GetAllUsersReq, rsp *
 	for _, data := range userDBDatas {
 		passwd, _ := encrypt.Decrypt(data.Password)
 		rsp.Datas = append(rsp.Datas, &webmodel.User{
-			UserId:   data.Rid,
+			UserId:   int(data.Rid),
 			Name:     data.Name,
 			Password: passwd,
 		})
@@ -87,7 +87,7 @@ func AddUserHandler(ctx *web.WebContext, req *webmodel.AddUserReq, rsp *webmodel
 		return err
 	}
 	rsp.Data = &webmodel.User{
-		UserId:   insertData.Rid,
+		UserId:   int(insertData.Rid),
 		Name:     req.Name,
 		Password: req.Password,
 	}
@@ -109,7 +109,7 @@ func DelUserHandler(ctx *web.WebContext, req *webmodel.DelUserReq, rsp *webmodel
 		return err
 	}
 
-	delUser, find, err := dao.GetUserData(req.UserId)
+	delUser, find, err := dao.GetUserData(int64(req.UserId))
 	if err != nil {
 		dao.Error(ctx, "user:%v del user:%v is err:%v", user.Rid, req.UserId, err)
 		return err
@@ -122,7 +122,7 @@ func DelUserHandler(ctx *web.WebContext, req *webmodel.DelUserReq, rsp *webmodel
 		return nil
 	}
 
-	err = dao.DelUserData(req.UserId)
+	err = dao.DelUserData(int64(req.UserId))
 	if err != nil {
 		dao.Error(ctx, "user:%v del user:%v name:%v is err:%v", user.Rid, req.UserId, delUser.Name, err)
 		return err
@@ -148,7 +148,7 @@ func ModifyUserHandler(ctx *web.WebContext, req *webmodel.ModifyUserReq, rsp *we
 		return err
 	}
 
-	modifyUser, find, err := dao.GetUserData(req.UserId)
+	modifyUser, find, err := dao.GetUserData(int64(req.UserId))
 	if err != nil {
 		dao.Error(ctx, "user:%v modify user:%v is err:%v", user.Rid, req.UserId, err)
 		return err
@@ -168,7 +168,7 @@ func ModifyUserHandler(ctx *web.WebContext, req *webmodel.ModifyUserReq, rsp *we
 	if modifyUser.Name != req.Name || modifyUser.Password != passwd {
 		modifyUser.Name = req.Name
 		modifyUser.Password = passwd
-		err = dao.UpdateUserData(req.UserId, modifyUser)
+		err = dao.UpdateUserData(int64(req.UserId), modifyUser)
 		if err != nil {
 			dao.Error(ctx, "user:%v modify user:%v is err:%v", user.Rid, req.UserId, err)
 			return err

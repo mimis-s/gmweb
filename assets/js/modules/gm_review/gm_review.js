@@ -17,13 +17,14 @@ export function createGmReviewClass() {
             approverDefinitions: [],
             messages: [],
             filter: {
+                projectId: 0,
                 startDate: '',
                 endDate: ''
             },
         },
 
-        async getReviewMessagesContainerBody() {
-            return document.getElementById('gmReviewMessagesContainer');
+        async getReviewContainerBody() {
+            return document.getElementById('gmReviewContainer');
         },
 
         // 创建步骤审批流程HTML
@@ -71,28 +72,34 @@ export function createGmReviewClass() {
         },
 
         // 创建气泡框HTML
-        async createBubbleHTML(step, stepIndex, messageId) {
-            const stepDef = this.state.stepDefinitions.find(s => s.id === step.stepId);
-            const approver = step.approverId ? this.state.approverDefinitions.find(a => a.id === step.approverId) : null;
+        createBubbleHTML(step, stepIndex, messageId) {
+            // const stepDef = this.state.stepDefinitions.find(s => s.id === step.stepid);
+            let stepDef = {
+                name: "完成",
+                description: step.desc,
+            }
+            if (!step && step.stepid == 0) {
+                stepDef.name = "发起GM命令";
+            }else if (!step && step.stepid == 1) {
+                stepDef.name = "审核";
+            }else if (!step && step.stepid == 2) {
+                stepDef.name = "发送";
+            }
 
             let statusText = "";
             let statusClass = "";
 
             switch (step.status) {
-                case "pending":
-                    statusText = "待处理";
-                    statusClass = "pending";
-                    break;
-                case "current":
-                    statusText = "进行中";
-                    statusClass = "current";
-                    break;
-                case "completed":
-                    statusText = "已完成";
+                case 0: // 成功
+                    statusText = "成功";
                     statusClass = "completed";
                     break;
-                case "rejected":
-                    statusText = "已拒绝";
+                case 1: // pending
+                    statusText = "进行中";
+                    statusClass = "pending";
+                    break;
+                case 2: // 失败
+                    statusText = "已完成";
                     statusClass = "rejected";
                     break;
             }
@@ -103,9 +110,9 @@ export function createGmReviewClass() {
                     <div class="bubble-desc">${stepDef ? stepDef.description : ""}</div>
             `;
 
-            if (approver) {
+            if (step.username) {
                 bubbleHTML += `
-                    <div><strong>审批人:</strong> ${approver.name} (${approver.role})</div>
+                    <div><strong>审批人:</strong> ${step.username} (${step.userid})</div>
                 `;
             } else {
                 bubbleHTML += `
@@ -113,9 +120,11 @@ export function createGmReviewClass() {
                 `;
             }
 
-            if (step.approveTime) {
+            if (step.reviewtime) {
+                const reviewtime = new Date(Number(step.reviewtime));
+                const timeStr = new Date(reviewtime).toLocaleString('zh-CN');
                 bubbleHTML += `
-                    <div><strong>审批时间:</strong> ${step.approveTime}</div>
+                    <div><strong>审批时间:</strong> ${timeStr}</div>
                 `;
             }
 
@@ -132,7 +141,7 @@ export function createGmReviewClass() {
             const stepElements = messageElement.querySelectorAll('.step');
 
             stepElements.forEach((stepEl, index) => {
-                const step = message.steps[index];
+                const step = message.resultdata[index];
 
                 // 创建气泡框
                 const bubbleHTML =  this.createBubbleHTML(step, index, message.id);
@@ -153,29 +162,17 @@ export function createGmReviewClass() {
         },
 
         // 创建消息元素
-        async createMessageElement(message) {
-            const messageElement = document.createElement('div');
-            messageElement.className = `message ${message.status !== 'in-progress' ? 'processed' : ''}`;
+        async createMessageElement(message, messageElement) {
+            console.debug("创建消息元素:", message)
+            // const messageElement = document.createElement('div');
+            messageElement.className = `message ${message.nextstep !== 3 ? 'processed' : ''}`;
             messageElement.dataset.id = message.id;
 
+            const messageStatus = message.resultdata.find(item => item.stepid === 1)
+            console.debug("messageStatus:", messageStatus)
+
             // 根据状态创建不同的内容
-            let actionContent = '';
-            if (message.status === 'approved') {
-                actionContent = `
-                    <div class="status-label approved">
-                        <i class="fas fa-check-circle"></i>
-                        已同意
-                    </div>
-                `;
-            } else if (message.status === 'rejected') {
-                actionContent = `
-                    <div class="status-label rejected">
-                        <i class="fas fa-times-circle"></i>
-                        已拒绝
-                    </div>
-                `;
-            } else {
-                actionContent = `
+            let actionContent = `
                     <div class="message-actions">
                         <button class="btn btn-approve">
                             <i class="fas fa-check-circle"></i>
@@ -187,16 +184,33 @@ export function createGmReviewClass() {
                         </button>
                     </div>
                 `;
+            if (messageStatus && messageStatus.desc === '同意') {
+                actionContent = `
+                    <div class="status-label approved">
+                        <i class="fas fa-check-circle"></i>
+                        已同意
+                    </div>
+                `;
+            } else if (messageStatus && messageStatus.desc === '拒绝') {
+                actionContent = `
+                    <div class="status-label rejected">
+                        <i class="fas fa-times-circle"></i>
+                        已拒绝
+                    </div>
+                `;
+            } else {
+
             }
 
             // 创建步骤审批HTML
             const stepsHTML = await this.createStepsHTML(message.id);
-
+            const startDate = new Date(Number(message.startdate));
+            const startTimeStr = new Date(startDate).toLocaleString('zh-CN');
             messageElement.innerHTML = `
                 <div class="message-header">
                     <div class="message-content">
-                        <div class="message-text">${message.text}</div>
-                        <div class="message-time">${message.time}</div>
+                        <div class="message-text">${message.ordername}(${message.projectname})</div>
+                        <div class="message-time">${startTimeStr}</div>
                     </div>
                     ${actionContent}
                 </div>
@@ -207,7 +221,7 @@ export function createGmReviewClass() {
             await this.addStepHoverEvents(messageElement, message);
 
             // 如果是待处理消息，添加按钮事件监听器
-            if (message.status === 'in-progress') {
+            if (message.nextstep === 1) {
                 const approveBtn = messageElement.querySelector('.btn-approve');
                 const rejectBtn = messageElement.querySelector('.btn-reject');
 
@@ -220,18 +234,19 @@ export function createGmReviewClass() {
 
         // 渲染消息列表
         async renderMessages() {
-            const messagesContainer = await this.getReviewMessagesContainerBody()
+            const reviewContainer = await this.getReviewContainerBody()
+            const messagesContainer = reviewContainer.querySelector('#gmReviewMessagesContainer');
             messagesContainer.innerHTML = '';
-            let startTimestamp = new Date(this.state.filter.startDate).getTime();
-            let endTimestamp = new Date(this.state.filter.endDate).getTime();
-            const projectSelect = messagesContainer.querySelector('#projectSelect');
+            let startTimestamp = new Date(this.state.filter.startDate).getTime().toString();
+            let endTimestamp = new Date(this.state.filter.endDate).getTime().toString();
             try {
-                const response = await apiClient.getReviewAll({
-                    projectid: Number(projectSelect?projectSelect.value:0),
-                    starttime: Number(startTimestamp),
-                    endtime: Number(endTimestamp),
-                });
-                console.debug("审核数据", response)
+                const getReviewAllReq = {
+                    ProjectId: Number(this.state.filter.projectId),
+                    StartTime: startTimestamp,    // 日期范围过滤
+                    EndTime: endTimestamp,      // 日期范围过滤
+                }
+                console.debug("开始获取审核数据",getReviewAllReq)
+                const response = await apiClient.getReviewAll(getReviewAllReq);
                 this.state.messages = response.message.datas;
 
                 if (this.state.messages.length === 0) {
@@ -252,7 +267,9 @@ export function createGmReviewClass() {
 
                 // 先渲染待处理消息，再渲染已处理消息
                 [...pendingMessages, ...processedMessages].forEach(message => {
-                    const messageElement = this.createMessageElement(message);
+                    const messageElement = document.createElement('div');
+                    this.createMessageElement(message,messageElement);
+                    console.debug("渲染消息:", messageElement)
                     messagesContainer.appendChild(messageElement);
                 });
             } catch (error) {
@@ -437,8 +454,8 @@ export function createGmReviewClass() {
         async addNewMessage() {
             // const newMessage = generateRandomMessage();
             // this.state.messages.push(newMessage);
-            const messagesContainer = await this.getReviewMessagesContainerBody()
-
+            const reviewContainer = await this.getReviewContainerBody()
+            const messagesContainer = reviewContainer.querySelector('#gmReviewMessagesContainer');
             // 如果当前显示空状态，先清空容器
             if (messagesContainer.querySelector('.empty-state')) {
                 messagesContainer.innerHTML = '';
@@ -477,7 +494,7 @@ export function createGmReviewClass() {
             // 设置日期范围默认值
             const today = new Date().toISOString().split('T')[0];
             const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() + 1);
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 1);
             const oneWeekAgoStr = oneWeekAgo.toISOString().split('T')[0];
 
             dynamicContent.querySelector('#startDate').value = oneWeekAgoStr;
@@ -487,6 +504,8 @@ export function createGmReviewClass() {
             this.state.filter.endDate = today;
 
             await this.renderMessages();
+
+            dynamicContent.querySelector('#queryForm').addEventListener('submit',(e) => {this.handleQuery(e)});
 
             // 初始添加一些动画效果
             const messageElements = document.querySelectorAll('.message');
@@ -508,6 +527,21 @@ export function createGmReviewClass() {
             // 添加进入动画
             dynamicContent.style.animation = 'fadeInUp 0.5s ease';
         },
+        // 处理查询
+        async handleQuery(e) {
+            e.preventDefault();
+            const reviewContainer = await this.getReviewContainerBody();
+            const gmReviewQueryPanel = reviewContainer.querySelector('#gmReviewQueryPanel')
+
+            // 获取查询条件
+            this.state.filter.startDate = gmReviewQueryPanel.querySelector('#startDate').value;
+            this.state.filter.endDate = gmReviewQueryPanel.querySelector('#endDate').value;
+            this.state.filter.projectId = gmReviewQueryPanel.querySelector('#projectSelect').value;
+
+            // 过滤和渲染
+            await this.renderMessages();
+        },
+
     };
 }
 

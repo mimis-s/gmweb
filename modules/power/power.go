@@ -9,6 +9,7 @@ import (
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
 	"github.com/mimis-s/gmweb/dao"
+	"github.com/mimis-s/gmweb/lib/parse"
 )
 
 func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, rsp *webmodel.GetPermissionRsp) error {
@@ -33,7 +34,7 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 
 	for _, userData := range allUsers {
 		rsp.AllUsers = append(rsp.AllUsers, &webmodel.PermissionGroupUserInfo{
-			UserId: userData.Rid,
+			UserId: int(userData.Rid),
 			Name:   userData.Name,
 		})
 	}
@@ -55,7 +56,7 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 	}
 	for _, projectData := range allProjects {
 		rsp.AllProjects = append(rsp.AllProjects, &webmodel.PermissionProject{
-			ProjectId: projectData.Id,
+			ProjectId: int(projectData.Id),
 			Name:      projectData.Name,
 		})
 	}
@@ -105,10 +106,10 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 			orderReviews = append(orderReviews, int(orderReview))
 		}
 		rsp.PermissionDatas = append(rsp.PermissionDatas, &webmodel.PermissionInfo{
-			Id:             powerData.PowerId,
+			Id:             int(powerData.PowerId),
 			Name:           powerData.Name,
 			Enable:         *powerData.Enable,
-			ProjectId:      powerData.ProjectId,
+			ProjectId:      int(powerData.ProjectId),
 			ProjectName:    tmpProjectName,
 			Level:          powerData.Data.Level,
 			OrderNameMatch: powerData.Data.OrderNameMatch,
@@ -156,10 +157,10 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 		}
 
 		rsp.Assignment = append(rsp.Assignment, &webmodel.PermissionGroupUserAssignmentInfo{
-			Id:        powerAssignment.Id,
-			UserId:    powerAssignment.UserId,
+			Id:        int(powerAssignment.Id),
+			UserId:    int(powerAssignment.UserId),
 			Name:      userData.Name,
-			GroupId:   powerGroupData.GroupId,
+			GroupId:   int(powerGroupData.GroupId),
 			GroupName: powerGroupData.Name,
 		})
 	}
@@ -182,10 +183,10 @@ func GetPermissionHandler(ctx *web.WebContext, req *webmodel.GetPermissionReq, r
 			}
 		}
 		rsp.PermissionGroupDatas = append(rsp.PermissionGroupDatas, &webmodel.PermissionGroupInfo{
-			Id:       powerGroup.GroupId,
+			Id:       int(powerGroup.GroupId),
 			Name:     powerGroup.Name,
 			Enable:   *powerGroup.Enable,
-			PowerIds: powerGroup.ExtraData.PowerIds,
+			PowerIds: parse.SliceInt64ToInt(powerGroup.ExtraData.PowerIds),
 		})
 
 		if bUpdatePowerGroup {
@@ -221,7 +222,7 @@ func AddPermissionHandler(ctx *web.WebContext, req *webmodel.AddPermissionReq, r
 
 	projectName := ""
 	if req.ProjectId != 0 {
-		projectData, find, err := dao.GetProjectData(req.ProjectId)
+		projectData, find, err := dao.GetProjectData(int64(req.ProjectId))
 		if err != nil {
 			dao.Error(ctx, "add power is err:%v", err)
 			return err
@@ -236,7 +237,7 @@ func AddPermissionHandler(ctx *web.WebContext, req *webmodel.AddPermissionReq, r
 
 	insertData := &dbmodel.Power{
 		Name:      req.Name,
-		ProjectId: req.ProjectId,
+		ProjectId: int64(req.ProjectId),
 		Enable:    &req.Enable,
 		Data: &db_extra.PowerExtra{
 			Level:          req.Level,
@@ -255,10 +256,10 @@ func AddPermissionHandler(ctx *web.WebContext, req *webmodel.AddPermissionReq, r
 		orderReviews = append(orderReviews, int(orderReview))
 	}
 	rsp.Data = &webmodel.PermissionInfo{
-		Id:             insertData.PowerId,
+		Id:             int(insertData.PowerId),
 		Name:           insertData.Name,
 		Enable:         *insertData.Enable,
-		ProjectId:      insertData.ProjectId,
+		ProjectId:      int(insertData.ProjectId),
 		ProjectName:    projectName,
 		Level:          insertData.Data.Level,
 		OrderNameMatch: insertData.Data.OrderNameMatch,
@@ -281,7 +282,7 @@ func ModifyPermissionHandler(ctx *web.WebContext, req *webmodel.ModifyPermission
 		return err
 	}
 
-	powerData, find, err := dao.GetPowerData(req.Data.Id)
+	powerData, find, err := dao.GetPowerData(int64(req.Data.Id))
 	if err != nil {
 		dao.Error(ctx, "modify power is err:%v", err)
 		return err
@@ -302,7 +303,7 @@ func ModifyPermissionHandler(ctx *web.WebContext, req *webmodel.ModifyPermission
 	powerData.Data.Level = req.Data.Level
 	powerData.Data.OrderNameMatch = req.Data.OrderNameMatch
 	powerData.Data.OrderReviews = orderReviews
-	powerData.ProjectId = req.Data.ProjectId
+	powerData.ProjectId = int64(req.Data.ProjectId)
 
 	err = dao.UpdatePowerData(powerData.PowerId, powerData)
 	if err != nil {
@@ -329,7 +330,7 @@ func DelPermissionHandler(ctx *web.WebContext, req *webmodel.DelPermissionReq, r
 		return err
 	}
 
-	err := dao.DelPowers([]int64{req.Id})
+	err := dao.DelPowers([]int64{int64(req.Id)})
 	if err != nil {
 		dao.Error(ctx, "del power:%v is err:%v", req.Id, err)
 		return err

@@ -117,7 +117,7 @@ func GetGmProjectBriefInfoHandler(ctx *web.WebContext, req *webmodel.GetGmProjec
 	rsp.Datas = make([]*webmodel.GmProjectBriefInfo, 0)
 	for _, projectData := range projectDatas {
 		rsp.Datas = append(rsp.Datas, &webmodel.GmProjectBriefInfo{
-			ProjectId: projectData.Id,
+			ProjectId: int(projectData.Id),
 			Name:      projectData.Name,
 			Desc:      projectData.Data.Desc,
 		})
@@ -171,7 +171,7 @@ func AddGmProjectHandler(ctx *web.WebContext, req *webmodel.AddGmProjectReq, rsp
 		return err
 	}
 	rsp.Data = &webmodel.GmProject{
-		ProjectId: insertData.Id,
+		ProjectId: int(insertData.Id),
 		Name:      insertData.Name,
 		Desc:      insertData.Data.Desc,
 		GmAddr:    insertData.Data.GmAddr,
@@ -196,7 +196,7 @@ func DelGmProjectReqHandler(ctx *web.WebContext, req *webmodel.DelGmProjectReq, 
 	}
 
 	// 项目对应权限也需要删除
-	projectData, find, err := dao.GetProjectData(req.ProjectId)
+	projectData, find, err := dao.GetProjectData(int64(req.ProjectId))
 	if err != nil {
 		dao.Error(ctx, "del project:%v is err:%v", req.ProjectId, err)
 		return err
@@ -208,20 +208,20 @@ func DelGmProjectReqHandler(ctx *web.WebContext, req *webmodel.DelGmProjectReq, 
 		return err
 	}
 
-	err = dao.DelPowersByProjectId([]int64{req.ProjectId})
+	err = dao.DelPowersByProjectId([]int64{int64(req.ProjectId)})
 	if err != nil {
 		dao.Error(ctx, "del project:%v powers is err:%v", req.ProjectId, err)
 		return err
 	}
 
 	// 对应的gm命令也要删除
-	err = dao.DelOrderDataByProjectId(req.ProjectId)
+	err = dao.DelOrderDataByProjectId(int64(req.ProjectId))
 	if err != nil {
 		dao.Error(ctx, "del project:%v order is err:%v", req.ProjectId, err)
 		return err
 	}
 
-	err = dao.DelProjectData(req.ProjectId)
+	err = dao.DelProjectData(int64(req.ProjectId))
 	if err != nil {
 		dao.Error(ctx, "del project:%v is err:%v", req.ProjectId, err)
 		return err
@@ -259,13 +259,13 @@ func ModifyGmProjectHandler(ctx *web.WebContext, req *webmodel.ModifyGmProjectRe
 		return err
 	}
 
-	if find && project.Id != req.ProjectId {
+	if find && project.Id != int64(req.ProjectId) {
 		err := fmt.Errorf("modify project:%v is already exist", req.Name)
 		dao.Error(ctx, err.Error())
 		return err
 	}
 
-	projectData, find, err := dao.GetProjectData(req.ProjectId)
+	projectData, find, err := dao.GetProjectData(int64(req.ProjectId))
 	if err != nil {
 		dao.Error(ctx, "modify project:%v is err:%v", req.ProjectId, err)
 		return err
@@ -328,7 +328,7 @@ func GetGmProjectBoxHandler(ctx *web.WebContext, req *webmodel.GetGmProjectBoxRe
 	rsp.Datas = make([]*webmodel.GmProject, 0)
 	for _, projectData := range projectDatas {
 		retProjectData := &webmodel.GmProject{
-			ProjectId: projectData.Id,
+			ProjectId: int(projectData.Id),
 			Name:      projectData.Name,
 			Desc:      projectData.Data.Desc,
 			GmAddr:    projectData.Data.GmAddr,
@@ -337,7 +337,7 @@ func GetGmProjectBoxHandler(ctx *web.WebContext, req *webmodel.GetGmProjectBoxRe
 
 		for _, orderData := range orderMap[projectData.Id] {
 			retOrderData := &webmodel.GmOrder{
-				OrderId:     orderData.Id,
+				OrderId:     int(orderData.Id),
 				OrderName:   orderData.Name,
 				Path:        orderData.Data.Path,
 				Method:      orderData.Data.Method,

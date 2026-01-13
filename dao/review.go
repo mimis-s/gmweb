@@ -31,11 +31,11 @@ func FindReviewDatas(projectId int64, orderIds []int64, startTime int64, endTime
 		Join("INNER", "project", "review.project_id = project.id").
 		Join("INNER", "gm_order", "review.order_id = gm_order.id").
 		Join("INNER", "user", "review.user_id = user.rid")
-	if projectId == 0 {
-		session = session.Where("start_date >= ? and  start_date <= ?", startTime, endTime)
-	} else {
-		session = session.Where("project_id = ? and start_date >= ? and  start_date <= ?", projectId, startTime, endTime)
-	}
+	//if projectId == 0 {
+	//	session = session.Where("start_date >= ? and  start_date <= ?", startTime, endTime)
+	//} else {
+	//	session = session.Where("project_id = ? and start_date >= ? and  start_date <= ?", projectId, startTime, endTime)
+	//}
 	err := session.In("order_id", orderIds).Find(&rets)
 	if err != nil {
 		return nil, err

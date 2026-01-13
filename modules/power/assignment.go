@@ -24,7 +24,7 @@ func AddPermissionAssignmentHandler(ctx *web.WebContext, req *webmodel.AddPowerA
 		return err
 	}
 
-	assignmentUser, find, err := dao.GetUserData(req.UserId)
+	assignmentUser, find, err := dao.GetUserData(int64(req.UserId))
 	if err != nil {
 		dao.Error(ctx, "add power assignment user:%v is err:%v", req.UserId, err)
 		return err
@@ -35,7 +35,7 @@ func AddPermissionAssignmentHandler(ctx *web.WebContext, req *webmodel.AddPowerA
 		dao.Error(ctx, err.Error())
 		return err
 	}
-	assignmentGroup, find, err := dao.GetPowerGroupData(req.GroupId)
+	assignmentGroup, find, err := dao.GetPowerGroupData(int64(req.GroupId))
 	if err != nil {
 		dao.Error(ctx, "add power assignment user:%v group:%v is err:%v", req.UserId, req.GroupId, err)
 		return err
@@ -47,7 +47,7 @@ func AddPermissionAssignmentHandler(ctx *web.WebContext, req *webmodel.AddPowerA
 		return err
 	}
 
-	_, find, err = dao.GetPowerAssignmentData(req.UserId, req.GroupId)
+	_, find, err = dao.GetPowerAssignmentData(int64(req.UserId), int64(req.GroupId))
 	if err != nil {
 		dao.Error(ctx, "add power assignment user:%v group:%v is err:%v", req.UserId, req.GroupId, err)
 		return err
@@ -60,8 +60,8 @@ func AddPermissionAssignmentHandler(ctx *web.WebContext, req *webmodel.AddPowerA
 	}
 
 	insertData := &dbmodel.PowerAssignMent{
-		UserId:  req.UserId,
-		GroupId: req.GroupId,
+		UserId:  int64(req.UserId),
+		GroupId: int64(req.GroupId),
 	}
 	err = dao.InsertPowerAssignmentData(insertData)
 	if err != nil {
@@ -70,9 +70,9 @@ func AddPermissionAssignmentHandler(ctx *web.WebContext, req *webmodel.AddPowerA
 	}
 
 	rsp.Data = &webmodel.PermissionGroupUserAssignmentInfo{
-		UserId:    assignmentUser.Rid,
+		UserId:    int(assignmentUser.Rid),
 		Name:      assignmentUser.Name,
-		GroupId:   assignmentGroup.GroupId,
+		GroupId:   int(assignmentGroup.GroupId),
 		GroupName: assignmentGroup.Name,
 	}
 	dao.Info(ctx, "add power assignment:%v name:%v group:%v is ok", insertData.UserId, assignmentUser.Name, assignmentGroup.Name)
@@ -92,7 +92,7 @@ func DelPermissionAssignmentHandler(ctx *web.WebContext, req *webmodel.DelPowerA
 		return err
 	}
 
-	err := dao.DelPowerAssignmentDataByIds([]int64{req.Id})
+	err := dao.DelPowerAssignmentDataByIds([]int64{int64(req.Id)})
 	if err != nil {
 		dao.Error(ctx, "del power assignment:%v is err:%v", req.Id, err)
 		return err

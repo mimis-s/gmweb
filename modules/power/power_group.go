@@ -10,6 +10,7 @@ import (
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
 	"github.com/mimis-s/gmweb/dao"
+	"github.com/mimis-s/gmweb/lib/parse"
 )
 
 // 权限组
@@ -27,7 +28,7 @@ func AddPermissionGroupHandler(ctx *web.WebContext, req *webmodel.AddPermissionG
 	}
 
 	// 查询这些添加的权限是否真实存在
-	powerDatas, err := dao.FindPowerDatas(req.PowerIds)
+	powerDatas, err := dao.FindPowerDatas(parse.SliceIntToInt64(req.PowerIds))
 	if err != nil {
 		dao.Error(ctx, "add power group is err:%v", err)
 		return err
@@ -41,7 +42,7 @@ func AddPermissionGroupHandler(ctx *web.WebContext, req *webmodel.AddPermissionG
 		Name:   req.Name,
 		Enable: &req.Enable,
 		ExtraData: &db_extra.PowerGroupExtra{
-			PowerIds: req.PowerIds,
+			PowerIds: parse.SliceIntToInt64(req.PowerIds),
 		},
 	}
 	err = dao.InsertPowerGroupData(insertData)
@@ -50,7 +51,7 @@ func AddPermissionGroupHandler(ctx *web.WebContext, req *webmodel.AddPermissionG
 		return err
 	}
 	rsp.Data = &webmodel.PermissionGroupInfo{
-		Id:       insertData.GroupId,
+		Id:       int(insertData.GroupId),
 		Name:     req.Name,
 		Enable:   req.Enable,
 		PowerIds: req.PowerIds,
@@ -72,7 +73,7 @@ func ModifyPermissionGroupHandler(ctx *web.WebContext, req *webmodel.ModifyPermi
 		return err
 	}
 
-	powerGroupData, find, err := dao.GetPowerGroupData(req.Data.Id)
+	powerGroupData, find, err := dao.GetPowerGroupData(int64(req.Data.Id))
 	if err != nil {
 		dao.Error(ctx, "modify power group is err:%v", err)
 		return err
@@ -84,7 +85,7 @@ func ModifyPermissionGroupHandler(ctx *web.WebContext, req *webmodel.ModifyPermi
 	}
 
 	// 查询这些添加的权限是否真实存在
-	powerDatas, err := dao.FindPowerDatas(req.Data.PowerIds)
+	powerDatas, err := dao.FindPowerDatas(parse.SliceIntToInt64(req.Data.PowerIds))
 	if err != nil {
 		dao.Error(ctx, "modify power group is err:%v", err)
 		return err
@@ -97,7 +98,7 @@ func ModifyPermissionGroupHandler(ctx *web.WebContext, req *webmodel.ModifyPermi
 
 	powerGroupData.Name = req.Data.Name
 	powerGroupData.Enable = &req.Data.Enable
-	powerGroupData.ExtraData.PowerIds = req.Data.PowerIds
+	powerGroupData.ExtraData.PowerIds = parse.SliceIntToInt64(req.Data.PowerIds)
 	err = dao.UpdatePowerGroupData(powerGroupData.GroupId, powerGroupData)
 	if err != nil {
 		dao.Error(ctx, "modify power group is err:%v", err)
@@ -122,7 +123,7 @@ func DelPermissionGroupHandler(ctx *web.WebContext, req *webmodel.DelPermissionG
 		return err
 	}
 
-	powerGroupData, find, err := dao.GetPowerGroupData(req.Id)
+	powerGroupData, find, err := dao.GetPowerGroupData(int64(req.Id))
 	if err != nil {
 		dao.Error(ctx, "del power group is err:%v", err)
 		return err

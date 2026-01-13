@@ -283,7 +283,7 @@ export const apiClient = {
     getLogs: (params) => api.post(Endpoints.GM_LOG, params),
 
     // 审核管理
-    getReviewAll: (data) => api.post(Endpoints.GM_REVIEW_ALL_GET, { data }),
+    getReviewAll: (data) => api.post(Endpoints.GM_REVIEW_ALL_GET, data),
     getReviewOrder: (orderid) => api.post(Endpoints.GM_REVIEW_ORDER_GET, { orderid: orderid }),
 
 };

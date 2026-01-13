@@ -119,14 +119,14 @@ export function createGmLogClass() {
 
         // 过滤和排序日志
         async filterAndSortLogs() {
-            let startTimestamp = new Date(this.state.filter.startDate).getTime()
-            let endTimestamp = new Date(this.state.filter.endDate).getTime()
+            let startTimestamp = new Date(this.state.filter.startDate).getTime().toString()
+            let endTimestamp = new Date(this.state.filter.endDate).getTime().toString()
             const getGmLogReq = {
                 UserName: this.state.filter.username,   // 用户名过滤(为空就是所有用户)
                 Ip: this.state.filter.ip,          // IP地址过滤(模糊匹配)
                 Level: Number(this.state.filter.level),       // 日志等级过滤(为0是所有等级)
-                StartTime: Number(startTimestamp),    // 日期范围过滤
-                EndTime: Number(endTimestamp),      // 日期范围过滤
+                StartTime: startTimestamp,    // 日期范围过滤
+                EndTime: endTimestamp,      // 日期范围过滤
                 Msg: this.state.filter.message,    // 消息内容过滤(模糊匹配)
             }
 
@@ -138,13 +138,13 @@ export function createGmLogClass() {
                 const logs = [];
                 for (let i = 0; i < response.message.datas.length; i++) {
                     const log = response.message.datas[i];
-                    const logDate = new Date(log.logtime);
+                    const logDate = new Date(Number(log.logtime));
                     logs.push({
                         id: log.userid,
                         username: log.username,
                         ip: log.ip,
                         level: log.level,
-                        time: logDate.toISOString(),
+                        time: logDate,
                         message: log.msg,
                     })
                 }

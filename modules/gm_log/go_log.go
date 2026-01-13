@@ -8,6 +8,7 @@ import (
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
 	"github.com/mimis-s/gmweb/dao"
+	"github.com/mimis-s/gmweb/lib/parse"
 )
 
 func GetGmLogHandler(ctx *web.WebContext, req *webmodel.GetGmLogReq, rsp *webmodel.GetGmLogRsp) error {
@@ -22,8 +23,9 @@ func GetGmLogHandler(ctx *web.WebContext, req *webmodel.GetGmLogReq, rsp *webmod
 		dao.Error(ctx, err.Error())
 		return err
 	}
-	startTime := int64(math.Floor(float64(req.StartTime / 1000)))
-	endTime := int64(math.Floor(float64(req.EndTime / 1000)))
+
+	startTime := int64(math.Floor(float64(parse.StringToInt64(req.StartTime) / 1000)))
+	endTime := int64(math.Floor(float64(parse.StringToInt64(req.EndTime) / 1000)))
 	gmLogs, err := dao.FindOperationLogDatas(startTime, endTime, req.Level, req.UserName, req.Ip, req.Msg)
 	if err != nil {
 		dao.Error(ctx, "find gm log is err:%v", err)
@@ -35,9 +37,9 @@ func GetGmLogHandler(ctx *web.WebContext, req *webmodel.GetGmLogReq, rsp *webmod
 			UserName: gmLog.UserName,
 			Ip:       gmLog.Ip,
 			Level:    gmLog.LogLevel,
-			LogTime:  gmLog.UpdateDate * 1000,
+			LogTime:  parse.Int64ToString(gmLog.UpdateDate * 1000),
 			Msg:      gmLog.LogStr,
-			UserId:   gmLog.UserId,
+			UserId:   int(gmLog.UserId),
 		})
 	}
 	return nil

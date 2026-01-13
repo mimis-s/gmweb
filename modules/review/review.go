@@ -7,6 +7,7 @@ import (
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
 	"github.com/mimis-s/gmweb/dao"
+	"github.com/mimis-s/gmweb/lib/parse"
 	"github.com/mimis-s/gmweb/modules/gm_common"
 )
 
@@ -17,13 +18,13 @@ func GetReviewHandler(ctx *web.WebContext, req *webmodel.GetReviewReq, rsp *webm
 		return nil
 	}
 
-	_, orderIds, err := dao.GetUserOrderByReview(ctx, req.ProjectId, user, define.EnumPowerReview_review)
+	_, orderIds, err := dao.GetUserOrderByReview(ctx, int64(req.ProjectId), user, define.EnumPowerReview_review)
 	if err != nil {
 		dao.Error(ctx, err.Error())
 		return err
 	}
 
-	datas, err := dao.FindReviewDatas(req.ProjectId, orderIds, req.StartTime, req.EndTime)
+	datas, err := dao.FindReviewDatas(int64(req.ProjectId), orderIds, parse.StringToInt64(req.StartTime), parse.StringToInt64(req.EndTime))
 	if err != nil {
 		dao.Error(ctx, err.Error())
 		return err
@@ -32,22 +33,25 @@ func GetReviewHandler(ctx *web.WebContext, req *webmodel.GetReviewReq, rsp *webm
 	rsp.Datas = make([]*webmodel.ReviewInfo, 0)
 	for _, data := range datas {
 		reviewModelData := &webmodel.ReviewInfo{
-			ProjectId:   data.ReviewDB.ProjectId,
+			Id:          int(data.ReviewDB.Id),
+			ProjectId:   int(data.ReviewDB.ProjectId),
 			ProjectName: data.ProjectDB.Name,
-			OrderId:     data.ReviewDB.OrderId,
+			OrderId:     int(data.ReviewDB.OrderId),
 			OrderName:   data.OrderDB.Name,
 			OrderDesc:   data.OrderDB.Desc,
-			UserId:      data.ReviewDB.UserId,
+			UserId:      int(data.ReviewDB.UserId),
 			UserName:    data.UserDB.Name,
+			NextStep:    data.ReviewDB.ExtraData.NextStepId,
 			ResultData:  make([]*webmodel.ReviewStep, 0),
-			StartDate:   data.ReviewDB.StartDate,
+			StartDate:   parse.Int64ToString(data.ReviewDB.StartDate),
 		}
 		for _, stepData := range data.ReviewDB.ExtraData.ResultData {
 			reviewModelData.ResultData = append(reviewModelData.ResultData, &webmodel.ReviewStep{
-				UserId:     stepData.UserId,
+				StepId:     int(stepData.StepId),
+				UserId:     int(stepData.UserId),
 				UserName:   stepData.UserName,
 				Status:     stepData.Status,
-				ReviewTime: stepData.ReviewTime,
+				ReviewTime: parse.Int64ToString(stepData.ReviewTime),
 				Desc:       stepData.Desc,
 			})
 		}
@@ -62,7 +66,7 @@ func GetUserOrderReviewHandler(ctx *web.WebContext, req *webmodel.GetUserOrderRe
 	if user == nil {
 		return nil
 	}
-	datas, err := dao.FindReviewByUserDatas(user.Rid, req.OrderId)
+	datas, err := dao.FindReviewByUserDatas(user.Rid, int64(req.OrderId))
 	if err != nil {
 		dao.Error(ctx, err.Error())
 		return err
@@ -70,22 +74,25 @@ func GetUserOrderReviewHandler(ctx *web.WebContext, req *webmodel.GetUserOrderRe
 	rsp.Datas = make([]*webmodel.ReviewInfo, 0)
 	for _, data := range datas {
 		reviewModelData := &webmodel.ReviewInfo{
-			ProjectId:   data.ReviewDB.ProjectId,
+			Id:          int(data.ReviewDB.Id),
+			ProjectId:   int(data.ReviewDB.ProjectId),
 			ProjectName: data.ProjectDB.Name,
-			OrderId:     data.ReviewDB.OrderId,
+			OrderId:     int(data.ReviewDB.OrderId),
 			OrderName:   data.OrderDB.Name,
 			OrderDesc:   data.OrderDB.Desc,
-			UserId:      data.ReviewDB.UserId,
+			UserId:      int(data.ReviewDB.UserId),
 			UserName:    data.UserDB.Name,
 			ResultData:  make([]*webmodel.ReviewStep, 0),
-			StartDate:   data.ReviewDB.StartDate,
+			NextStep:    data.ReviewDB.ExtraData.NextStepId,
+			StartDate:   parse.Int64ToString(data.ReviewDB.StartDate),
 		}
 		for _, stepData := range data.ReviewDB.ExtraData.ResultData {
 			reviewModelData.ResultData = append(reviewModelData.ResultData, &webmodel.ReviewStep{
-				UserId:     stepData.UserId,
+				StepId:     int(stepData.StepId),
+				UserId:     int(stepData.UserId),
 				UserName:   stepData.UserName,
 				Status:     stepData.Status,
-				ReviewTime: stepData.ReviewTime,
+				ReviewTime: parse.Int64ToString(stepData.ReviewTime),
 				Desc:       stepData.Desc,
 			})
 		}
@@ -101,7 +108,7 @@ func OrderReviewStepHandler(ctx *web.WebContext, req *webmodel.OrderReviewStepRe
 		return nil
 	}
 
-	reviewData, find, err := dao.GetReviewData(req.ReviewId)
+	reviewData, find, err := dao.GetReviewData(int64(req.ReviewId))
 	if err != nil {
 		dao.Error(ctx, "order review step：%v %v is err:%v", req.ReviewId, req.IsAgree, err)
 		return err
@@ -119,7 +126,7 @@ func OrderReviewStepHandler(ctx *web.WebContext, req *webmodel.OrderReviewStepRe
 		return err
 	}
 
-	stepData, err := gm_common.StepGmOrderReview(ctx, user, reviewData.ReviewDB.ProjectId, reviewData.ReviewDB.OrderId, req.ReviewId, req.IsAgree, false)
+	stepData, err := gm_common.StepGmOrderReview(ctx, user, reviewData.ReviewDB.ProjectId, reviewData.ReviewDB.OrderId, int64(req.ReviewId), req.IsAgree, false)
 	if err != nil {
 		return err
 	}
@@ -144,21 +151,24 @@ func OrderReviewStepHandler(ctx *web.WebContext, req *webmodel.OrderReviewStepRe
 		return err
 	}
 	rsp.Data = &webmodel.ReviewInfo{
-		ProjectId:   reviewData.ReviewDB.ProjectId,
+		Id:          int(reviewData.ReviewDB.Id),
+		ProjectId:   int(reviewData.ReviewDB.ProjectId),
 		ProjectName: reviewData.ProjectDB.Name,
-		OrderId:     reviewData.ReviewDB.OrderId,
+		OrderId:     int(reviewData.ReviewDB.OrderId),
 		OrderName:   reviewData.OrderDB.Name,
 		OrderDesc:   reviewData.OrderDB.Desc,
-		UserId:      reviewData.ReviewDB.UserId,
+		UserId:      int(reviewData.ReviewDB.UserId),
 		UserName:    reviewData.UserDB.Name,
+		NextStep:    reviewData.ReviewDB.ExtraData.NextStepId,
 		ResultData:  make([]*webmodel.ReviewStep, 0),
 	}
 	for _, stepData := range reviewData.ReviewDB.ExtraData.ResultData {
 		rsp.Data.ResultData = append(rsp.Data.ResultData, &webmodel.ReviewStep{
-			UserId:     stepData.UserId,
+			StepId:     int(stepData.StepId),
+			UserId:     int(stepData.UserId),
 			UserName:   stepData.UserName,
 			Status:     stepData.Status,
-			ReviewTime: stepData.ReviewTime,
+			ReviewTime: parse.Int64ToString(stepData.ReviewTime),
 			Desc:       stepData.Desc,
 		})
 	}
