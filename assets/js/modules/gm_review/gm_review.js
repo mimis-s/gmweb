@@ -30,7 +30,6 @@ export function createGmReviewClass() {
         // 创建步骤审批流程HTML
         async createStepsHTML(message) {
             let stepsHTML = '<div class="approval-process">';
-            stepsHTML += '<div class="process-title">审批流程</div>';
             stepsHTML += '<div class="steps-container">';
             // 步骤 -> 0: 发起gm命令 1: 审核 2: 完成
             let stepIds = [0, 1, 2];
@@ -54,9 +53,7 @@ export function createGmReviewClass() {
 
                 stepsHTML += `
                     <div class="${stepClass}" data-step-index="${stepId}" data-message-id="${message.id}">
-                        <div class="step-dot">
-                            ${stepId + 1}
-                        </div>
+                        <div class="step-dot"></div>
                         <div class="step-number">${stepStatusClass}</div>
                         <div class="step-content">${stepIdName[index]}</div>
                     </div>

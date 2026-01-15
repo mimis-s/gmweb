@@ -73,7 +73,7 @@
         .message {
             background: white;
             border-radius: 12px;
-            padding: 25px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
@@ -94,11 +94,11 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 25px;
         }
 
         .message-content {
             flex: 1;
+            text-align: left;
         }
 
         .message-text {
@@ -156,19 +156,10 @@
             position: relative;
             padding: 20px 0;
         }
-
-        .process-title {
-            font-size: 1rem;
-            color: #7f8c8d;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
         .steps-container {
             display: flex;
             justify-content: space-between;
             position: relative;
-            margin-top: 10px;
         }
 
         .step {
@@ -188,12 +179,12 @@
             align-items: center;
             justify-content: center;
             /*left: 60%;*/
-            width: 80%;
-            height: 3px;
+            width: 90%;
+            height: 2px;
             background-color: #e0e0e0;
             z-index: 1;
             transition: all 0.5s ease;
-            transform: translate(60%, calc(-50% + 15px)); /* 向上偏移10px */
+            transform: translate(55%, calc(-50% + 8px)); /* 向上偏移10px */
         }
 
         .step.completed:not(:last-child)::after {
@@ -205,8 +196,8 @@
         }
 
         .step-dot {
-            width: 30px;
-            height: 30px;
+            width: 15px;
+            height: 15px;
             border-radius: 50%;
             background-color: #e0e0e0;
             display: flex;
@@ -285,7 +276,7 @@
         .bubble-tooltip::after {
             content: '';
             position: absolute;
-            top: 100%;  /* 箭头在气泡底部 */
+            top: 99%;  /* 箭头在气泡底部 */
             left: 50%;
             transform: translateX(-50%);
             border-width: 8px;
@@ -296,7 +287,7 @@
         .bubble-tooltip.show {
             opacity: 1;
             visibility: visible;
-            transform: translateX(-50%) translateY(0);
+            transform: translateX(-50%) translateY(-10px);
         }
 
         .bubble-title {
