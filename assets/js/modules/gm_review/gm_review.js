@@ -155,17 +155,18 @@ export function createGmReviewClass() {
             let stepIdName = ["GM请求", "审核", "执行"];
             stepIds.forEach((stepId, index) => {
                 const step = message.resultdata.find(s => s.stepid === stepId);
-                const stepEl = stepElements[index]
-                // 创建气泡框
+                const stepEl = stepElements[index];
+                const stepDot = stepEl.querySelector('.step-dot');
+                
+                // 创建气泡框并插入到 step-dot 内部
                 const bubbleHTML =  this.createBubbleHTML(step, index, message.id);
-                stepEl.insertAdjacentHTML('beforeend', bubbleHTML);
+                stepDot.insertAdjacentHTML('beforeend', bubbleHTML);
 
-                const bubble = stepEl.querySelector('.bubble-tooltip');
+                const bubble = stepDot.querySelector('.bubble-tooltip');
 
-                // 鼠标进入事件
-
-                const stepDot = stepEl.querySelector('.step-dot')
+                // 鼠标进入事件 - 使用 fixed 定位计算位置
                 stepDot.addEventListener('mouseenter', () => {
+                    const rect = stepDot.getBoundingClientRect();
                     bubble.classList.add('show');
                 });
 

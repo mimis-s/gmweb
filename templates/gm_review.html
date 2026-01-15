@@ -67,6 +67,7 @@
             flex-direction: column;
             gap: 30px;
             transition: all 0.4s ease;
+            overflow: visible;  /* 允许气泡溢出显示 */
         }
 
         .message {
@@ -78,7 +79,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
             transition: all 0.4s ease;
             position: relative;
-            overflow: hidden;
+            overflow: visible;  /* 允许气泡溢出显示 */
             border-left: 4px solid #3498db;
             transform: translateY(0);
         }
@@ -178,18 +179,21 @@
             z-index: 2;
             flex: 1;
             cursor: pointer;
+            padding-top: 50px;  /* 为气泡留出空间 */
         }
 
         .step:not(:last-child)::after {
             content: '';
             position: absolute;
-            top: 15px;
-            left: 60%;
+            align-items: center;
+            justify-content: center;
+            /*left: 60%;*/
             width: 80%;
             height: 3px;
             background-color: #e0e0e0;
             z-index: 1;
             transition: all 0.5s ease;
+            transform: translate(60%, calc(-50% + 15px)); /* 向上偏移10px */
         }
 
         .step.completed:not(:last-child)::after {
@@ -211,7 +215,6 @@
             color: white;
             font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 10px;
             position: relative;
             z-index: 3;
             transition: all 0.5s ease;
@@ -261,9 +264,9 @@
         /* 气泡框样式 */
         .bubble-tooltip {
             position: absolute;
-            top: -90px;
+            bottom: 100%;  /* 相对于 step-dot 底部定位到上方 */
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(-10px);
             background-color: #2c3e50;
             color: white;
             padding: 12px 16px;
@@ -282,18 +285,18 @@
         .bubble-tooltip::after {
             content: '';
             position: absolute;
-            top: 100%;
+            top: 100%;  /* 箭头在气泡底部 */
             left: 50%;
             transform: translateX(-50%);
             border-width: 8px;
             border-style: solid;
-            border-color: #2c3e50 transparent transparent transparent;
+            border-color: #2c3e50 transparent transparent transparent;  /* 箭头向下指向圆点 */
         }
 
         .bubble-tooltip.show {
             opacity: 1;
             visibility: visible;
-            top: -100px;
+            transform: translateX(-50%) translateY(0);
         }
 
         .bubble-title {
