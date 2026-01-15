@@ -32,27 +32,23 @@ export function createGmReviewClass() {
             let stepsHTML = '<div class="approval-process">';
             stepsHTML += '<div class="process-title">审批流程</div>';
             stepsHTML += '<div class="steps-container">';
-            // type ReviewStep struct {
-            //     StepId     int                         `json:"stepid"`
-            //     UserId     int64                       `json:"userid"` // 当前步骤的审批人
-            //     UserName   string                      `json:"username"`
-            //     Status     define.EnumReviewStepStatus `json:"status"`     // 状态(1:成功, 2:等待审批, 3:失败)
-            //     ReviewTime int64                       `json:"reviewtime"` // 审核时间
-            //     Desc       string                      `json:"desc"`       // 步骤具体信息(可以填当前步骤的gm命令,也可以是执行之后的返回值)
-            // }
             // 步骤 -> 0: 发起gm命令 1: 审核 2: 完成
             let stepIds = [0, 1, 2];
-            let stepIdName = ["GM请求", "审核", "完成"];
+            let stepIdName = ["GM请求", "审核", "执行"];
             stepIds.forEach((stepId, index) => {
                 const step = message.resultdata.find(s => s.stepid === stepId);
                 let stepClass = "step";
+                let stepStatusClass = "pending";
                 if (step) {
                     if (step.status === 0) { // 成功
                         stepClass = "step completed";
+                        stepStatusClass = "success"
                     } else if (step.status === 1) { // pending
                         stepClass = "step current";
+                        stepStatusClass = "pending"
                     } else if (step.status === 2) { // 失败
                         stepClass = "step rejected";
+                        stepStatusClass = "fail"
                     }
                 }
 
@@ -61,7 +57,7 @@ export function createGmReviewClass() {
                         <div class="step-dot">
                             ${stepId + 1}
                         </div>
-                        <div class="step-number">步骤${stepId + 1}</div>
+                        <div class="step-number">${stepStatusClass}</div>
                         <div class="step-content">${stepIdName[index]}</div>
                     </div>
                 `;
@@ -73,36 +69,51 @@ export function createGmReviewClass() {
 
         // 创建气泡框HTML
         createBubbleHTML(step, stepIndex, messageId) {
-            // const stepDef = this.state.stepDefinitions.find(s => s.id === step.stepid);
             let stepDef = {
-                name: "完成",
-                description: step.desc,
-            }
-            if (!step && step.stepid == 0) {
-                stepDef.name = "发起GM命令";
-            }else if (!step && step.stepid == 1) {
-                stepDef.name = "审核";
-            }else if (!step && step.stepid == 2) {
-                stepDef.name = "发送";
+                name: "待审核",
+                description: "",
+                username: "",
+                userid: 0,
+                reviewtime: 0,
             }
 
-            let statusText = "";
-            let statusClass = "";
-
-            switch (step.status) {
-                case 0: // 成功
-                    statusText = "成功";
-                    statusClass = "completed";
-                    break;
-                case 1: // pending
-                    statusText = "进行中";
-                    statusClass = "pending";
-                    break;
-                case 2: // 失败
-                    statusText = "已完成";
-                    statusClass = "rejected";
-                    break;
+            let statusText = "进行中";
+            let statusClass = "pending";
+            if (step) {
+                stepDef.description = step.desc;
+                stepDef.username = step.username;
+                stepDef.userid = step.userid;
+                stepDef.reviewtime = step.reviewtime;
+                switch (step.stepid){
+                    case 0:
+                        stepDef.name = "发起GM命令";
+                        stepDef.description = `${step.desc}`;
+                        break;
+                    case 1:
+                        stepDef.name = "审核结果";
+                        stepDef.description = `${step.desc}`;
+                        break;
+                    case 2:
+                        stepDef.name = "执行结果";
+                        stepDef.description = `${step.desc}`;
+                        break;
+                }
+                switch (step.status) {
+                    case 0: // 成功
+                        statusText = "成功";
+                        statusClass = "completed";
+                        break;
+                    case 1: // pending
+                        statusText = "进行中";
+                        statusClass = "pending";
+                        break;
+                    case 2: // 失败
+                        statusText = "已完成";
+                        statusClass = "rejected";
+                        break;
+                }
             }
+
 
             let bubbleHTML = `
                 <div class="bubble-tooltip" id="bubble-${messageId}-${stepIndex}">
@@ -110,9 +121,9 @@ export function createGmReviewClass() {
                     <div class="bubble-desc">${stepDef ? stepDef.description : ""}</div>
             `;
 
-            if (step.username) {
+            if (stepDef.username) {
                 bubbleHTML += `
-                    <div><strong>审批人:</strong> ${step.username} (${step.userid})</div>
+                    <div><strong>审批人:</strong> ${stepDef.username} (${stepDef.userid})</div>
                 `;
             } else {
                 bubbleHTML += `
@@ -120,8 +131,8 @@ export function createGmReviewClass() {
                 `;
             }
 
-            if (step.reviewtime) {
-                const reviewtime = new Date(Number(step.reviewtime));
+            if (stepDef.reviewtime !== 0) {
+                const reviewtime = new Date(Number(stepDef.reviewtime));
                 const timeStr = new Date(reviewtime).toLocaleString('zh-CN');
                 bubbleHTML += `
                     <div><strong>审批时间:</strong> ${timeStr}</div>
@@ -140,9 +151,11 @@ export function createGmReviewClass() {
         async addStepHoverEvents(messageElement, message) {
             const stepElements = messageElement.querySelectorAll('.step');
 
-            stepElements.forEach((stepEl, index) => {
-                const step = message.resultdata[index];
-
+            let stepIds = [0, 1, 2];
+            let stepIdName = ["GM请求", "审核", "执行"];
+            stepIds.forEach((stepId, index) => {
+                const step = message.resultdata.find(s => s.stepid === stepId);
+                const stepEl = stepElements[index]
                 // 创建气泡框
                 const bubbleHTML =  this.createBubbleHTML(step, index, message.id);
                 stepEl.insertAdjacentHTML('beforeend', bubbleHTML);
@@ -150,12 +163,14 @@ export function createGmReviewClass() {
                 const bubble = stepEl.querySelector('.bubble-tooltip');
 
                 // 鼠标进入事件
-                stepEl.addEventListener('mouseenter', () => {
+
+                const stepDot = stepEl.querySelector('.step-dot')
+                stepDot.addEventListener('mouseenter', () => {
                     bubble.classList.add('show');
                 });
 
                 // 鼠标离开事件
-                stepEl.addEventListener('mouseleave', () => {
+                stepDot.addEventListener('mouseleave', () => {
                     bubble.classList.remove('show');
                 });
             });
@@ -196,8 +211,6 @@ export function createGmReviewClass() {
                         已拒绝
                     </div>
                 `;
-            } else {
-
             }
 
             // 创建步骤审批HTML
@@ -421,8 +434,13 @@ export function createGmReviewClass() {
         async updateBubbleTooltips(messageElement, message) {
             const stepElements = messageElement.querySelectorAll('.step');
 
-            stepElements.forEach((stepEl, index) => {
-                const step = message.steps[index];
+            let stepIds = [0, 1, 2];
+            let stepIdName = ["GM请求", "审核", "执行"];
+            stepIds.forEach((stepId, index) => {
+                const step = message.resultdata.find(s => s.stepid === stepId);
+                const stepEl = stepElements[index]
+            // stepElements.forEach((stepEl, index) => {
+            //     const step = message.steps[index];
                 const bubble = stepEl.querySelector('.bubble-tooltip');
 
                 if (bubble) {
