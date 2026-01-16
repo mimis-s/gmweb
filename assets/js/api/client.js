@@ -285,7 +285,7 @@ export const apiClient = {
     // 审核管理
     getReviewAll: (data) => api.post(Endpoints.GM_REVIEW_ALL_GET, data),
     getReviewOrder: (orderid) => api.post(Endpoints.GM_REVIEW_ORDER_GET, { orderid: orderid }),
-
+    setReviewStep: (data) => api.post(Endpoints.GM_REVIEW_STEP_SET, data),
 };
 
 // 导出 HTML 加载器

@@ -43,5 +43,5 @@ export const Endpoints = {
     // 审核管理
     GM_REVIEW_ALL_GET: '/api/review/all/get',
     GM_REVIEW_ORDER_GET: '/api/review/order/get',
-
+    GM_REVIEW_STEP_SET: '/api/review/step/set',
 };

@@ -84,6 +84,7 @@ func Init(s *app.Registry, htmlEmbed embed.FS, assetsEmbed embed.FS) {
 		// 审核
 		engine.PostWithStructParams("/api/review/all/get", "获取所有可以查看的审核信息", webmodel.GetReviewReq{}, controllerHandler.PostApiGetReview)
 		engine.PostWithStructParams("/api/review/order/get", "获取单个命令的审核信息", webmodel.GetUserOrderReviewReq{}, controllerHandler.PostApiGetUserOrderReview)
+		engine.PostWithStructParams("/api/review/step/set", "审核命令", webmodel.OrderReviewStepReq{}, controllerHandler.PostApiOrderReviewStep)
 
 		a.AddServer("gmweb", engine)
 		return nil

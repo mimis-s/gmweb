@@ -2,7 +2,9 @@ package review
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/mimis-s/gmweb/common/dbmodel/db_extra"
 	"github.com/mimis-s/gmweb/common/define"
 	"github.com/mimis-s/gmweb/common/web"
 	"github.com/mimis-s/gmweb/common/webmodel"
@@ -138,13 +140,24 @@ func OrderReviewStepHandler(ctx *web.WebContext, req *webmodel.OrderReviewStepRe
 
 	firstStep := reviewData.ReviewDB.ExtraData.ResultData[0]
 
-	stepData, err = gm_common.StepGmOrderPush(ctx, user, firstStep.UserId, firstStep.UserName, reviewData.OrderDB, reviewData.ProjectDB, firstStep.Desc)
-	if err != nil {
-		dao.Error(ctx, "order review step：%v %v is err:%v", req.ReviewId, req.IsAgree, err)
-		return err
+	lastStep := &db_extra.ReviewStep{
+		StepId:     define.EnumOrderStep_Push,
+		UserId:     user.Rid,
+		UserName:   user.Name,
+		Status:     define.EnumReviewStepStatus_refuse,
+		ReviewTime: time.Now().Unix(),
+		Desc:       "审批已拒绝",
+	}
+
+	if req.IsAgree {
+		lastStep, err = gm_common.StepGmOrderPush(ctx, user, firstStep.UserId, firstStep.UserName, reviewData.OrderDB, reviewData.ProjectDB, firstStep.Desc)
+		if err != nil {
+			dao.Error(ctx, "order review step：%v %v is err:%v", req.ReviewId, req.IsAgree, err)
+			return err
+		}
 	}
 	reviewData.ReviewDB.ExtraData.NextStepId++
-	reviewData.ReviewDB.ExtraData.ResultData = append(reviewData.ReviewDB.ExtraData.ResultData, stepData)
+	reviewData.ReviewDB.ExtraData.ResultData = append(reviewData.ReviewDB.ExtraData.ResultData, lastStep)
 	err = dao.UpdateReviewData(reviewData.ReviewDB.Id, reviewData.ReviewDB)
 	if err != nil {
 		dao.Error(ctx, "order review step：%v %v is err:%v", req.ReviewId, req.IsAgree, err)

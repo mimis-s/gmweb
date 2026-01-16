@@ -368,7 +368,7 @@ type GetUserOrderReviewRsp struct {
 // 审核命令
 type OrderReviewStepReq struct {
 	ReviewId int  `json:"reviewid"` // 审核id
-	IsAgree  bool `json:"is_agree"` // 是否同意(true:同意, false:拒绝)
+	IsAgree  bool `json:"isagree"`  // 是否同意(true:同意, false:拒绝)
 }
 
 type OrderReviewStepRsp struct {

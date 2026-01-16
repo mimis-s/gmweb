@@ -42,4 +42,6 @@ var (
 	EnumReviewStepStatus_success EnumReviewStepStatus = 0 // 成功
 	EnumReviewStepStatus_pending EnumReviewStepStatus = 1 // pending
 	EnumReviewStepStatus_fail    EnumReviewStepStatus = 2 // 失败
+	EnumReviewStepStatus_agree   EnumReviewStepStatus = 3 // 同意
+	EnumReviewStepStatus_refuse  EnumReviewStepStatus = 4 // 拒绝
 )

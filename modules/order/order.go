@@ -214,7 +214,7 @@ func SendGmOrderHandler(ctx *web.WebContext, req *webmodel.SendGmOrderReq, rsp *
 		dao.Error(ctx, err.Error())
 	}
 
-	err = afterAutoReview(ctx, user, reviewData)
+	//err = afterAutoReview(ctx, user, reviewData)
 	rsp.Data = &webmodel.ReviewInfo{
 		ProjectId:   int(reviewData.ReviewDB.ProjectId),
 		ProjectName: reviewData.ProjectDB.Name,

@@ -48,6 +48,12 @@ export function createGmReviewClass() {
                     } else if (step.status === 2) { // 失败
                         stepClass = "step rejected";
                         stepStatusClass = "fail"
+                    } else if (step.status === 3) { // 同意
+                        stepClass = "step completed";
+                        stepStatusClass = "agree"
+                    } else if (step.status === 4) { // 拒绝
+                        stepClass = "step rejected";
+                        stepStatusClass = "refuse"
                     }
                 }
 
@@ -106,6 +112,14 @@ export function createGmReviewClass() {
                         break;
                     case 2: // 失败
                         statusText = "已完成";
+                        statusClass = "rejected";
+                        break;
+                    case 3: // 同意
+                        statusText = "同意";
+                        statusClass = "completed";
+                        break;
+                    case 4: // 拒绝
+                        statusText = "拒绝";
                         statusClass = "rejected";
                         break;
                 }
@@ -298,124 +312,19 @@ export function createGmReviewClass() {
             if (messageIndex === -1) return;
 
             const message = this.state.messages[messageIndex];
-
+            let isAgree = false;
             if (action === 'approve') {
-                // 同意操作：将当前步骤标记为已完成
-                // 随机选择一个审批人
-                const approverId = Math.floor(Math.random() * 5) + 1;
-                // 生成当前时间作为审批时间
-                const now = new Date();
-                const approveTime = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-                message.steps[message.currentStep].status = "completed";
-                message.steps[message.currentStep].approverId = approverId;
-                message.steps[message.currentStep].approveTime = approveTime;
-
-                // 检查是否还有下一步
-                if (message.currentStep < message.steps.length - 1) {
-                    // 还有下一步，更新当前步骤
-                    message.currentStep++;
-                    message.steps[message.currentStep].status = "current";
-                    message.status = "in-progress";
-
-                    // 创建新的状态标签
-                    const statusLabel = document.createElement('div');
-                    statusLabel.className = 'status-label in-progress';
-                    statusLabel.innerHTML = `
-                        <i class="fas fa-spinner fa-pulse"></i>
-                        进行中 (${message.currentStep + 1}/${message.steps.length})
-                    `;
-
-                    // 替换按钮容器
-                    const actionsContainer = messageElement.querySelector('.message-actions');
-                    actionsContainer.parentNode.replaceChild(statusLabel, actionsContainer);
-
-                    // 更新步骤显示
-                    const stepElements = messageElement.querySelectorAll('.step');
-                    stepElements.forEach((stepEl, index) => {
-                        stepEl.className = 'step';
-                        if (index < message.currentStep) {
-                            stepEl.classList.add('completed');
-                        } else if (index === message.currentStep) {
-                            stepEl.classList.add('current');
-                        }
-                    });
-
-                    // 更新气泡框
-                    await this.updateBubbleTooltips(messageElement, message);
-                } else {
-                    // 所有步骤已完成，整个流程通过
-                    message.status = "approved";
-
-                    // 创建已同意状态标签
-                    const statusLabel = document.createElement('div');
-                    statusLabel.className = 'status-label approved';
-                    statusLabel.innerHTML = `
-                        <i class="fas fa-check-circle"></i>
-                        已同意
-                    `;
-
-                    // 替换按钮容器
-                    const actionsContainer = messageElement.querySelector('.message-actions');
-                    actionsContainer.parentNode.replaceChild(statusLabel, actionsContainer);
-
-                    // 添加已处理样式
-                    messageElement.classList.add('processed');
-
-                    // 更新所有步骤显示为已完成
-                    const stepElements = messageElement.querySelectorAll('.step');
-                    stepElements.forEach(stepEl => {
-                        stepEl.className = 'step completed';
-                    });
-
-                    // 更新气泡框
-                    await this.updateBubbleTooltips(messageElement, message);
-                }
-            } else {
-                // 拒绝操作：将当前步骤标记为已拒绝
-                // 随机选择一个审批人
-                const approverId = Math.floor(Math.random() * 5) + 1;
-                // 生成当前时间作为审批时间
-                const now = new Date();
-                const approveTime = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-                message.steps[message.currentStep].status = "rejected";
-                message.steps[message.currentStep].approverId = approverId;
-                message.steps[message.currentStep].approveTime = approveTime;
-                message.status = "rejected";
-
-                // 创建已拒绝状态标签
-                const statusLabel = document.createElement('div');
-                statusLabel.className = 'status-label rejected';
-                statusLabel.innerHTML = `
-                    <i class="fas fa-times-circle"></i>
-                    已拒绝
-                `;
-
-                // 替换按钮容器
-                const actionsContainer = messageElement.querySelector('.message-actions');
-                actionsContainer.parentNode.replaceChild(statusLabel, actionsContainer);
-
-                // 添加已处理样式
-                messageElement.classList.add('processed');
-
-                // 更新步骤显示
-                const stepElements = messageElement.querySelectorAll('.step');
-                stepElements.forEach((stepEl, index) => {
-                    stepEl.className = 'step';
-                    if (index < message.currentStep) {
-                        stepEl.classList.add('completed');
-                    } else if (index === message.currentStep) {
-                        stepEl.classList.add('rejected');
-                    }
-                });
-
-                // 更新气泡框
-                await this.updateBubbleTooltips(messageElement, message);
+                isAgree = true
             }
-
+            const setReviewStepReq = {
+                reviewId: message.id,
+                isagree: isAgree,
+            }
+            const response = await apiClient.setReviewStep(setReviewStepReq)
             // 更新消息数组
             this.state.messages[messageIndex] = message;
+
+            await this.createMessageElement(response.message.data, messageElement)
 
             // 添加平滑动画效果
             messageElement.style.transition = 'all 0.5s ease';

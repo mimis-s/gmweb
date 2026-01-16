@@ -396,3 +396,14 @@ func (c *ControllerHandler) PostApiGetUserOrderReview(ctx *web.WebContext, req *
 	}
 	ctx.SuccessOk(rsp)
 }
+
+// 审核命令
+func (c *ControllerHandler) PostApiOrderReviewStep(ctx *web.WebContext, req *webmodel.OrderReviewStepReq) {
+	rsp := &webmodel.OrderReviewStepRsp{}
+	if err := review.OrderReviewStepHandler(ctx, req, rsp); err != nil {
+		log.Errorf("step order review is err:%v", err)
+		ctx.Err("step order review is err:%v", err)
+		return
+	}
+	ctx.SuccessOk(rsp)
+}

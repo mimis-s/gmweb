@@ -177,15 +177,17 @@ func StepGmOrderReview(ctx *web.WebContext, user *dao.CacheUser, reviewProjectId
 	}
 
 	desc := "拒绝"
+	status := define.EnumReviewStepStatus_refuse
 	if isAgree {
 		desc = "同意"
+		status = define.EnumReviewStepStatus_agree
 	}
 
 	stepData := &db_extra.ReviewStep{
 		StepId:     define.EnumOrderStep_review,
 		UserId:     user.Rid,
 		UserName:   user.Name,
-		Status:     define.EnumReviewStepStatus_success,
+		Status:     status,
 		ReviewTime: time.Now().Unix(),
 		Desc:       desc,
 	}
